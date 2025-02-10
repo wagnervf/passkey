@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:passkey/src/core/router/routes.dart';
+import 'package:passkey/src/core/utils/utils.dart';
 import 'package:passkey/src/modules/auth/model/auth_user_model.dart';
 
 class InitialScreen extends StatelessWidget {
@@ -41,37 +42,47 @@ class InitialScreen extends StatelessWidget {
             ),
             const SizedBox(height: 80),
 
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ElevatedButton(
-                  onPressed: () => _acessar(context),
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 30, vertical: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  child: const Text(
-                    "Acessar",
-                    style: TextStyle(
-                     fontWeight: FontWeight.bold,
-                     fontSize: 18
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 20),
-                TextButton(
-                  child: Text(
-                    "Criar Conta",
-                    style: Theme.of(context).textTheme.displaySmall,
-                  ),
-                  onPressed: () => _registrar(context),
-                ),
-              ],
-            )
+            buttonCriarConta(context),
+            const SizedBox(height: 20),
+            buttoAcesssar(context) 
+           
           ],
+        ),
+      ),
+    );
+  }
+
+  SizedBox buttonCriarConta(BuildContext context) {
+    return SizedBox(
+      width: MediaQuery.of(context).size.width * .9,
+      height: 50,
+      child: OutlinedButton(
+        onPressed: () => _registrar(context),
+        // style: ElevatedButton.styleFrom(
+        //   padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+        //   shape: RoundedRectangleBorder(
+        //     borderRadius: BorderRadius.circular(10),
+        //   ),
+        // ),
+        child: const Text(
+          "Criar Conta",
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+        ),
+      ),
+    );
+  }
+
+
+   SizedBox buttoAcesssar(BuildContext context) {
+    return SizedBox(
+      width: MediaQuery.of(context).size.width * .9,
+      height: 50,
+      child: ElevatedButton(
+        onPressed: () => _acessar(context),
+        style: Utils.styleButtonElevated(),
+        child: const Text(
+          "Acessar",
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
         ),
       ),
     );

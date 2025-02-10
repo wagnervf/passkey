@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:passkey/src/core/utils/utils.dart';
 import 'package:passkey/src/modules/register/controller/register_controller.dart';
 import 'package:passkey/src/modules/register/model/registro_model.dart';
 import 'package:provider/provider.dart';
@@ -20,10 +21,13 @@ class _TextFieldImportRegisterState extends State<TextFieldImportRegister> {
 
   @override
   Widget build(BuildContext context) {
-    return TextButton.icon(
-      onPressed: () => _mostrarModal(context),
-      label: const Text('Importar Registro'),
-      icon: const Icon(Icons.restart_alt_outlined),
+    return Align(
+      alignment: Alignment.topRight,
+      child: TextButton.icon(
+        onPressed: () => _mostrarModal(context),
+        label: const Text('Importar Registro'),
+        icon: const Icon(Icons.restart_alt_outlined),
+      ),
     );
   }
 
@@ -32,24 +36,29 @@ class _TextFieldImportRegisterState extends State<TextFieldImportRegister> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text("Importar Registro"),
-          titleTextStyle: Theme.of(context).textTheme.titleSmall,
+          actionsPadding: EdgeInsets.all(0),
+          title: const Text("Importar Registro", style: TextStyle(fontSize: 18),),
+          titleTextStyle: Theme.of(context).textTheme.titleMedium,
           content: textFlield(context),
+          actionsAlignment: MainAxisAlignment.center,
+
           actions: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop(); // Fecha o modal
-                  },
-                  child: OutlinedButton(
-                    child: const Text("Fechar"),
-                    onPressed: () => Navigator.of(context).pop(),
+            Padding(
+              padding: const EdgeInsets.all(18.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  buttonImport(context),
+                  SizedBox(height: 10,),
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton(
+                      child: const Text("Fechar"),
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
                   ),
-                ),
-                buttonImport(context),
-              ],
+                ],
+              ),
             ),
           ],
         );
@@ -57,34 +66,38 @@ class _TextFieldImportRegisterState extends State<TextFieldImportRegister> {
     );
   }
 
-  ElevatedButton buttonImport(BuildContext context) {
+  SizedBox buttonImport(BuildContext context) {
     String jsonContent = jsonController.text;
 
-    return ElevatedButton(
-      onPressed: () async {
-        if (jsonContent.isNotEmpty) {
-          var registroImportado = await importarRegistro(jsonContent);
+    return SizedBox(
+      width: double.infinity,
+      height: 50,
+      child: ElevatedButton(
+        onPressed: () async {
+          if (jsonContent.isNotEmpty) {
+            var registroImportado = await importarRegistro(jsonContent);
 
-          if (registroImportado != null) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                  content: const Text('Registro importado com sucesso!')),
-            );
+            if (registroImportado != null) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                    content: const Text('Registro importado com sucesso!')),
+              );
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                    content:
+                        Text('Erro ao importar registro! Verifique o JSON.')),
+              );
+            }
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                  content:
-                      Text('Erro ao importar registro! Verifique o JSON.')),
+              const SnackBar(content: Text('O campo JSON está vazio!')),
             );
           }
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('O campo JSON está vazio!')),
-          );
-        }
-      },
-      child: const Text('Importar Registro'),
-    );  
+        },
+        child: Text('Importar Registro', style: TextStyle(fontSize: 18),),
+      ),
+    );
   }
 
   SizedBox textFlield(BuildContext context) {

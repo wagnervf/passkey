@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:passkey/src/core/backup_restore/text_field_import_register.dart';
+import 'package:passkey/src/core/components/form_field_input_password.dart';
 import 'package:passkey/src/core/components/my_text_field.dart';
 import 'package:passkey/src/core/components/show_messeger.dart';
 import 'package:passkey/src/core/router/routes.dart';
@@ -43,11 +44,6 @@ class _RegisterFormState extends State<RegisterForm> {
     });
 
     // _typeSelecionado = TipoRegisterModel(
-    //   id: 7,
-    //   name: 'Amazon',
-    //   icon: 'amazon',
-    //   color: const Color(0xFFFF9900),
-    // );
   }
 
   loadEdits(RegisterModel register) {
@@ -80,97 +76,82 @@ class _RegisterFormState extends State<RegisterForm> {
     return Scaffold(
       appBar: AppBar(
         title: Text(edit ? 'Editar registro' : 'Novo registro'),
-        actions: [
-          TextFieldImportRegister()
-         
-        ],
-      ),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            botaoFechar(context),
-            botaoSalvar(context),
-          ],
-        ),
       ),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Form(
-            key: _formularioKey,
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Padding(
-                  //   padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                  //   child: Text(
-                  //     'Tipo',
-                  //     style: Theme.of(context).textTheme.labelSmall,
-                  //   ),
-                  // ),
-                  // selecionarTipo(context),
-                  SizedBox(height: size.height * 0.02),
-                  MyTextField(
-                    myController: _titleController,
-                    fieldName: "Título",
-                  ),
-                  SizedBox(height: size.height * 0.02),
-                  MyTextField(
-                    myController: _loginController,
-                    fieldName: "Login",
-                  ),
-                  SizedBox(height: size.height * 0.02),
-                  TextFormField(
-                    controller: _passwordController,
-                    obscureText: _obscureText,
-                    decoration: decorationField(
-                      'Senha',
-                      const Icon(
-                        Icons.key,
-                      ),
+        child: LayoutBuilder(builder: (context, constraint) {
+          return SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: constraint.maxHeight),
+              child: IntrinsicHeight(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Form(
+                    key: _formularioKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                           SizedBox(
+                            width: size.width * .9,
+                            height: 50,
+                            child: TextFieldImportRegister()),
+                        SizedBox(height: size.height * 0.02),
+                        MyTextField(
+                          myController: _titleController,
+                          description: "Título",
+                        ),
+                        SizedBox(height: size.height * 0.02),
+                        MyTextField(
+                          myController: _loginController,
+                          description: "Login",
+                        ),
+                        SizedBox(height: size.height * 0.02),
+                        FormFieldInputPassword(
+                          passwordController: _passwordController,
+                          copy: true,
+                        ),
+                        const SizedBox(height: 10),
+                        SizedBox(height: size.height * 0.02),
+                        MyTextField(
+                          myController: _siteController,
+                          description: "Endereço Web",
+                          icon: Icons.language,
+                        ),
+                        SizedBox(height: size.height * 0.02),
+                        MyTextField(
+                          myController: _descriptionController,
+                          description: "Observação",
+                        ),
+                       
+                     
+                        const Spacer(),
+                        botaoSalvar(context),
+                        SizedBox(height: size.height * 0.02),
+                        botaoFechar(context),
+                         SizedBox(height:20),
+                      ],
                     ),
                   ),
-                  SizedBox(height: size.height * 0.02),
-                  MyTextField(
-                    myController: _siteController,
-                    fieldName: "Endereço Web",
-                    myIcon: Icons.language,
-                  ),
-                  SizedBox(height: size.height * 0.02),
-                  MyTextField(
-                    myController: _descriptionController,
-                    fieldName: "Observação",
-                  ),
-                ],
+                ),
               ),
             ),
-          ),
-        ),
+          );
+        }),
       ),
     );
   }
 
-  Padding botaoSalvar(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: SizedBox(
-        width: Utils.width(context) * 0.35,
-        height: 50,
-        child: FilledButton(
-          onPressed: () async {
-            await acaoSalvarRegistro(context);
-          },
-          // },
-          child: Text(
-            'Salvar',
-            style: Theme.of(context)
-                .textTheme
-                .bodyLarge!
-                .copyWith(color: Colors.white),
-          ),
+  SizedBox botaoSalvar(BuildContext context) {
+    return SizedBox(
+      width: Utils.width(context) * .9,
+      height: 60,
+      child: ElevatedButton(
+        style: Utils.styleButtonElevated(),
+        onPressed: () async {
+          await acaoSalvarRegistro(context);
+        },
+        child: Text(
+          'Salvar',
+          style: TextStyle(fontSize: 20),
         ),
       ),
     );
@@ -178,14 +159,18 @@ class _RegisterFormState extends State<RegisterForm> {
 
   botaoFechar(BuildContext context) {
     return SizedBox(
-      width: Utils.width(context) * 0.3,
+      width: Utils.width(context) * .9,
       height: 50,
-      child: OutlinedButton(
-          onPressed: () => _clearInputs(),
-          child: Text('Cancelar',
-              style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                    color: Theme.of(context).colorScheme.primary,
-                  ))),
+      child: TextButton(
+        onPressed: () => _clearInputs(),
+        child: Text(
+          'Cancelar',
+          style: TextStyle(fontSize: 18),
+          // style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+          //       color: Theme.of(context).colorScheme.primary,
+          //     ),
+        ),
+      ),
     );
   }
 

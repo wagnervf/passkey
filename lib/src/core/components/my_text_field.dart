@@ -1,36 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:passkey/src/core/utils/utils.dart';
 
+// ignore: must_be_immutable
 class MyTextField extends StatelessWidget {
-  MyTextField(
-      {super.key,
-      required this.fieldName,
-      required this.myController,
-      this.myIcon});
+  MyTextField({
+    super.key,
+    required this.description,
+    required this.myController,
+    this.icon,
+  });
+
   final TextEditingController myController;
-  String fieldName;
-  IconData? myIcon;
+  String description;
+  IconData? icon;
+  
   @override
   Widget build(BuildContext context) {
     return TextFormField(
       controller: myController,
-      decoration: InputDecoration(
-        labelText: fieldName,
-        suffixIcon: myIcon == null ? SizedBox.shrink() : Icon(myIcon),
-        border:  UnderlineInputBorder(
-            borderSide: BorderSide(color: Theme.of(context).colorScheme.onPrimary)),
-
-        filled: true,
-        fillColor: Colors.grey[50],
-
-        hintStyle: TextStyle(
-          color: Colors.grey[500],
-          fontSize: 12,
-        ),
-        labelStyle: TextStyle(
-          color: Colors.grey[700],
-          fontSize: 16,
-        ),
-      ),
+      decoration: Utils.decorationField(description, icon)
     );
   }
+
+
+  
 }

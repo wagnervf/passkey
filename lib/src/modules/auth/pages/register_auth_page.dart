@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:go_router/go_router.dart';
-import 'package:passkey/src/core/components/show_messeger.dart';
+import 'package:passkey/src/core/components/form_field_input_password.dart';
 import 'package:passkey/src/core/router/routes.dart';
 import 'package:passkey/src/core/utils/utils.dart';
 import 'package:passkey/src/core/components/show_sucess.dart';
@@ -27,7 +27,6 @@ class _RegisterAuthPageState extends State<RegisterAuthPage> {
   final _passwordController = TextEditingController();
 
   final _formKeyAuth = GlobalKey<FormState>();
-  bool _obscureText = true;
 
   bool edit = false;
 
@@ -84,23 +83,17 @@ class _RegisterAuthPageState extends State<RegisterAuthPage> {
     EmailValidator(errorText: 'Insira um e-mail válido'),
   ]);
 
-  final passwordValidator = MultiValidator([
-    RequiredValidator(errorText: 'Senha obrigatória'),
-    MinLengthValidator(6,
-        errorText: 'Sua senha deve possuir pelo menos 6 dígitos'),
-  ]);
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        excludeHeaderSemantics: true,        
-        title: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Text(
-            edit ? 'Editar perfil' : 'Criar conta',
-          ),
-        ),
+        excludeHeaderSemantics: true,
+        // title: Padding(
+        //   padding: const EdgeInsets.all(8.0),
+        //   child: Text(
+        //     edit ? 'Editar perfil' : 'Criar conta',
+        //   ),
+        // ),
         // actions: [
         //   Padding(
         //     padding: const EdgeInsets.all(8.0),
@@ -161,35 +154,44 @@ class _RegisterAuthPageState extends State<RegisterAuthPage> {
               constraints: BoxConstraints(minHeight: constraint.maxHeight),
               child: IntrinsicHeight(
                 child: Padding(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.all(24.0),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      Align(alignment: Alignment.center, child: _imgPasskey(size, context)),
-
-                      Utils.titleCard(context, 'Nome'),
-                      _buildTextField(
+                      Text(
+                        "Criar Conta",
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.displayLarge,
+                      ),
+                      const SizedBox(height: 20),
+                      Text(
+                        "Armazenamento criptografado e acesso fácil quando precisar",
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.titleSmall,
+                      ),
+                      const SizedBox(height: 40),
+                      formField(
                         controller: _nameController,
-                        hintText: 'Insira o seu Nome',
+                        hintText: 'Nome',
                         icon: Icons.person,
                         validator: (value) => value == null || value.isEmpty
                             ? 'Por favor, insira o seu nome'
                             : null,
                       ),
-                      SizedBox(height: size.height * 0.02),
-                      Utils.titleCard(context, 'E-mail'),
-                      _buildTextField(
+                      SizedBox(height: size.height * 0.03),
+                      formField(
                         controller: _emailController,
-                        hintText: 'Insira o endereço de E-mail',
+                        hintText: 'E-mail',
                         icon: Icons.email_outlined,
                         validator: emailValidator.call,
                       ),
-                      SizedBox(height: size.height * 0.02),
-                  
-                      Utils.titleCard(context, 'Senha mestra'),
-                      inputPassword(),
-                  
+                      SizedBox(height: size.height * 0.03),
+                      FormFieldInputPassword(
+                        passwordController: _passwordController,
+                        copy: true,
+                      ),
+                      const SizedBox(height: 10),
                       Padding(
                         padding: const EdgeInsets.all(8),
                         child: Text(
@@ -198,20 +200,43 @@ class _RegisterAuthPageState extends State<RegisterAuthPage> {
                           style: Theme.of(context).textTheme.bodyMedium,
                         ),
                       ),
-                      //const Spacer(),
-                     
+
+                      const SizedBox(height: 20),
+                      SizedBox(
+                        width: size.width * .9,
+                        height: 50,
+                        child: ElevatedButton(
+                          onPressed: () => _register(context),
+                          style: Utils.styleButtonElevated(),
+                          child: const Text(
+                            "Criar Conta",
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 18),
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 10),
+
+                      SizedBox(
+                        width: size.width * .9,
+                        height: 50,
+                        child: TextButton(
+                          child: Text(
+                            "Já possuo uma conta",
+                            style: Theme.of(context).textTheme.displaySmall,
+                          ),
+                          onPressed: () => _acessar(context),
+                        ),
+                      ),
+
                       const Spacer(),
-                  
-                      buttonSalvarContinuar(context),
-                  
-                  
-                  
+
                       ListTile(
                         dense: true,
                         leading: const Icon(
                           Icons.info_outline,
                           size: 16,
-                          //color: Theme.of(context).colorScheme.primary,
                         ),
                         title: Text(
                             'Seus dados serão criptografados e salvos em seu dispositivo.',
@@ -228,21 +253,13 @@ class _RegisterAuthPageState extends State<RegisterAuthPage> {
     );
   }
 
-  Padding _imgPasskey(Size size, BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(10),
-      child: SizedBox(
-        height: size.height * .1,
-        child: Image.asset(
-          'assets/images/passkey.png',
-          fit: BoxFit.contain,
-          color: Colors.teal,
-        ),
-      ),
-    );
+ 
+
+  void _acessar(BuildContext context) {
+    GoRouter.of(context).pushReplacement(RoutesPaths.auth);
   }
 
-  Widget _buildTextField({
+  Widget formField({
     required TextEditingController controller,
     required String hintText,
     required IconData icon,
@@ -250,20 +267,7 @@ class _RegisterAuthPageState extends State<RegisterAuthPage> {
   }) {
     return TextFormField(
       controller: controller,
-      decoration: InputDecoration(
-        prefixIcon: Icon(
-          icon,
-        ),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
-        hintText: hintText,
-        filled: true,
-        fillColor: Theme.of(context).colorScheme.onPrimary,
-        hintStyle: TextStyle(
-          color: Colors.grey[700],
-          fontWeight: FontWeight.bold,
-          fontSize: 14,
-        ),
-      ),
+      decoration: Utils.decorationField(hintText, icon),
       validator: validator,
     );
   }
@@ -276,7 +280,7 @@ class _RegisterAuthPageState extends State<RegisterAuthPage> {
         color: Theme.of(context).colorScheme.primary,
         child: ListTile(
           minTileHeight: 60,
-          title: Text(edit ? 'Salvar' : 'Continuar',
+          title: Text(edit ? 'Salvar' : 'Criar',
               style:
                   TextStyle(color: Theme.of(context).colorScheme.onSecondary)),
           leading: Icon(Icons.save,
@@ -288,66 +292,6 @@ class _RegisterAuthPageState extends State<RegisterAuthPage> {
           ),
         ),
       ),
-    );
-  }
-
-  Row inputPassword() {
-    return Row(
-      children: [
-        Expanded(
-          child: SizedBox(
-            child: TextFormField(
-              //   style: const TextStyle(color: Colors.black),
-              controller: _passwordController,
-              obscureText: _obscureText,
-              decoration: decoration('Insira sua senha mestra'),
-              validator: passwordValidator.call,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  InputDecoration decoration(String description) {
-    return InputDecoration(
-      border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
-      suffixIcon: SizedBox(
-        width: 100,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            IconButton(
-              icon: Icon(
-                _obscureText ? Icons.visibility : Icons.visibility_off,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-              onPressed: () {
-                setState(() {
-                  _obscureText = !_obscureText;
-                });
-              },
-            ),
-            IconButton(
-              onPressed: () =>
-                  Utils.copyToClipboard(_passwordController.text, context),
-              icon: Icon(
-                Icons.copy,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-            ),
-          ],
-        ),
-      ),
-      hintText: description,
-      filled: true,
-      fillColor: Theme.of(context).colorScheme.onPrimary,
-      hintStyle: TextStyle(
-        color: Colors.grey[700],
-        fontWeight: FontWeight.bold,
-        fontSize: 14,
-      ),
-      errorStyle: const TextStyle(color: Colors.amber),
     );
   }
 }

@@ -19,7 +19,6 @@ class Utils {
     return MediaQuery.of(context).size.width;
   }
 
-
   static Padding titleCard(BuildContext context, String title) {
     return Padding(
       padding: const EdgeInsets.only(left: 8.0),
@@ -48,8 +47,6 @@ class Utils {
     }
   }
 
-  
-
   static Color? getColorPlus(int id) {
     switch (id) {
       case 0:
@@ -71,54 +68,42 @@ class Utils {
     }
   }
 
-  static Column formField(String label, String hint, IconData icon,
-      TextEditingController controller, BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Text(
-            label,
-            style: Theme.of(context).textTheme.displaySmall,
-          ),
-        ),
-        TextFormField(
-          controller: controller,
-          decoration: decorationField(
-              hint,
-              Icon(
-                icon,
-                color: Theme.of(context).colorScheme.primary,
-              )),
-        ),
-      ],
-    );
-  }
-
-  static InputDecoration decorationField(String description, Widget icon) {
+  static InputDecoration decorationField(String description, IconData? icon) {
     return InputDecoration(
-      contentPadding: const EdgeInsets.all(20),
+      prefixIcon: icon == null
+          ? null
+          : Icon(
+              icon,
+            ),
       hintText: description,
+      border: UnderlineInputBorder(
+          borderSide: BorderSide(color: Colors.teal, width: 0.3),
+          borderRadius: BorderRadius.circular(10)),
+      contentPadding: EdgeInsets.all(18),
       filled: true,
-      fillColor: Colors.white,
+      fillColor: const Color.fromARGB(255, 235, 253, 252),
       hintStyle: TextStyle(
-        color: Colors.grey[700],
+        color: Colors.teal[700],
         fontWeight: FontWeight.bold,
         fontSize: 14,
       ),
-      border: OutlineInputBorder(
-        borderSide: const BorderSide(color: Colors.grey),
-        borderRadius: BorderRadius.circular(5),
-      ),
-      errorStyle: const TextStyle(color: Colors.cyan),
+      errorStyle: const TextStyle(color: Colors.red),
     );
   }
 
+ 
   static void copyToClipboard(String text, BuildContext context) {
     Clipboard.setData(ClipboardData(text: text));
     ShowMessager.show(context, 'Copiado!');
+  }
+
+  static  ButtonStyle styleButtonElevated() {
+    return ElevatedButton.styleFrom(
+      padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+      ),
+    );
   }
 
   static IconData getIcon(String iconName) {
