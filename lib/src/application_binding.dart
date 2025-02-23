@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:passkey/src/modules/configuracoes/backup_restore/controllers/backup_restore_controller.dart';
 import 'package:passkey/src/core/shared_preferences/shared_preferences_service.dart';
 import 'package:passkey/src/core/storage/i_token_storage.dart';
 import 'package:passkey/src/core/storage/token_storage.dart';
@@ -44,7 +45,8 @@ class ApplicationBinding extends StatelessWidget {
         ),
 
         //Provider<GoogleAuthServices>(lazy: true, create: (context) => AuthServices()),
-        Provider<AuthRepository>(lazy: true, create: (context) => AuthRepository()),
+        Provider<AuthRepository>(
+            lazy: true, create: (context) => AuthRepository()),
         Provider<AuthController>(
             lazy: true,
             create: (context) => AuthController(
@@ -65,9 +67,18 @@ class ApplicationBinding extends StatelessWidget {
           ),
         ),
 
-        Provider<RegisterRepository>(lazy: true, create: (context) => RegisterRepositoryImpl()),
+        Provider<RegisterRepository>(
+            lazy: true, create: (context) => RegisterRepositoryImpl()),
 
-        Provider<RegisterController>(lazy: true, create: (context) => RegisterController(registerRepository: context.read())),
+        Provider<RegisterController>(
+            lazy: true,
+            create: (context) =>
+                RegisterController(registerRepository: context.read())),
+
+        Provider<BackupRestoreController>(
+            lazy: true, create: (context) => BackupRestoreController(registerControllerX: context.read() )),
+
+            
       ],
       child: child,
     );

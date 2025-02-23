@@ -6,7 +6,6 @@ import 'package:go_router/go_router.dart';
 import 'package:passkey/src/core/router/routes.dart';
 import 'package:passkey/src/modules/auth/controllers/auth_controller.dart';
 import 'package:passkey/src/modules/auth/controllers/auth_state.dart';
-import 'package:passkey/src/modules/auth/model/auth_user_model.dart';
 import 'package:passkey/src/modules/splash/initial_screen.dart';
 
 class SplashPage extends StatefulWidget {
@@ -35,18 +34,6 @@ class SplashPageState extends State<SplashPage> {
         child: _blocBuilder(context),
       ),
     );
-
-    //   Container(
-    //       height: MediaQuery.of(context).size.height,
-    //       padding: const EdgeInsets.all(18),
-    //       margin: const EdgeInsets.all(20),
-    //       decoration: const BoxDecoration(
-    //         borderRadius: BorderRadius.all(
-    //           Radius.circular(50),
-    //         ),
-    //       ),
-    //       child: ),
-    // );
   }
 
   BlocBuilder<AuthController, AuthState> _blocBuilder(BuildContext context) {

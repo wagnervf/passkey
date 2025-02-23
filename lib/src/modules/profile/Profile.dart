@@ -81,7 +81,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           const SizedBox(
                             height: 10,
                           ),
-                          Utils.titleCard(context, 'Sistemas'),
+                          Utils.titleCard(context, 'Sistema'),
                           ItemCardWithIcon(
                             text: 'Configurações',
                             icon: Icons.settings,

@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:passkey/src/core/components/item_card_with_icon.dart';
 import 'package:passkey/src/core/components/show_messeger.dart';
 import 'package:passkey/src/core/router/routes.dart';
 import 'package:passkey/src/core/utils/utils.dart';
 import 'package:passkey/src/modules/auth/controllers/auth_controller.dart';
 import 'package:passkey/src/modules/auth/controllers/auth_state.dart';
 import 'package:passkey/src/modules/auth/model/auth_user_model.dart';
+import 'package:passkey/src/modules/configuracoes/backup_restore/views/backup_restore_page.dart';
 import 'package:passkey/src/modules/configuracoes/views/widgets/icon_change_theme.dart';
-import 'package:passkey/src/modules/register/controller/register_controller.dart';
 
 class ConfiguracoesPage extends StatefulWidget {
   const ConfiguracoesPage({super.key});
@@ -78,21 +77,14 @@ class _ConfiguracoesPageState extends State<ConfiguracoesPage> {
                           const SizedBox(
                             height: 20,
                           ),
-                         Utils.titleCard(context, 'Gerenciar Tema'),
+                          Utils.titleCard(context, 'Gerenciar Tema'),
                           const IconChangeTheme(),
                           const SizedBox(
                             height: 20,
                           ),
-                        
                           Utils.titleCard(context, 'Gerenciar Registros'),
-                          ItemCardWithIcon(
-                              text: 'Exportar Registros',
-                              icon: Icons.download,
-                              onTap: () => buttonExport(context)),
-                          ItemCardWithIcon(
-                              text: 'Importar Registros',
-                              icon: Icons.upload_file,
-                              onTap: () => buttonImport()),
+
+                          BackupRestorePage(), 
                           const Spacer(),
                           buttonRemoverUser(context),
                           Center(
@@ -117,7 +109,6 @@ class _ConfiguracoesPageState extends State<ConfiguracoesPage> {
       );
     });
   }
-
 
   InkWell buttonRemoverUser(BuildContext context) {
     return InkWell(
@@ -173,8 +164,6 @@ class _ConfiguracoesPageState extends State<ConfiguracoesPage> {
             ),
             TextButton(
               onPressed: () async {
-                Navigator.pop(context);
-
                 bool result =
                     await context.read<AuthController>().logoutAndRemoveUser();
 
@@ -183,13 +172,14 @@ class _ConfiguracoesPageState extends State<ConfiguracoesPage> {
                     context,
                     'Usuário removido com sucesso.',
                   );
-                  GoRouter.of(context).pushReplacement(RoutesPaths.splash);
                 } else {
                   ShowMessager.show(
                     context,
                     'Erro ao tentar remover o usuário. Tente Novamente.',
                   );
                 }
+
+                GoRouter.of(context).pushReplacement(RoutesPaths.splash);
               },
               style: TextButton.styleFrom(foregroundColor: Colors.red),
               child: const Text('Excluir'),
@@ -198,28 +188,6 @@ class _ConfiguracoesPageState extends State<ConfiguracoesPage> {
         );
       },
     );
-  }
-
-  buttonExport(BuildContext context) async {
-    bool resultBackup =
-        await context.read<RegisterController>().exportarViaArquivo();
-
-    if (resultBackup) {
-      return ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: const Text('Dados exportados com sucesso!')),
-      );
-    }
-  }
-
-  buttonImport() async {
-    bool resultBackup =
-        await context.read<RegisterController>().importarViaArquivo();
-
-    if (resultBackup) {
-      return ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: const Text('Dados importados com sucesso!')),
-      );
-    }
   }
 
   profile(BuildContext context, AuthUserModel? userLoged) {
@@ -245,11 +213,11 @@ class _ConfiguracoesPageState extends State<ConfiguracoesPage> {
     );
   }
 
-  _auth() {
-    return GoRouter.of(context).pushReplacement(RoutesPaths.auth);
-  }
+  // _auth() {
+  //   return GoRouter.of(context).pushReplacement(RoutesPaths.auth);
+  // }
 
-  _goToEdit(AuthUserModel userLoged) async {
-    await GoRouter.of(context).push(RoutesPaths.authRegister, extra: userLoged);
-  }
+  // _goToEdit(AuthUserModel userLoged) async {
+  //   await GoRouter.of(context).push(RoutesPaths.authRegister, extra: userLoged);
+  // }
 }

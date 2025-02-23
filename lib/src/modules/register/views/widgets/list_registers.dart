@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -30,9 +32,9 @@ class _ListRegistersState extends State<ListRegisters> {
       builder: (context, state) {
         switch (state) {
           case RegisterLoading():
-            return const Center(
-              child: SizedBox(
-                height: 300,
+            return SizedBox(
+              height: MediaQuery.of(context).size.height * .8,
+              child: const Center(
                 child: CircularProgressIndicator(),
               ),
             );
@@ -40,39 +42,53 @@ class _ListRegistersState extends State<ListRegisters> {
             return const Text('Erro');
           case RegisterLoaded():
             final informacoes = state.register;
-            return Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                fieldPesquisar(),
-                const SizedBox(height: 10),
-                Padding(
-                  padding: const EdgeInsets.only(left: 8.0),
-                  child: Text('Meus Registros',
-                      style: Theme.of(context).textTheme.titleSmall),
-                ),
-                const SizedBox(height: 10),
-                listRegistros(informacoes),
-                const SizedBox(height: 10),
-              ],
-            );
+
+            return informacoes.isEmpty
+                ? emptyRegisters(context)
+                : Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      fieldPesquisar(),
+                      const SizedBox(height: 10),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 8.0),
+                        child: Text('Meus Registros',
+                            style: Theme.of(context).textTheme.titleSmall),
+                      ),
+                      const SizedBox(height: 10),
+                      listRegistros(informacoes),
+                      const SizedBox(height: 10),
+                    ],
+                  );
         }
-        return Column(
+        return SizedBox.shrink();
+      },
+    );
+  }
+
+  emptyRegisters(BuildContext context) {
+    return Center(
+      child: SizedBox(
+        height: MediaQuery.of(context).size.height * .8,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            Text('Você ainda não possui nenhum Registro!'),
+            const SizedBox(height: 10),
             Card(
               child: TextButton.icon(
                   onPressed: () =>
                       GoRouter.of(context).push(RoutesPaths.register),
                   label: const Text(
-                    'Adicionar Registro',
+                    'Clique aqui para adicionar um Registro',
                   ),
                   icon: const Icon(Icons.add)),
             ),
-            const SizedBox(height: 10),
           ],
-        );
-        // : SizedBox.shrink();
-      },
+        ),
+      ),
     );
   }
 
@@ -154,7 +170,6 @@ class _ListRegistersState extends State<ListRegisters> {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
         color: Theme.of(context).colorScheme.surface,
-
       ),
       child: Row(
         children: [
@@ -163,15 +178,15 @@ class _ListRegistersState extends State<ListRegisters> {
               decoration: InputDecoration(
                   hintText: 'Pesquisar',
                   border: OutlineInputBorder(
-                    borderSide: borderSide, 
+                    borderSide: borderSide,
                     borderRadius: borderRadius,
                   ),
                   enabledBorder: OutlineInputBorder(
-                    borderSide: borderSide, 
+                    borderSide: borderSide,
                     borderRadius: borderRadius,
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderSide: borderSide, 
+                    borderSide: borderSide,
                     borderRadius: borderRadius,
                   ),
                   filled: true,

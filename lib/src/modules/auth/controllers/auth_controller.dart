@@ -1,9 +1,7 @@
 // ignore_for_file: depend_on_referenced_packages
 
-//import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:local_auth/local_auth.dart';
-import 'package:passkey/src/core/components/show_messeger.dart';
 import 'package:passkey/src/core/storage/i_token_storage.dart';
 import 'package:passkey/src/modules/auth/controllers/auth_state.dart';
 import 'package:passkey/src/modules/auth/model/auth_user_model.dart';
@@ -15,13 +13,11 @@ class AuthController extends Cubit<AuthState> {
   AuthController({
     required this.tokenStorage,
     required this.authRepository,
-  }) : super(AuthInitialState()) {
-    //   checkAuthentication();
-  }
+  }) : super(AuthInitialState());
 
-  //final GoogleAuthServices services;
   final TokenStorageInterface tokenStorage;
   final AuthRepository authRepository;
+  
   AuthUserModel? _user;
   AuthUserModel? get userLogado => _user;
 
@@ -32,6 +28,7 @@ class AuthController extends Cubit<AuthState> {
     if (_user != null) {
       emit(AuthSuccessState(_user));
     } else {
+      emit(AuthErrorState('Usuário não encontrado!'));
       emit(AuthUnauthenticatedState());
     }
   }
@@ -39,18 +36,30 @@ class AuthController extends Cubit<AuthState> {
   Future<void> login(String password) async {
     emit(AuthLoadingState());
     final isValid = await authRepository.validatePassword(password);
+
     if (isValid) {
-      final user = await authRepository.getUser();
-      emit(AuthSuccessState(user!));
+      try {
+        final user = await authRepository.getUser();
+
+        emit(AuthSuccessState(user!));
+      } catch (e) {
+        emit(AuthErrorState('Usuário não encontrado!'));
+      }
     } else {
       emit(AuthErrorState('Senha incorreta'));
     }
   }
 
-  Future<void> register(AuthUserModel user) async {
+  Future<void> registerUser(AuthUserModel user) async {
     emit(AuthLoadingState());
-    await authRepository.saveUser(user);
-    emit(AuthSuccessState(user));
+    try {
+      final result = await authRepository.saveUser(user);
+      result
+          ? emit(AuthSuccessState(user))
+          : emit(AuthErrorState('Erro ao cadastrar usuário'));
+    } catch (e) {
+      emit(AuthErrorState('Erro ao cadastrar usuário'));
+    }
   }
 
   Future<bool> logoutAndRemoveUser() async {

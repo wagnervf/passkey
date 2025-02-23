@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:passkey/src/core/backup_restore/text_field_import_register.dart';
+import 'package:passkey/src/modules/configuracoes/backup_restore/text_field_import_register.dart';
 import 'package:passkey/src/core/components/form_field_input_password.dart';
 import 'package:passkey/src/core/components/my_text_field.dart';
 import 'package:passkey/src/core/components/show_messeger.dart';
@@ -33,6 +33,8 @@ class _RegisterFormState extends State<RegisterForm> {
   late RegisterModel? register;
   bool _obscureText = true;
   bool edit = false;
+  bool carregando = false;
+
   @override
   void initState() {
     super.initState();
@@ -90,11 +92,11 @@ class _RegisterFormState extends State<RegisterForm> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                           SizedBox(
+                        SizedBox(
                             width: size.width * .9,
                             height: 50,
                             child: TextFieldImportRegister()),
-                        SizedBox(height: size.height * 0.02),
+                        SizedBox(height: size.height * 0.03),
                         MyTextField(
                           myController: _titleController,
                           description: "Título",
@@ -121,13 +123,11 @@ class _RegisterFormState extends State<RegisterForm> {
                           myController: _descriptionController,
                           description: "Observação",
                         ),
-                       
-                     
                         const Spacer(),
                         botaoSalvar(context),
                         SizedBox(height: size.height * 0.02),
                         botaoFechar(context),
-                         SizedBox(height:20),
+                        SizedBox(height: 20),
                       ],
                     ),
                   ),
@@ -149,10 +149,12 @@ class _RegisterFormState extends State<RegisterForm> {
         onPressed: () async {
           await acaoSalvarRegistro(context);
         },
-        child: Text(
-          'Salvar',
-          style: TextStyle(fontSize: 20),
-        ),
+        child: carregando
+            ? CircularProgressIndicator(color: Colors.white,)
+            : Text(
+                'Salvar',
+                style: TextStyle(fontSize: 20),
+              ),
       ),
     );
   }
@@ -165,16 +167,17 @@ class _RegisterFormState extends State<RegisterForm> {
         onPressed: () => _clearInputs(),
         child: Text(
           'Cancelar',
-          style: TextStyle(fontSize: 18),
-          // style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-          //       color: Theme.of(context).colorScheme.primary,
-          //     ),
+          style: TextStyle(fontSize: 18),         
         ),
       ),
     );
   }
 
   Future<void> acaoSalvarRegistro(BuildContext context) async {
+    setState(() {
+      carregando = true;
+    });
+
     RegisterModel formQuery = RegisterModel(
       id: edit ? register!.id : const Uuid().v4(),
       title: _titleController.text,

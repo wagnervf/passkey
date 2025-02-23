@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
 import 'package:go_router/go_router.dart';
+import 'package:passkey/src/modules/configuracoes/backup_restore/controllers/backup_restore_controller.dart';
 import 'package:passkey/src/core/components/show_messeger.dart';
 import 'package:passkey/src/core/router/routes.dart';
 import 'package:passkey/src/modules/register/controller/register_controller.dart';
@@ -23,9 +24,10 @@ class _ExpandButtonsActionsState extends State<ExpandButtonsActions> {
   final _key = GlobalKey<ExpandableFabState>();
 
   _compartilharRegistro() async {
-    await context
-        .read<RegisterController>()
-        .exportarUmRegistro(widget.registro);
+       final exportarImportarService =
+        Provider.of<BackupRestoreController>(context, listen: false);
+
+        exportarImportarService.exportarUmRegistro(widget.registro);
 
     // ignore: use_build_context_synchronously
     ScaffoldMessenger.of(context).showSnackBar(
@@ -80,10 +82,7 @@ class _ExpandButtonsActionsState extends State<ExpandButtonsActions> {
       key: _key,
       type: ExpandableFabType.up,
       childrenAnimation: ExpandableFabAnimation.none,
-      distance: 70,
-      // overlayStyle: ExpandableFabOverlayStyle(
-      //   color: Colors.white.withOpacity(0.9),
-      // ),
+      distance: 70,     
       children: [
         Row(
           children: [

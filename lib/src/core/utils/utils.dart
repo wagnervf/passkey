@@ -81,12 +81,12 @@ class Utils {
           borderRadius: BorderRadius.circular(10)),
       contentPadding: EdgeInsets.all(18),
       filled: true,
-      fillColor: const Color.fromARGB(255, 235, 253, 252),
-      hintStyle: TextStyle(
-        color: Colors.teal[700],
-        fontWeight: FontWeight.bold,
-        fontSize: 14,
-      ),
+     // fillColor: const Color.fromARGB(255, 235, 253, 252),
+      // hintStyle: TextStyle(
+      //   color: Colors.teal[700],
+      //   fontWeight: FontWeight.bold,
+      //   fontSize: 14,
+      // ),
       errorStyle: const TextStyle(color: Colors.red),
     );
   }

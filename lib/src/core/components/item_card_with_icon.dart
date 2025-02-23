@@ -14,7 +14,7 @@ class ItemCardWithIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Color corIcon = Theme.of(context).colorScheme.onTertiaryContainer;
+    Color corIcon = Theme.of(context).colorScheme.primary;
     return Card(
       child: ListTile(
         minTileHeight: 60,
@@ -24,7 +24,7 @@ class ItemCardWithIcon extends StatelessWidget {
         trailing: Icon(Icons.keyboard_arrow_right, color: corIcon),
         title: Text(
           text,
-          style: Theme.of(context).textTheme.titleMedium,
+          style: Theme.of(context).textTheme.displaySmall,
         ),
       ),
     );

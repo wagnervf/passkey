@@ -1,69 +1,64 @@
 import 'dart:convert';
+import 'dart:developer';
+import 'package:passkey/src/core/components/encrypt/encrypt_decrypt_services.dart';
+import 'package:passkey/src/core/data/services/secure_storage_service.dart';
 import 'package:passkey/src/modules/auth/model/auth_user_model.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:encrypt/encrypt.dart' as encrypt;
 
 class AuthRepository {
-  static const _userKey = 'user_data';
-  static const _encryptionKey = 'my32lengthsupersecretnooneknows1';
+  static const _userKey = 'auth_user';
 
-  Future<void> saveUser(AuthUserModel user) async {
-    final prefs = await SharedPreferences.getInstance();
-    final encryptedPassword = _encryptPassword(user.password);
-    final userToSave = {
-      'name': user.name,
-      'email': user.email,
-      'password': encryptedPassword,
-    };
-    prefs.setString(_userKey, json.encode(userToSave));
+  final secureStorageService = SecureStorageService();
+  final encrypt = EncryptDecryptServices();
+
+  Future<bool> saveUser(AuthUserModel user) async {
+    try {
+      final encryptedPassword = encrypt.encryptPassword(user.password);
+      final userToSave = {
+        'name': user.name,
+        'email': user.email,
+        'password': encryptedPassword,
+      };
+      secureStorageService.setDataKey(_userKey, json.encode(userToSave));
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 
   Future<bool> logoutAndRemoveUser() async {
-    final prefs = await SharedPreferences.getInstance();
-
     // Remove o usuário
-    if (prefs.containsKey(_userKey)) {
-      await prefs.remove(_userKey);
-       await prefs.clear();
+    if (await secureStorageService.hasApiKey(_userKey)) {
+      await secureStorageService.deleteApiKey(_userKey);
+      await secureStorageService.deleteAll();
+
       return true;
     } else {
       return false;
     }
-
-    // Opcional: Limpar outros dados (se necessário)
-    
-    
-   
   }
 
   Future<AuthUserModel?> getUser() async {
-    final prefs = await SharedPreferences.getInstance();
-    final userData = prefs.getString(_userKey);
-
-    if (userData == null) return null;
+    final userData = await secureStorageService.getDataKey(_userKey);
+    if (userData == '') return null;
 
     try {
-      // Decodificar o JSON armazenado em um mapa
       final jsonUser = json.decode(userData);
-      print(jsonUser['password']?.toString());
 
-      // Garantir que o campo "password" seja tratado como String
       final encryptedPassword = jsonUser['password']?.toString();
       if (encryptedPassword == null) {
-        throw Exception('Password ausente ou inválido no JSON');
+        throw Exception('Senha ausente ou inválido no JSON');
       }
 
       // Descriptografar a senha
-      final decryptedPassword = _decryptPassword(encryptedPassword);
+      final decryptedPassword = encrypt.decryptPassword(encryptedPassword);
 
-      // Construir o modelo de usuário
       return AuthUserModel(
         name: jsonUser['name']?.toString() ?? '',
         email: jsonUser['email']?.toString() ?? '',
         password: decryptedPassword,
       );
     } catch (e) {
-      print('Erro ao recuperar o usuário: $e');
+      log('Erro ao recuperar o usuário: $e');
       return null;
     }
   }
@@ -71,33 +66,5 @@ class AuthRepository {
   Future<bool> validatePassword(String inputPassword) async {
     final user = await getUser();
     return user?.password == inputPassword;
-  }
-
-  String _encryptPassword(String password) {
-    final key = encrypt.Key.fromUtf8('my32lengthsupersecretnooneknows1');
-    final iv = encrypt.IV.fromLength(16);
-    final encrypter = encrypt.Encrypter(encrypt.AES(key));
-
-    final encrypted = encrypter.encrypt(password, iv: iv);
-
-    // Concatenar o IV com o texto criptografado
-    return '${iv.base64}:${encrypted.base64}';
-  }
-
-  String _decryptPassword(String encryptedPassword) {
-    final key = encrypt.Key.fromUtf8('my32lengthsupersecretnooneknows1');
-
-    // Separar o IV do texto criptografado
-    final parts = encryptedPassword.split(':');
-    if (parts.length != 2) {
-      throw Exception('Dados criptografados inválidos');
-    }
-
-    final iv = encrypt.IV.fromBase64(parts[0]);
-    final encryptedText = parts[1];
-
-    final encrypter = encrypt.Encrypter(encrypt.AES(key));
-
-    return encrypter.decrypt64(encryptedText, iv: iv);
   }
 }

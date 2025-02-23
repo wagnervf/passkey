@@ -2,15 +2,15 @@
 import 'dart:convert';
 
 
-class AuthUserModel {
-    final String name;
-  final String email;
-  final String password;
-  AuthUserModel({
-    this.name = '',
-    this.email = '',
-    this.password = '',
-  });
+  class AuthUserModel {
+      final String name;
+    final String email;
+    final String password;
+    AuthUserModel({
+      this.name = '',
+      this.email = '',
+      this.password = '',
+    });
 
   AuthUserModel copyWith({
     String? name,

@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:passkey/src/core/utils/utils.dart';
 import 'package:passkey/src/modules/register/controller/register_controller.dart';
-import 'package:passkey/src/modules/register/model/registro_model.dart';
 import 'package:provider/provider.dart';
 
 class TextFieldImportRegister extends StatefulWidget {
-  TextFieldImportRegister({super.key});
+  const TextFieldImportRegister({super.key});
 
   @override
   State<TextFieldImportRegister> createState() =>
@@ -21,13 +19,10 @@ class _TextFieldImportRegisterState extends State<TextFieldImportRegister> {
 
   @override
   Widget build(BuildContext context) {
-    return Align(
-      alignment: Alignment.topRight,
-      child: TextButton.icon(
-        onPressed: () => _mostrarModal(context),
-        label: const Text('Importar Registro'),
-        icon: const Icon(Icons.restart_alt_outlined),
-      ),
+    return OutlinedButton.icon(
+      onPressed: () => _mostrarModal(context),
+      label: const Text('Importar Registro'),
+      icon: const Icon(Icons.restart_alt_outlined),
     );
   }
 
@@ -37,11 +32,13 @@ class _TextFieldImportRegisterState extends State<TextFieldImportRegister> {
       builder: (BuildContext context) {
         return AlertDialog(
           actionsPadding: EdgeInsets.all(0),
-          title: const Text("Importar Registro", style: TextStyle(fontSize: 18),),
+          title: const Text(
+            "Importar Registro",
+            style: TextStyle(fontSize: 18),
+          ),
           titleTextStyle: Theme.of(context).textTheme.titleMedium,
           content: textFlield(context),
           actionsAlignment: MainAxisAlignment.center,
-
           actions: [
             Padding(
               padding: const EdgeInsets.all(18.0),
@@ -49,7 +46,9 @@ class _TextFieldImportRegisterState extends State<TextFieldImportRegister> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   buttonImport(context),
-                  SizedBox(height: 10,),
+                  SizedBox(
+                    height: 10,
+                  ),
                   SizedBox(
                     width: double.infinity,
                     child: OutlinedButton(
@@ -80,7 +79,7 @@ class _TextFieldImportRegisterState extends State<TextFieldImportRegister> {
             if (registroImportado != null) {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                    content: const Text('Registro importado com sucesso!')),
+                    content: Text('Registro importado com sucesso!')),
               );
             } else {
               ScaffoldMessenger.of(context).showSnackBar(
@@ -95,7 +94,10 @@ class _TextFieldImportRegisterState extends State<TextFieldImportRegister> {
             );
           }
         },
-        child: Text('Importar Registro', style: TextStyle(fontSize: 18),),
+        child: Text(
+          'Importar Registro',
+          style: TextStyle(fontSize: 18),
+        ),
       ),
     );
   }

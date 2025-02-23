@@ -1,53 +1,72 @@
+// ignore_for_file: unnecessary_nullable_for_final_variable_declarations
+
 import 'dart:convert';
 import 'dart:developer';
-import 'dart:io';
 
-import 'package:file_picker/file_picker.dart';
+import 'package:passkey/src/core/data/services/secure_storage_service.dart';
 import 'package:passkey/src/core/either/either.dart';
 import 'package:passkey/src/core/exceptions/repository_exception.dart';
 import 'package:passkey/src/modules/register/model/registro_model.dart';
 import 'package:passkey/src/modules/register/repositories/register_repository.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:share_plus/share_plus.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class RegisterRepositoryImpl implements RegisterRepository {
-  // late final RestClient restClient;
-
   RegisterRepositoryImpl();
-  List<RegisterModel> allRegisters = [];
-  static const _keyRegistros = 'registros';
 
-  Future<List<RegisterModel>> getListRegister() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    List<String>? registrosString = prefs.getStringList(_keyRegistros);
+  final SecureStorageService _secureStorageService = SecureStorageService();
+  static const _keyRegistros = 'registers';
 
-    if (registrosString == null) {
+  /// Obtém todos os registros salvos
+  Future<List<RegisterModel>> _getListRegister() async {
+    try {
+      final List<String>? registrosString =
+          await _secureStorageService.getStringList(_keyRegistros);
+
+      if (registrosString == null || registrosString.isEmpty) {
+        return [];
+      }
+
+      return registrosString
+          .map(
+            (registro) => RegisterModel.fromMap(
+              jsonDecode(registro),
+            ),
+          )
+          .toList();
+    } catch (e, s) {
+      log("Erro ao buscar registros: $e", error: e, stackTrace: s);
       return [];
     }
+  }
 
-    return registrosString
-        .map((registroString) =>
-            RegisterModel.fromMap(jsonDecode(registroString)))
-        .toList();
+  /// Salva uma lista de registros no armazenamento seguro
+  Future<bool> _salvarLocalmente(List<RegisterModel> listRegisters) async {
+    try {
+      final List<String> registrosString = listRegisters
+          .map(
+            (reg) => jsonEncode(
+              reg.toMap(),
+            ),
+          )
+          .toList();
+      return await _secureStorageService.saveStringList(
+          _keyRegistros, registrosString);
+    } catch (e, s) {
+      log("Erro ao salvar registros localmente: $e", error: e, stackTrace: s);
+      return false;
+    }
   }
 
   @override
   Future<Either<RepositoryException, List<RegisterModel>>>
       getAllRegisterRepository() async {
     try {
-      var listRegisters = await getListRegister();
-
-      if (listRegisters.isEmpty) {
-        return Right([]);
-      }
-
+      final List<RegisterModel> listRegisters = await _getListRegister();
       return Right(listRegisters);
     } catch (e, s) {
-      log(e.toString(), error: e, stackTrace: s);
-      return Left(RepositoryException(
-        message: 'Erro de conexão ao buscar os Register',
-      ));
+      log("Erro ao obter registros: $e", error: e, stackTrace: s);
+      return Left(
+        RepositoryException(message: 'Erro ao buscar os registros.'),
+      );
     }
   }
 
@@ -55,67 +74,54 @@ class RegisterRepositoryImpl implements RegisterRepository {
   Future<Either<RepositoryException, bool>> saveRegisterRepository(
       RegisterModel register) async {
     try {
-      //  SharedPreferences prefs = await SharedPreferences.getInstance();
-      var listRegisters = await getListRegister();
-
+      final List<RegisterModel> listRegisters = await _getListRegister();
       listRegisters.add(register);
 
-      var result = await salvarLocalmente(listRegisters);
-
+      final bool result = await _salvarLocalmente(listRegisters);
       return Right(result);
     } catch (e, s) {
-      log('Erro ao salvar registros: $e', error: e, stackTrace: s);
-      return Left(RepositoryException(
-        message: 'Erro ao salvar os registros.',
-      ));
+      log("Erro ao salvar registro: $e", error: e, stackTrace: s);
+      return Left(RepositoryException(message: 'Erro ao salvar o registro.'));
     }
   }
 
-  salvarLocalmente(List<RegisterModel> listRegisters) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+  @override
+  Future<Either<RepositoryException, bool>> saveListRegisterRepository(
+      List<RegisterModel> listRegisters) async {
+    try {
+      //final List<RegisterModel> listRegisters = await _getListRegister();
+     // listRegisters.add(register);
 
-    List<String> registrosStringAtualizado =
-        listRegisters.map((registro) => jsonEncode(registro.toMap())).toList();
-
-    return await prefs.setStringList(_keyRegistros, registrosStringAtualizado);
+      final bool result = await _salvarLocalmente(listRegisters);
+      return Right(result);
+    } catch (e, s) {
+      log("Erro ao salvar registro: $e", error: e, stackTrace: s);
+      return Left(RepositoryException(message: 'Erro ao salvar o registro.'));
+    }
   }
+
+
+  
 
   @override
   Future<Either<RepositoryException, bool>> updateRegisterRepository(
       RegisterModel registro) async {
     try {
-      //  SharedPreferences prefs = await SharedPreferences.getInstance();
-      var listRegisters = await getListRegister();
-      //  print(listRegisters.toString());
-      //  print(registro.id.toString());
+      final List<RegisterModel> listRegisters = await _getListRegister();
+      final int index =
+          listRegisters.indexWhere((reg) => reg.id == registro.id);
 
-      // Encontrar o índice do registro a ser atualizado
-      int index = listRegisters.indexWhere((reg) => reg.id == registro.id);
-
-      if (index != -1) {
-        // Substituir o registro antigo pelo novo
-        listRegisters[index] = registro;
-
-        // List<String> registrosStringAtualizado = listRegisters
-        //     .map((registro) => jsonEncode(registro.toMap()))
-        //     .toList();
-
-        // await prefs.setStringList(_keyRegistros, registrosStringAtualizado);
-        var result = await salvarLocalmente(listRegisters);
-
-        return Right(result);
-      } else {
-        return Left(RepositoryException(
-          message: 'Erro ao atualizar registro',
-        ));
+      if (index == -1) {
+        return Left(RepositoryException(message: 'Registro não encontrado.'));
       }
 
-      // return Right(true);
+      listRegisters[index] = registro;
+      final bool result = await _salvarLocalmente(listRegisters);
+      return Right(result);
     } catch (e, s) {
-      log(e.toString(), error: e, stackTrace: s);
-      return Left(RepositoryException(
-        message: 'Erro ao atualizar registro',
-      ));
+      log("Erro ao atualizar registro: $e", error: e, stackTrace: s);
+      return Left(
+          RepositoryException(message: 'Erro ao atualizar o registro.'));
     }
   }
 
@@ -123,141 +129,20 @@ class RegisterRepositoryImpl implements RegisterRepository {
   Future<Either<RepositoryException, bool>> deleteRegisterRepository(
       RegisterModel registro) async {
     try {
-      //  SharedPreferences prefs = await SharedPreferences.getInstance();
-      var listRegisters = await getListRegister();
-      //  print(listRegisters.toString());
-      //  print(registro.id.toString());
+      final List<RegisterModel> listRegisters = await _getListRegister();
 
-      // Encontrar o índice do registro a ser atualizado
-      int index = listRegisters.indexWhere((reg) => reg.id == registro.id);
+      final int beforeCount = listRegisters.length;
+      listRegisters.removeWhere((reg) => reg.id == registro.id);
 
-      if (index != -1) {
-        // Substituir o registro antigo pelo novo
-        //listRegisters[index] = registro;
-
-        listRegisters.remove(listRegisters[index]);
-
-        // List<String> registrosStringAtualizado = listRegisters
-        //     .map((registro) => jsonEncode(registro.toMap()))
-        //     .toList();
-
-        // await prefs.setStringList(_keyRegistros, registrosStringAtualizado);
-        var result = await salvarLocalmente(listRegisters);
-
-        return Right(result);
-      } else {
-        return Left(RepositoryException(
-          message: 'Erro ao remover o registro',
-        ));
+      if (beforeCount == listRegisters.length) {
+        return Left(RepositoryException(message: 'Registro não encontrado.'));
       }
+
+      final bool result = await _salvarLocalmente(listRegisters);
+      return Right(result);
     } catch (e, s) {
-      log(e.toString(), error: e, stackTrace: s);
-      return Left(RepositoryException(
-        message: 'Erro ao remover o registro',
-      ));
+      log("Erro ao remover registro: $e", error: e, stackTrace: s);
+      return Left(RepositoryException(message: 'Erro ao remover o registro.'));
     }
-  }
-
-
-
-
-// TODO: Melhorar, revisão possiveis erros
-  @override
-  Future<ShareResultStatus> exportarViaArquivoRepository() async {
-    try {
-      List<RegisterModel> registros = await getListRegister();
-
-      String jsonContent =
-          jsonEncode(registros.map((r) => r.toJson()).toList());
-
-      // Cria um arquivo temporário no diretório de documentos
-      Directory directory = await getTemporaryDirectory();
-      File file = File('${directory.path}/passkey_backup.json');
-
-      await file.writeAsString(jsonContent);
-
-      ShareResult result = await Share.shareXFiles(
-        [XFile(file.path)],
-        text: 'Segue o backup dos dados do meu aplicativo!',
-      );
-      log('Backup realizado com sucesso!');
-
-      return result.status;
-    } catch (e) {
-      log(e.toString());
-
-      return ShareResultStatus.unavailable;
-    }
-  }
-
-  @override
-  Future<Either<RepositoryException, bool>>
-      importarViaArquivoRepository() async {
-    try {
-      // Permite que o usuário selecione o arquivo JSON
-      FilePickerResult? result = await FilePicker.platform.pickFiles(
-        dialogTitle: 'Selecione o arquivo de backup',
-        type: FileType.custom,
-        allowedExtensions: ['json'],
-      );
-
-      if (result != null && result.files.single.path != null) {
-        String filePath = result.files.single.path!;
-        File file = File(filePath);
-
-        // Lê e decodifica o conteúdo do arquivo JSON
-        String jsonContent = await file.readAsString();
-        List<dynamic> registrosJson = jsonDecode(jsonContent);
-
-        var listRegisters = registrosJson
-            .map((registrosJson) =>
-                RegisterModel.fromMap(jsonDecode(registrosJson)))
-            .toList();
-
-        var registro = await salvarLocalmente(listRegisters);
-
-        log('Dados importados com sucesso!');
-
-        return Right(registro);
-      } else {
-        log('Importação cancelada pelo usuário.');
-
-        return Left(RepositoryException(
-          message: 'Importação cancelada pelo usuário.',
-        ));
-      }
-    } catch (e) {
-      log('Erro ao importar dados: $e');
-      return Left(RepositoryException(
-        message: 'Erro ao importar dados:',
-      ));
-    }
-  }
-
-  @override
-  Future<bool> exportarUmRegistroRepository(RegisterModel registro) async {
-    try {
-      // Converte o registro para JSON
-      String jsonContent = jsonEncode(registro.toJson());
-
-      // Compartilha o registro JSON como texto
-      await Share.share(
-        jsonContent,
-        subject: 'Compartilhamento de Registro',
-      );
-      
-      log('Registro compartilhado com sucesso!');
-
-      return true;
-    } catch (e) {
-      log('Erro ao compartilhar registro: $e');
-      return false;
-    }
-  }
-  
-  @override
-  Future<Either<RepositoryException, bool>> importarUmRegistroRepository() {
-    // TODO: implement importarUmRegistroRepository
-    throw UnimplementedError();
   }
 }

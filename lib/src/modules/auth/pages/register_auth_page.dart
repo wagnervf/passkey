@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:passkey/src/core/components/form_field_input_password.dart';
+import 'package:passkey/src/core/components/help/help_view.dart';
 import 'package:passkey/src/core/router/routes.dart';
 import 'package:passkey/src/core/utils/utils.dart';
 import 'package:passkey/src/core/components/show_sucess.dart';
@@ -60,7 +61,7 @@ class _RegisterAuthPageState extends State<RegisterAuthPage> {
       );
 
       try {
-        await context.read<AuthController>().register(user);
+        await context.read<AuthController>().registerUser(user);
       } catch (e) {
         DialogUtils.showSuccessDialog(
           context,
@@ -157,10 +158,10 @@ class _RegisterAuthPageState extends State<RegisterAuthPage> {
                   padding: const EdgeInsets.all(24.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        "Criar Conta",
+                        edit ? 'Editar perfil' : 'Criar Conta',
                         textAlign: TextAlign.center,
                         style: Theme.of(context).textTheme.displayLarge,
                       ),
@@ -170,7 +171,7 @@ class _RegisterAuthPageState extends State<RegisterAuthPage> {
                         textAlign: TextAlign.center,
                         style: Theme.of(context).textTheme.titleSmall,
                       ),
-                      const SizedBox(height: 40),
+                      const Spacer(),
                       formField(
                         controller: _nameController,
                         hintText: 'Nome',
@@ -191,33 +192,30 @@ class _RegisterAuthPageState extends State<RegisterAuthPage> {
                         passwordController: _passwordController,
                         copy: true,
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 5),
                       Padding(
-                        padding: const EdgeInsets.all(8),
+                        padding: const EdgeInsets.all(4),
                         child: Text(
                           'Senha mestra, a única senha que você precisará lembrar.',
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.bodyMedium,
+                          textAlign: TextAlign.start,
+                          style: Theme.of(context).textTheme.labelSmall,
                         ),
                       ),
-
-                      const SizedBox(height: 20),
+                      const Spacer(),
                       SizedBox(
                         width: size.width * .9,
                         height: 50,
                         child: ElevatedButton(
                           onPressed: () => _register(context),
                           style: Utils.styleButtonElevated(),
-                          child: const Text(
-                            "Criar Conta",
+                          child: Text(
+                            edit ? 'Salvar' : "Criar Conta",
                             style: TextStyle(
                                 fontWeight: FontWeight.bold, fontSize: 18),
                           ),
                         ),
                       ),
-
                       const SizedBox(height: 10),
-
                       SizedBox(
                         width: size.width * .9,
                         height: 50,
@@ -229,18 +227,15 @@ class _RegisterAuthPageState extends State<RegisterAuthPage> {
                           onPressed: () => _acessar(context),
                         ),
                       ),
-
                       const Spacer(),
 
-                      ListTile(
-                        dense: true,
-                        leading: const Icon(
-                          Icons.info_outline,
+                      OutlinedButton.icon(
+                        icon: const Icon(
+                          Icons.help,
                           size: 16,
                         ),
-                        title: Text(
-                            'Seus dados serão criptografados e salvos em seu dispositivo.',
-                            style: Theme.of(context).textTheme.labelSmall),
+                        label: Text('Porque devo criar uma conta?'),
+                        onPressed: () => HelpView.mostrarDialogCriarConta(context),
                       ),
                     ],
                   ),
@@ -252,8 +247,6 @@ class _RegisterAuthPageState extends State<RegisterAuthPage> {
       ),
     );
   }
-
- 
 
   void _acessar(BuildContext context) {
     GoRouter.of(context).pushReplacement(RoutesPaths.auth);

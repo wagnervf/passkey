@@ -28,7 +28,7 @@ class _FormFieldInputPasswordState extends State<FormFieldInputPassword> {
       controller: widget.passwordController,
       obscureText: widget.obscureText,
       decoration: InputDecoration(
-      //  prefixIcon: Icon(Icons.key),
+        //  prefixIcon: Icon(Icons.key),
         suffixIcon: SizedBox(
           width: 100,
           child: Row(
@@ -37,7 +37,6 @@ class _FormFieldInputPasswordState extends State<FormFieldInputPassword> {
               IconButton(
                 icon: Icon(
                   widget.obscureText ? Icons.visibility : Icons.visibility_off,
-                  color: Theme.of(context).colorScheme.primary,
                 ),
                 onPressed: () {
                   setState(() {
@@ -51,7 +50,6 @@ class _FormFieldInputPasswordState extends State<FormFieldInputPassword> {
                           widget.passwordController.text, context),
                       icon: Icon(
                         Icons.copy,
-                        color: Theme.of(context).colorScheme.primary,
                       ),
                     )
                   : SizedBox.shrink(),
@@ -64,12 +62,7 @@ class _FormFieldInputPasswordState extends State<FormFieldInputPassword> {
             borderRadius: BorderRadius.circular(10)),
         contentPadding: EdgeInsets.all(18),
         filled: true,
-        fillColor: const Color.fromARGB(255, 235, 253, 252),
-        hintStyle: TextStyle(
-          color: Colors.teal[700],
-          fontWeight: FontWeight.bold,
-          fontSize: 14,
-        ),
+
         errorStyle: const TextStyle(color: Colors.red),
       ),
       validator: passwordValidator.call,

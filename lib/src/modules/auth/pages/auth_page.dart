@@ -67,7 +67,7 @@ class AuthPageState extends State<AuthPage> {
         if (state is AuthLoadingState) {
           return const Center(child: CircularProgressIndicator());
         }
-        return _formLogin(context);
+        return mounted ?  _formLogin(context) :  Center(child: CircularProgressIndicator());
       },
     );
   }
@@ -112,6 +112,8 @@ class AuthPageState extends State<AuthPage> {
                     
                     const SizedBox(height: 10),
                     buttonEntrar(context),
+                      const SizedBox(height: 5),
+                    buttonEsqueciSenha(size, context),
                     const Spacer(),
                     const Center(
                       child: Text(
@@ -120,10 +122,8 @@ class AuthPageState extends State<AuthPage> {
                       ),
                     ),
                     const Spacer(),
-                    buttoBiometria(context),
-                    
-                    const Spacer(),
-                    buttonEsqueciSenha(size, context),
+                    buttoBiometria(context),                    
+                    const Spacer(),                   
 
                     buttonCriarConta(context),
                     Text(
@@ -141,14 +141,17 @@ class AuthPageState extends State<AuthPage> {
     );
   }
 
-  SizedBox buttonEsqueciSenha(Size size, BuildContext context) {
-    return SizedBox(     
-      child: TextButton(
-        child: Text(
-          "Esqueci minha senha",
-          style: Theme.of(context).textTheme.displaySmall,
+   buttonEsqueciSenha(Size size, BuildContext context) {
+    return Align(
+      alignment: Alignment.bottomRight,
+      child: SizedBox(     
+        child: TextButton(
+          child: Text(
+            "Esqueci minha senha",
+            style: Theme.of(context).textTheme.labelSmall,
+          ),
+          onPressed: () => {},
         ),
-        onPressed: () => {},
       ),
     );
   }
@@ -170,13 +173,7 @@ class AuthPageState extends State<AuthPage> {
       width: MediaQuery.of(context).size.width * .9,
       height: 50,
       child: OutlinedButton(
-        onPressed: () => _login(context),
-        // style: ElevatedButton.styleFrom(
-        //   padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
-        //   shape: RoundedRectangleBorder(
-        //     borderRadius: BorderRadius.circular(10),
-        //   ),
-        // ),
+        onPressed: () => _login(context),       
         child: const Text(
           "Entrar",
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),

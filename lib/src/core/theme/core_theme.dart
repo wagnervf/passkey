@@ -19,53 +19,50 @@ ThemeData get lightTheme => ThemeData(
       primaryColor: lightColorScheme.primary,
       cardColor: lightColorScheme.primaryContainer,
       listTileTheme: ListTileThemeData(iconColor: lightColorScheme.primary),
-   //   iconTheme: IconThemeData(color: lightColorScheme.primary),
-    //  scaffoldBackgroundColor: Colors.grey[50],
+      //   iconTheme: IconThemeData(color: lightColorScheme.primary),
+      //  scaffoldBackgroundColor: Colors.grey[50],
 
       brightness: Brightness.light,
-   // primaryColor: const lightColorScheme.primary, // Verde WhatsApp
-    primaryColorLight: lightColorScheme.primary,
-    primaryColorDark:  lightColorScheme.primary,
-    scaffoldBackgroundColor: lightColorScheme.surface,// const Color(0xFFFFFFFF),
-     appBarTheme:  AppBarTheme(
-      backgroundColor: lightColorScheme.surface,
-        titleTextStyle: const TextStyle(fontSize: 18, color: Colors.black)
+      // primaryColor: const lightColorScheme.primary, // Verde WhatsApp
+      primaryColorLight: lightColorScheme.primary,
+      primaryColorDark: lightColorScheme.primary,
+      scaffoldBackgroundColor:
+          lightColorScheme.surface, // const Color(0xFFFFFFFF),
+      appBarTheme: AppBarTheme(
+          backgroundColor: lightColorScheme.surface,
+          titleTextStyle: const TextStyle(fontSize: 18, color: Colors.black)
 
-    //   foregroundColor: Colors.white,
-    //   iconTheme: IconThemeData(color: Colors.white),
-     ),
-    floatingActionButtonTheme:  FloatingActionButtonThemeData(
-      backgroundColor: lightColorScheme.primary,
-      foregroundColor: Colors.white,
-    ),
-    iconTheme:  IconThemeData(color: lightColorScheme.primary),
-    // textTheme: const TextTheme(
-    //   bodyLarge: TextStyle(color: Colors.black87),
-    //   bodyMedium: TextStyle(color: Colors.black87),
-    //   titleLarge: TextStyle(color: Colors.black),
-    // ),
-    dividerColor: Colors.grey[300],
-    bottomNavigationBarTheme:  BottomNavigationBarThemeData(
-      backgroundColor: Color(0xFFFFFFFF),
-      selectedItemColor: lightColorScheme.primary,
-      unselectedItemColor: Colors.grey,
-    ),
-   
-      
-      
-    
-       elevatedButtonTheme: ElevatedButtonThemeData(
+          //   foregroundColor: Colors.white,
+          //   iconTheme: IconThemeData(color: Colors.white),
+          ),
+      floatingActionButtonTheme: FloatingActionButtonThemeData(
+        backgroundColor: lightColorScheme.primary,
+        foregroundColor: Colors.white,
+      ),
+      iconTheme: IconThemeData(color: lightColorScheme.primary),
+      // textTheme: const TextTheme(
+      //   bodyLarge: TextStyle(color: Colors.black87),
+      //   bodyMedium: TextStyle(color: Colors.black87),
+      //   titleLarge: TextStyle(color: Colors.black),
+      // ),
+      dividerColor: Colors.grey[300],
+      bottomNavigationBarTheme: BottomNavigationBarThemeData(
+        backgroundColor: Color(0xFFFFFFFF),
+        selectedItemColor: lightColorScheme.primary,
+        unselectedItemColor: Colors.grey,
+      ),
+
+      elevatedButtonTheme: ElevatedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          side: BorderSide(
-            color: lightColorScheme.primary,
-            width: 1,
-          ),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15.0),
-          ),
-          backgroundColor: lightColorScheme.primary,
-          foregroundColor: Colors.white
-        ),
+            side: BorderSide(
+              color: lightColorScheme.primary,
+              width: 1,
+            ),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15.0),
+            ),
+            backgroundColor: lightColorScheme.primary,
+            foregroundColor: Colors.white),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
@@ -91,17 +88,22 @@ ThemeData get lightTheme => ThemeData(
           ),
         ),
       ),
+
+      iconButtonTheme: IconButtonThemeData(
+
+        style: ButtonStyle(iconColor:WidgetStatePropertyAll(lightColorScheme.primary),
+        foregroundColor: WidgetStatePropertyAll(lightColorScheme.primary)
+        )
+      ),
       cardTheme: const CardTheme(color: Colors.white),
-      // bottomNavigationBarTheme: BottomNavigationBarThemeData(
-      //   unselectedItemColor: lightColorScheme.secondary,
-      //   showUnselectedLabels: true,
-      //   selectedItemColor: lightColorScheme.primary,
-      //   showSelectedLabels: true,
-      //   elevation: 10,
-      //   selectedLabelStyle: const TextStyle(fontSize: 14),
-      //   unselectedLabelStyle: const TextStyle(fontSize: 14),
-      //   type: BottomNavigationBarType.fixed,
-      // ),
+      inputDecorationTheme: InputDecorationTheme(
+        fillColor: const Color.fromARGB(255, 235, 253, 252),
+        hintStyle: TextStyle(
+           color: Colors.teal[700],
+        fontWeight: FontWeight.bold,
+        fontSize: 14,
+        )
+      ),
       segmentedButtonTheme: _segmentedButtonTheme(),
       textTheme: TextTheme(
         displayLarge: TextStyle(
@@ -119,13 +121,14 @@ ThemeData get lightTheme => ThemeData(
           fontSize: 18,
           fontWeight: FontWeight.bold,
         ),
-        labelMedium: const TextStyle(
+        labelMedium: TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.bold,
-          // color: lightColorScheme.primary,
+           color: lightColorScheme.primary,
         ),
         labelSmall: TextStyle(
           color: lightColorScheme.primary,
+           fontSize: 12,
         ),
         titleLarge: const TextStyle(
           fontWeight: FontWeight.bold,
@@ -135,13 +138,10 @@ ThemeData get lightTheme => ThemeData(
         ),
         titleSmall: const TextStyle(fontWeight: FontWeight.bold),
         headlineSmall: const TextStyle(color: Colors.white, fontSize: 12),
-        bodySmall:  TextStyle(
-          fontSize: 12,
-          color: lightColorScheme.outline
-        ),
+        bodySmall: TextStyle(fontSize: 12, color: lightColorScheme.outline),
         bodyMedium: const TextStyle(
           fontSize: 16,
-        //  color: Colors.white,
+          //  color: Colors.white,
         ),
         bodyLarge: const TextStyle(
           fontSize: 20,
@@ -157,70 +157,96 @@ ThemeData get darkTheme => ThemeData(
       // pageTransitionsTheme: pageTransitionsTheme,
       brightness: Brightness.dark,
       primaryColor: darkColorScheme.primary,
-    primaryColorLight: darkColorScheme.primary,
-    primaryColorDark: const Color(0xFF0B141A),
-    scaffoldBackgroundColor: const Color(0xFF121B22),
- 
-    floatingActionButtonTheme: const FloatingActionButtonThemeData(
-      backgroundColor: Color(0xFF25D366),
-      foregroundColor: Colors.white,
-    ),
-    iconTheme: const IconThemeData(color: Colors.white),
- 
-    dividerColor: Colors.grey[700],
-    bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-      backgroundColor: Color(0xFF1F2C34),
-      selectedItemColor: Color(0xFF25D366),
-      unselectedItemColor: Colors.grey,
-    ),
-    textButtonTheme: TextButtonThemeData(style: ButtonStyle(foregroundColor: WidgetStatePropertyAll(darkColorScheme.secondary))),
-     // primaryColor: darkColorScheme.onPrimary,
+      primaryColorLight: darkColorScheme.primary,
+      primaryColorDark: const Color(0xFF0B141A),
+      scaffoldBackgroundColor: const Color(0xFF121B22),
+
+      floatingActionButtonTheme: const FloatingActionButtonThemeData(
+        backgroundColor: Color(0xFF25D366),
+        foregroundColor: Colors.white,
+      ),
+      iconTheme: const IconThemeData(color: Colors.white),
+     // listTileTheme: ListTileThemeData(tileColor: Colors.amber),
+     cardTheme: CardTheme(color: darkColorScheme.onPrimaryContainer),
+
+      dividerColor: Colors.grey[700],
+      bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+        backgroundColor: Color(0xFF1F2C34),
+        selectedItemColor: Color(0xFF25D366),
+        unselectedItemColor: Colors.grey,
+      ),
+      textButtonTheme: TextButtonThemeData(
+          style: ButtonStyle(
+              foregroundColor:
+                  WidgetStatePropertyAll(darkColorScheme.secondary))),
+      // primaryColor: darkColorScheme.onPrimary,
       appBarTheme: AppBarTheme(
-       // centerTitle: true,
-     //  color: darkColorScheme.onPrimary,
-        actionsIconTheme: IconThemeData(color: darkColorScheme.secondary, ),
+        // centerTitle: true,
+        //  color: darkColorScheme.onPrimary,
+        actionsIconTheme: IconThemeData(
+          color: darkColorScheme.secondary,
+        ),
         iconTheme: IconThemeData(color: darkColorScheme.secondary),
         elevation: 0,
-        titleTextStyle: TextStyle(fontSize: 18, color: darkColorScheme.secondary),
+        titleTextStyle:
+            TextStyle(fontSize: 18, color: darkColorScheme.secondary),
         foregroundColor: darkColorScheme.secondary,
         //backgroundColor: darkColorScheme.secondary,
 
         systemOverlayStyle: SystemUiOverlayStyle(
-
           statusBarColor: darkColorScheme.onPrimary,
           statusBarIconBrightness: Brightness.light,
           statusBarBrightness: Brightness.dark,
         ),
       ),
       segmentedButtonTheme: _segmentedButtonTheme(),
-      // bottomNavigationBarTheme: BottomNavigationBarThemeData(
-      //   unselectedItemColor: lightColorScheme.onPrimary,
-      //   showUnselectedLabels: true,
-      //   selectedItemColor: lightColorScheme.primary,
-      //   showSelectedLabels: true,
-      //   elevation: 10,
-      //   selectedLabelStyle: const TextStyle(fontSize: 14),
-      //   unselectedLabelStyle: const TextStyle(fontSize: 14),
-      //   type: BottomNavigationBarType.fixed,
-      // ),
+      inputDecorationTheme: InputDecorationTheme(
+        //fillColor: const Color.fromARGB(255, 235, 253, 252),
+        hintStyle: TextStyle(
+        //   color: Colors.teal[700],
+        fontWeight: FontWeight.bold,
+        fontSize: 14,
+        )
+      ),
+      iconButtonTheme: IconButtonThemeData(
+
+        style: ButtonStyle(iconColor:WidgetStatePropertyAll(Colors.white, ),
+        foregroundColor: WidgetStatePropertyAll(Colors.white)
+        )
+      ),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+            side: BorderSide(
+              color: darkColorScheme.primary,
+              width: 1,
+            ),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15.0),
+            ),
+            backgroundColor: darkColorScheme.primary,
+            foregroundColor: Colors.white),
+      ),
       outlinedButtonTheme: OutlinedButtonThemeData(
+        
         style: OutlinedButton.styleFrom(
           side: BorderSide(
-            color: lightColorScheme.primary,
+            color: Colors.white,
             width: 1,
           ),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(15.0),
           ),
+          foregroundColor: Colors.white,
         ),
+        
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
-          backgroundColor: lightColorScheme.primary,
+          backgroundColor: darkColorScheme.primary,
           foregroundColor: Colors.white,
           textStyle: const TextStyle(color: Colors.white),
           side: BorderSide(
-            color: lightColorScheme.primary,
+            color: darkColorScheme.primary,
             width: 1,
           ),
           shape: RoundedRectangleBorder(
@@ -246,7 +272,8 @@ ThemeData get darkTheme => ThemeData(
           fontWeight: FontWeight.bold,
           // color: lightColorScheme.primary,
         ),
-        labelSmall: TextStyle(color: darkColorScheme.secondary
+        labelSmall: TextStyle(color: darkColorScheme.secondary,
+         fontSize: 12,
             //   color: lightColorScheme.primary,
             ),
         titleLarge: const TextStyle(
