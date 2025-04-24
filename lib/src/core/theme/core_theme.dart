@@ -19,6 +19,7 @@ ThemeData get lightTheme => ThemeData(
       primaryColor: lightColorScheme.primary,
       cardColor: lightColorScheme.primaryContainer,
       listTileTheme: ListTileThemeData(iconColor: lightColorScheme.primary),
+      
       //   iconTheme: IconThemeData(color: lightColorScheme.primary),
       //  scaffoldBackgroundColor: Colors.grey[50],
 
@@ -27,7 +28,7 @@ ThemeData get lightTheme => ThemeData(
       primaryColorLight: lightColorScheme.primary,
       primaryColorDark: lightColorScheme.primary,
       scaffoldBackgroundColor:
-          lightColorScheme.surface, // const Color(0xFFFFFFFF),
+          lightColorScheme.surface,
       appBarTheme: AppBarTheme(
           backgroundColor: lightColorScheme.surface,
           titleTextStyle: const TextStyle(fontSize: 18, color: Colors.black)

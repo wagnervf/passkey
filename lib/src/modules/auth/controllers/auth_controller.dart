@@ -8,6 +8,7 @@ import 'package:passkey/src/modules/auth/model/auth_user_model.dart';
 import 'package:passkey/src/modules/auth/repositories/auth_repository.dart';
 import 'package:local_auth_android/local_auth_android.dart';
 import 'package:local_auth_darwin/local_auth_darwin.dart';
+import 'package:passkey/src/modules/auth/providers/auth_user_provider.dart';
 
 class AuthController extends Cubit<AuthState> {
   AuthController({
@@ -27,6 +28,7 @@ class AuthController extends Cubit<AuthState> {
 
     if (_user != null) {
       emit(AuthSuccessState(_user));
+      AuthUserProvider.instance.setUser(_user!);
     } else {
       emit(AuthErrorState('Usuário não encontrado!'));
       emit(AuthUnauthenticatedState());
@@ -42,6 +44,8 @@ class AuthController extends Cubit<AuthState> {
         final user = await authRepository.getUser();
 
         emit(AuthSuccessState(user!));
+          // Notify the provider about the new user
+        AuthUserProvider.instance.setUser(user);
       } catch (e) {
         emit(AuthErrorState('Usuário não encontrado!'));
       }
@@ -54,9 +58,13 @@ class AuthController extends Cubit<AuthState> {
     emit(AuthLoadingState());
     try {
       final result = await authRepository.saveUser(user);
-      result
-          ? emit(AuthSuccessState(user))
-          : emit(AuthErrorState('Erro ao cadastrar usuário'));
+      if (result) {
+        emit(AuthSuccessState(user));
+        // Notify the provider about the new user
+        AuthUserProvider.instance.setUser(user);
+      } else {
+        emit(AuthErrorState('Erro ao cadastrar usuário'));
+      }
     } catch (e) {
       emit(AuthErrorState('Erro ao cadastrar usuário'));
     }
@@ -73,6 +81,12 @@ class AuthController extends Cubit<AuthState> {
       return false;
     }
   }
+
+
+  limparContaAntesDeCriarUser() async {
+    await authRepository.logoutAndRemoveUser();
+  }
+
 
   loginWithBiometrics() async {
     try {

@@ -24,10 +24,10 @@ class _ExpandButtonsActionsState extends State<ExpandButtonsActions> {
   final _key = GlobalKey<ExpandableFabState>();
 
   _compartilharRegistro() async {
-       final exportarImportarService =
+    final exportarImportarService =
         Provider.of<BackupRestoreController>(context, listen: false);
 
-        exportarImportarService.exportarUmRegistro(widget.registro);
+    exportarImportarService.exportarUmRegistro(widget.registro);
 
     // ignore: use_build_context_synchronously
     ScaffoldMessenger.of(context).showSnackBar(
@@ -62,11 +62,13 @@ class _ExpandButtonsActionsState extends State<ExpandButtonsActions> {
                     .read<RegisterController>()
                     .deleteRegisterController(widget.registro);
 
-                if (result == true) {
-                  ShowMessager.show(context, 'Registro removido');
+                if (context.mounted) {
+                  if (result == true) {
+                    ShowMessager.show(context, 'Registro removido');
+                  }
+                  Navigator.of(context).pop();
+                  Navigator.of(context).pop();
                 }
-                Navigator.of(context).pop();
-                Navigator.of(context).pop();
               },
               child: const Text('Excluir'),
             ),
@@ -78,15 +80,16 @@ class _ExpandButtonsActionsState extends State<ExpandButtonsActions> {
 
   @override
   Widget build(BuildContext context) {
+    final tema = Theme.of(context).textTheme;
     return ExpandableFab(
       key: _key,
       type: ExpandableFabType.up,
       childrenAnimation: ExpandableFabAnimation.none,
-      distance: 70,     
+      distance: 70,
       children: [
         Row(
           children: [
-            const Text('Compartilhar'),
+             Text('Compartilhar', style: tema.labelMedium,),
             const SizedBox(width: 20),
             FloatingActionButton.small(
               heroTag: null,
@@ -97,7 +100,7 @@ class _ExpandButtonsActionsState extends State<ExpandButtonsActions> {
         ),
         Row(
           children: [
-            const Text('Excluir'),
+             Text('Excluir', style: tema.labelMedium,),
             const SizedBox(width: 20),
             FloatingActionButton.small(
               heroTag: null,
@@ -106,9 +109,9 @@ class _ExpandButtonsActionsState extends State<ExpandButtonsActions> {
             ),
           ],
         ),
-        const Row(
+         Row(
           children: [
-            Text('Favorito'),
+            Text('Favorito', style: tema.labelMedium,),
             SizedBox(width: 20),
             FloatingActionButton.small(
               heroTag: null,
@@ -119,7 +122,7 @@ class _ExpandButtonsActionsState extends State<ExpandButtonsActions> {
         ),
         Row(
           children: [
-            const Text('Alterar'),
+             Text('Alterar', style: tema.labelMedium,),
             const SizedBox(width: 20),
             FloatingActionButton.small(
               heroTag: null,

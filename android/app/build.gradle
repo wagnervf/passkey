@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = "passkey.brcriativi.com.br.passkey"
-    compileSdk = flutter.compileSdkVersion
+    compileSdk = 35 //flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
     compileOptions {

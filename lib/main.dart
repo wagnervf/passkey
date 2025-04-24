@@ -11,9 +11,7 @@ Future<void> main() async {
     () async {
       WidgetsFlutterBinding.ensureInitialized();
       await SharedPreferencesService.init();
-       SecureStorageService.init();
-
-
+      SecureStorageService.init();
 
       runApp(
         const ApplicationBinding(
@@ -26,4 +24,3 @@ Future<void> main() async {
     },
   );
 }
-

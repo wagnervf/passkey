@@ -13,6 +13,7 @@ class IconChangeTheme extends StatelessWidget {
     final themeConfig = context.watch<ThemeController>();
     return ItemCardWithIcon(
       text: 'Mudar Tema',
+      subtTitle: 'Mude o tema do aplicativo',
       icon: themeConfig.isDark
           ? Icons.light_mode_outlined
           : Icons.dark_mode_outlined,

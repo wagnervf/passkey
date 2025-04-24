@@ -3,7 +3,10 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
+import 'dart:typed_data';
 
+import 'package:csv/csv.dart';
+import 'package:encrypt/encrypt.dart' as encrypt;
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:passkey/src/core/components/encrypt/encrypt_decrypt_services.dart';
@@ -23,12 +26,40 @@ class BackupRestoreController extends Cubit<BackupRestoreState> {
       : super(BackupRestoreStateInitialState());
 
   static const _keyRegistros = 'registers';
-
   static const _userKey = 'auth_user';
 
   final secureStorageService = SecureStorageService();
-  final encrypt = EncryptDecryptServices();
+  final encryptP = EncryptDecryptServices();
   final RegisterController registerControllerX;
+
+   /// 🔐 Função para criptografar os dados
+  String _encryptData(String plainText) {
+    final key = encrypt.Key.fromUtf8(
+        '0123456789abcdef0123456789abcdef'); // Chave de 32 bytes
+    final iv = encrypt.IV.fromLength(16); // IV de 16 bytes
+    final encrypter = encrypt.Encrypter(encrypt.AES(key));
+
+    final encrypted = encrypter.encrypt(plainText, iv: iv);
+    return base64Encode(iv.bytes + encrypted.bytes); // Concatenamos IV + dados
+  }
+
+/// 🔓 Função para descriptografar os dados
+  String _decryptData(String encryptedText) {
+    final key = encrypt.Key.fromUtf8(
+        '0123456789abcdef0123456789abcdef'); // Chave de 32 bytes
+    final encryptedBytes = base64Decode(encryptedText);
+
+    final iv = encrypt.IV(Uint8List.fromList(
+        encryptedBytes.sublist(0, 16))); // Primeiro 16 bytes são o IV
+    final encryptedData =
+        encrypt.Encrypted(Uint8List.fromList(encryptedBytes.sublist(16)));
+
+    final encrypter = encrypt.Encrypter(encrypt.AES(key));
+    return encrypter.decrypt(encryptedData, iv: iv);
+  }
+
+  
+
 
   /// Obtém a lista de registros armazenados
   Future<List<RegisterModel>> _getListRegister() async {
@@ -66,7 +97,7 @@ class BackupRestoreController extends Cubit<BackupRestoreState> {
       }
 
       // Descriptografar a senha
-      final decryptedPassword = encrypt.decryptPassword(encryptedPassword);
+      final decryptedPassword = encryptP.decryptPassword(encryptedPassword);
 
       final user = AuthUserModel(
         name: jsonUser['name']?.toString() ?? '',
@@ -107,19 +138,20 @@ class BackupRestoreController extends Cubit<BackupRestoreState> {
       final String dataExport =
           jsonEncode({_userKey: userJson, _keyRegistros: jsonRegister});
 
-      log("Dados exportados: $dataExport");
+      // 🔐 Criptografando os dados
+      final String encryptedData = _encryptData(dataExport);
 
       // Obtendo diretório
       final Directory directory = await getApplicationDocumentsDirectory();
-      final String filePath = '${directory.path}/passkey_backup.json';
+      final String filePath = '${directory.path}/passkey_backup.enc';
       final File file = File(filePath);
 
-      await file.writeAsString(dataExport);
+      await file.writeAsString(encryptedData);
 
       // Compartilhando o arquivo
       final ShareResult result = await Share.shareXFiles(
         [XFile(file.path)],
-        text: 'Segue o backup dos dados do meu aplicativo!',
+        text: 'Segue o backup criptografado dos dados do meu aplicativo!',
       );
 
       file.existsSync();
@@ -134,13 +166,15 @@ class BackupRestoreController extends Cubit<BackupRestoreState> {
       return "Erro ao exportar backup: $e";
     }
   }
-
+ 
   Future<String?> restoreBackup(AuthController authController,
       RegisterController registerController) async {
     try {
       emit(BackupRestoreStateLoadingState());
+     // name	url	username	password	note
 
-      final resultado = await importarViaArquivo();
+
+      final resultado = await _importarViaArquivo();
 
       if (resultado != null) {
         AuthUserModel user = resultado['user'];
@@ -151,31 +185,33 @@ class BackupRestoreController extends Cubit<BackupRestoreState> {
 
         // Salvar usuário corretamente via AuthController
         await authController.registerUser(user);
-        await registerControllerX.saveListRegisterController(registros);
+        await registerController.saveListRegisterController(registros);
+
         emit(BackupRestoreStateSuccessState());
 
         return 'Usuário importado!';
-
-        // Salvar registros corretamente via RegisterController
-        //  await registerController.importRegisters(registros);
       } else {
         log('Falha ao importar os dados.');
-        
         emit(BackupRestoreStateErrorState('Falha ao importar os dados.'));
         return 'Falha ao importar os dados.';
       }
     } catch (e) {
-      emit(BackupRestoreStateErrorState("Erro ao exportar backup: $e"));
-      return "Erro ao exportar backup: $e";
+      emit(BackupRestoreStateErrorState("Erro ao importar backup: $e"));
+      return "Erro ao importar backup: $e";
     }
   }
 
-  Future<Map<String, dynamic>?> importarViaArquivo() async {
+  Future<Map<String, dynamic>?> _importarViaArquivo() async {
     try {
-      // Selecionar o arquivo JSON
-      FilePickerResult? result = await FilePicker.platform.pickFiles(
-        type: FileType.custom,
-        allowedExtensions: ['json'],
+      // Selecionar o arquivo criptografado
+      // FilePickerResult? result = await FilePicker.platform.pickFiles(
+      //   type: FileType.custom,
+      //   allowedExtensions: ['enc'], // Arquivo encriptado
+      // );
+
+      final FilePickerResult? result = await FilePicker.platform.pickFiles(
+        dialogTitle: 'Selecione um arquivo',
+        type: FileType.any, // ✅ Permite qualquer arquivo
       );
 
       if (result == null || result.files.single.path == null) {
@@ -184,10 +220,13 @@ class BackupRestoreController extends Cubit<BackupRestoreState> {
       }
 
       final File file = File(result.files.single.path!);
-      final String fileContent = await file.readAsString();
+      final String encryptedContent = await file.readAsString();
+
+      // 🔓 Descriptografar os dados
+      final String decryptedData = _decryptData(encryptedContent);
 
       // Decodificar o JSON
-      final Map<String, dynamic> dataMap = jsonDecode(fileContent);
+      final Map<String, dynamic> dataMap = jsonDecode(decryptedData);
 
       // Validar a estrutura do JSON
       if (!dataMap.containsKey(_userKey) ||
@@ -206,12 +245,9 @@ class BackupRestoreController extends Cubit<BackupRestoreState> {
           registrosJson.map((r) => RegisterModel.fromJson(r)).toList();
 
       log("Importação concluída com sucesso!");
-      log("Usuário: ${user.name}, ${user.email}, ${user.password}");
+      log("Usuário: ${user.name}, ${user.email}");
       log("Registros: ${registros.length}");
-      log("Registros: ${registros.first.description}");
 
-      //bool userImported = await _saveUserImported(user);
-      // return userImported ? 'Usuário importado' : 'Erro ao importar';
       return {
         'user': user,
         'registros': registros,
@@ -222,19 +258,38 @@ class BackupRestoreController extends Cubit<BackupRestoreState> {
     }
   }
 
+
+
+  
   Future<bool> exportarUmRegistro(RegisterModel registro) async {
     try {
       final String jsonContent = jsonEncode(registro.toJson());
 
-      await Share.share(
-        jsonContent,
-        subject: 'Compartilhamento de Registro',
+      // 🔐 Criptografando os dados
+      final String encryptedData = _encryptData(jsonContent);
+
+      // Obtendo diretório
+      final Directory directory = await getApplicationDocumentsDirectory();
+      final String filePath = '${directory.path}/registro_backup.json';
+      final File file = File(filePath);
+
+      await file.writeAsString(encryptedData);
+
+      // Compartilhando o arquivo
+      final ShareResult result = await Share.shareXFiles(
+        [XFile(file.path)],
+        text: 'Segue o backup criptografado do registro selecionado!',
       );
 
-      log('Registro compartilhado com sucesso!');
+      file.existsSync();
+      emit(BackupRestoreStateSuccessState());
+
+      log('Compartilhamento: $result');
+      log('Registro exportado com sucesso! Arquivo salvo em: $filePath');
       return true;
     } catch (e, s) {
       log("Erro ao exportar registro: $e", error: e, stackTrace: s);
+      emit(BackupRestoreStateErrorState("Erro ao exportar registro: $e"));
       return false;
     }
   }
@@ -243,28 +298,35 @@ class BackupRestoreController extends Cubit<BackupRestoreState> {
   Future<Either<RepositoryException, bool>> importarUmRegistro() async {
     try {
       final FilePickerResult? result = await FilePicker.platform.pickFiles(
-        dialogTitle: 'Selecione um arquivo JSON contendo um único registro',
-        type: FileType.custom,
-        allowedExtensions: ['json'],
+        dialogTitle: 'Selecione um arquivo',
+        type: FileType.any, // ✅ Permite qualquer arquivo
       );
 
       if (result == null || result.files.single.path == null) {
-        log('Importação cancelada pelo usuário.');
-        return Left(
-            RepositoryException(message: 'Importação cancelada pelo usuário.'));
+        log("Nenhum arquivo selecionado.");
+        return Left(RepositoryException(message: 'Nenhum arquivo selecionado.'));
       }
 
-      final String filePath = result.files.single.path!;
-      final File file = File(filePath);
-      final String jsonContent = await file.readAsString();
-      final Map<String, dynamic> registroJson = jsonDecode(jsonContent);
+      final File file = File(result.files.single.path!);
+      final String encryptedContent = await file.readAsString();
 
-      final RegisterModel registro = RegisterModel.fromMap(registroJson);
+      // 🔓 Descriptografar os dados
+      final String decryptedData = _decryptData(encryptedContent);
 
-      final List<RegisterModel> listRegisters = await _getListRegister();
-      listRegisters.add(registro);
+      // Decodificar o JSON
+      final Map<String, dynamic> dataMap = jsonDecode(decryptedData);
 
-      final sucesso = await _saveRegistersImported(listRegisters);
+      // Validar a estrutura do JSON
+      if (!dataMap.containsKey('id') || !dataMap.containsKey('name')) {
+        log("Formato de arquivo inválido.");
+        return Left(RepositoryException(message: 'Formato de arquivo inválido.'));
+      }
+
+      // Decodificar o registro
+      final RegisterModel registro = RegisterModel.fromJson(dataMap as String);
+
+      // Salvar o registro importado
+      final sucesso = await _saveOneRegisterImported(registro);
 
       if (sucesso) {
         log('Registro importado com sucesso!');
@@ -279,32 +341,75 @@ class BackupRestoreController extends Cubit<BackupRestoreState> {
     }
   }
 
-  Future<bool> _saveRegistersImported(List<RegisterModel> listRegisters) async {
+  Future<bool> _saveOneRegisterImported(RegisterModel registro) async {
     try {
+      final List<RegisterModel> registros = await _getListRegister();
+      registros.add(registro);
+
       final List<String> registrosString =
-          listRegisters.map((reg) => jsonEncode(reg.toMap())).toList();
+          registros.map((reg) => jsonEncode(reg.toMap())).toList();
 
       await secureStorageService.saveStringList(_keyRegistros, registrosString);
 
       return true;
     } catch (e, s) {
-      log("Erro ao salvar registros localmente: $e", error: e, stackTrace: s);
+      log("Erro ao salvar registro localmente: $e", error: e, stackTrace: s);
       return false;
     }
   }
 
-  // Future<bool> _saveUserImported(AuthUserModel user) async {
-  //   if (user.name == '') return false;
+ 
+Future<List<Map<String, String>>> importCsv() async {
+  try {
+    // Permitir que o usuário selecione o arquivo CSV
+    final FilePickerResult? result = await FilePicker.platform.pickFiles(
+      dialogTitle: 'Selecione um arquivo CSV',
+      type: FileType.custom,
+      allowedExtensions: ['csv'], // Apenas arquivos CSV
+    );
 
-  //   final encryptedPassword = encrypt.encryptPassword(user.password);
-  //   final userToSave = {
-  //     'name': user.name,
-  //     'email': user.email,
-  //     'password': encryptedPassword,
-  //   };
-  //   await secureStorageService.setDataKey(_userKey, json.encode(userToSave));
-  //   return true;
-  // }
+    if (result == null || result.files.single.path == null) {
+      throw Exception('Nenhum arquivo selecionado.');
+    }
 
-  getTemporaryDirectory() {}
+    final File file = File(result.files.single.path!);
+
+    if (!await file.exists()) {
+      throw Exception('Arquivo CSV não encontrado: ${file.path}');
+    }
+
+    final csvContent = await file.readAsString();
+    final List<List<dynamic>> rows = const CsvToListConverter().convert(
+      csvContent,
+      eol: '\n', // Define o separador de linhas
+    );
+
+    if (rows.isEmpty) {
+      throw Exception('O arquivo CSV está vazio.');
+    }
+
+    // A primeira linha do CSV deve conter os cabeçalhos
+    final headers = rows.first.map((header) => header.toString()).toList();
+    final dataRows = rows.skip(1); // Ignora a linha de cabeçalhos
+
+    // Converte as linhas em uma lista de mapas
+    final List<Map<String, String>> data = dataRows.map((row) {
+      final Map<String, String> rowData = {};
+      for (int i = 0; i < headers.length; i++) {
+        rowData[headers[i]] = row[i]?.toString() ?? '';
+      }
+      return rowData;
+    }).toList();
+
+    for (var row in data) {
+      print('Name: ${row['name']}, URL: ${row['url']}, Username: ${row['username']}, Password: ${row['password']}, Note: ${row['note']}');
+    }
+
+    return data;
+  } catch (e) {
+    rethrow;
+  }
+}
+
+
 }

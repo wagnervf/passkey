@@ -40,7 +40,6 @@ class AuthPageState extends State<AuthPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          backgroundColor: Theme.of(context).colorScheme.primary,
           toolbarHeight: 10,
         ),
         body: _blocCosumer());
@@ -67,7 +66,9 @@ class AuthPageState extends State<AuthPage> {
         if (state is AuthLoadingState) {
           return const Center(child: CircularProgressIndicator());
         }
-        return mounted ?  _formLogin(context) :  Center(child: CircularProgressIndicator());
+        return mounted
+            ? _formLogin(context)
+            : Center(child: CircularProgressIndicator());
       },
     );
   }
@@ -91,46 +92,50 @@ class AuthPageState extends State<AuthPage> {
                     Container(
                       padding: const EdgeInsets.all(4.0),
                       margin: const EdgeInsets.all(2.0),
-                      height: size.height * .1,
+                      height: size.height * .2,
                       child: Image.asset(
                         'assets/images/passkey.png',
-                        fit: BoxFit.contain,
+                        fit: BoxFit.scaleDown,
                         color: Colors.teal,
                       ),
                     ),
                     const SizedBox(height: 10),
-                    Text(
-                      "Acessar",
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.displayLarge,
-                    ),
+                    Padding(
+                        padding: EdgeInsets.only(left: 28.0),
+                        child: ListTile(
+                          
+                          title: Text(
+                            "Acessar",
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context).textTheme.displayLarge,
+                          ),
+                          subtitle: Text(
+                            "Armazenamento criptografado e acesso fácil quando precisar",
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context).textTheme.bodySmall,
+                          ),
+                        )),
                     const SizedBox(height: 24),
+                    buttoBiometria(context),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 28.0),
+                      child: const Center(
+                        child: Text(
+                          ' ou ',
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                      ),
+                    ),
                     FormFieldInputPassword(
                       passwordController: _passwordController,
                       copy: false,
                     ),
-                    
                     const SizedBox(height: 10),
                     buttonEntrar(context),
-                      const SizedBox(height: 5),
+                    const SizedBox(height: 5),
                     buttonEsqueciSenha(size, context),
                     const Spacer(),
-                    const Center(
-                      child: Text(
-                        ' ou ',
-                        style: TextStyle(color: Colors.grey),
-                      ),
-                    ),
-                    const Spacer(),
-                    buttoBiometria(context),                    
-                    const Spacer(),                   
-
                     buttonCriarConta(context),
-                    Text(
-                      "Armazenamento criptografado e acesso fácil quando precisar",
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
                   ],
                 ),
               ),
@@ -141,10 +146,10 @@ class AuthPageState extends State<AuthPage> {
     );
   }
 
-   buttonEsqueciSenha(Size size, BuildContext context) {
+  buttonEsqueciSenha(Size size, BuildContext context) {
     return Align(
       alignment: Alignment.bottomRight,
-      child: SizedBox(     
+      child: SizedBox(
         child: TextButton(
           child: Text(
             "Esqueci minha senha",
@@ -156,8 +161,8 @@ class AuthPageState extends State<AuthPage> {
     );
   }
 
-  SizedBox buttonCriarConta( BuildContext context) {
-    return SizedBox(    
+  SizedBox buttonCriarConta(BuildContext context) {
+    return SizedBox(
       child: TextButton(
         child: Text(
           "Criar Conta",
@@ -173,7 +178,7 @@ class AuthPageState extends State<AuthPage> {
       width: MediaQuery.of(context).size.width * .9,
       height: 50,
       child: OutlinedButton(
-        onPressed: () => _login(context),       
+        onPressed: () => _login(context),
         child: const Text(
           "Entrar",
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
@@ -197,8 +202,6 @@ class AuthPageState extends State<AuthPage> {
     );
   }
 
- 
-
   Future<void> _login(BuildContext context) async {
     final password = _passwordController.text;
     if (password.isEmpty) {
@@ -207,8 +210,8 @@ class AuthPageState extends State<AuthPage> {
     context.read<AuthController>().login(password);
   }
 
-    void _registrar(BuildContext context) {
-      GoRouter.of(context).pushReplacement(RoutesPaths.authRegister);
+  void _registrar(BuildContext context) {
+    GoRouter.of(context).pushReplacement(RoutesPaths.authRegister);
   }
 
   Future<void> _authenticateWithBiometrics(BuildContext context) async {

@@ -26,9 +26,10 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.onPrimary,
       appBar: AppBar(
-        title: const Text('Perfil'),
+        toolbarHeight: 10,
+        excludeHeaderSemantics: true,
+        leading: SizedBox.shrink(),
       ),
       body: SafeArea(child: body(context)),
     );
@@ -65,6 +66,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   profile(context, userLoged),
+                  Divider(),
                   Expanded(
                     child: Padding(
                       padding: const EdgeInsets.all(18.0),
@@ -75,6 +77,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           Utils.titleCard(context, 'Usuário'),
                           ItemCardWithIcon(
                             text: 'Editar Perfil',
+                            subtTitle: 'Altere os dados do seu perfil',
                             icon: Icons.edit,
                             onTap: () => _goToEdit(userLoged!),
                           ),
@@ -84,12 +87,15 @@ class _ProfilePageState extends State<ProfilePage> {
                           Utils.titleCard(context, 'Sistema'),
                           ItemCardWithIcon(
                             text: 'Configurações',
+                            subtTitle: 'Altere as configurações do app',
                             icon: Icons.settings,
                             onTap: () => _goToConfig(userLoged!),
                           ),
-                          const Spacer(),
+                        
                           ItemCardWithIcon(
                             text: 'Sair',
+
+                            subtTitle: 'Sair do aplicativo',
                             icon: Icons.logout_outlined,
                             onTap: () => _auth(),
                           ),

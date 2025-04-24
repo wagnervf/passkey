@@ -73,7 +73,8 @@ class SplashPageState extends State<SplashPage> {
   void _authSucess(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       GoRouter.of(context).pushReplacement(
-        RoutesPaths.auth,
+        RoutesPaths.home,
+       // RoutesPaths.listRegisters,
       );
     });
   }

@@ -61,7 +61,10 @@ class _RegisterAuthPageState extends State<RegisterAuthPage> {
       );
 
       try {
+        await context.read<AuthController>().limparContaAntesDeCriarUser();
+
         await context.read<AuthController>().registerUser(user);
+
       } catch (e) {
         DialogUtils.showSuccessDialog(
           context,

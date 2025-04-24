@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:passkey/src/core/components/item_card_with_icon.dart';
 import 'package:passkey/src/core/components/show_messeger.dart';
 import 'package:passkey/src/core/router/routes.dart';
 import 'package:passkey/src/core/utils/utils.dart';
@@ -9,6 +10,7 @@ import 'package:passkey/src/modules/auth/controllers/auth_state.dart';
 import 'package:passkey/src/modules/auth/model/auth_user_model.dart';
 import 'package:passkey/src/modules/configuracoes/backup_restore/views/backup_restore_page.dart';
 import 'package:passkey/src/modules/configuracoes/views/widgets/icon_change_theme.dart';
+import 'package:passkey/src/modules/import_registers_csv/pages/import_register_csv_page.dart';
 
 class ConfiguracoesPage extends StatefulWidget {
   const ConfiguracoesPage({super.key});
@@ -28,7 +30,6 @@ class _ConfiguracoesPageState extends State<ConfiguracoesPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.onPrimary,
       appBar: AppBar(
         title: const Text('Configurações'),
       ),
@@ -78,15 +79,27 @@ class _ConfiguracoesPageState extends State<ConfiguracoesPage> {
                             height: 20,
                           ),
                           Utils.titleCard(context, 'Gerenciar Tema'),
+
                           const IconChangeTheme(),
-                          const SizedBox(
-                            height: 20,
-                          ),
+                          const SizedBox(height: 20),
                           Utils.titleCard(context, 'Gerenciar Registros'),
 
-                          BackupRestorePage(), 
+                          //    BackupRestorePage(),
+
+                          ImportRegisterCsvPage(),
+                          const SizedBox(height: 20),
+                          
+                          ItemCardWithIcon(
+                            text: 'Excluir todos os dados',
+                            subtTitle:
+                                'Apagar do celular todos os dados do aplicativo.',
+                            icon: Icons.delete,
+                            onTap: () => _confirmarExclusao(context),
+                          ),
+
+                          //  buttonRemoverUser(context),
                           const Spacer(),
-                          buttonRemoverUser(context),
+
                           Center(
                             child: Text(
                               '© $currentYear PassKey seu gerenciador de senhas particular e privativo. Todos os direitos reservados.',
@@ -110,29 +123,29 @@ class _ConfiguracoesPageState extends State<ConfiguracoesPage> {
     });
   }
 
-  InkWell buttonRemoverUser(BuildContext context) {
-    return InkWell(
-      onTap: () => _confirmarExclusao(context),
-      child: Card(
-        child: ListTile(
-          minTileHeight: 60,
-          dense: true,
-          contentPadding: const EdgeInsets.only(right: 8, left: 8),
-          leading: const Icon(
-            Icons.delete,
-            color: Colors.red,
-          ),
-          title: Text(
-            'Excluir o usuário e apagar os registros',
-            style: Theme.of(context)
-                .textTheme
-                .titleMedium!
-                .copyWith(color: Colors.red),
-          ),
-        ),
-      ),
-    );
-  }
+  // InkWell buttonRemoverUser(BuildContext context) {
+  //   return InkWell(
+  //     onTap: () => _confirmarExclusao(context),
+  //     child: Card(
+  //       child: ListTile(
+  //         minTileHeight: 60,
+  //         dense: true,
+  //         contentPadding: const EdgeInsets.only(right: 8, left: 8),
+  //         leading: const Icon(
+  //           Icons.delete,
+  //           color: Colors.red,
+  //         ),
+  //         title: Text(
+  //           'Excluir o usuário e apagar os registros',
+  //           style: Theme.of(context)
+  //               .textTheme
+  //               .titleMedium!
+  //               .copyWith(color: Colors.red),
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
 
   // Modal de confirmação antes de excluir a conta
   void _confirmarExclusao(BuildContext context) {

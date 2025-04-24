@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
 import 'package:go_router/go_router.dart';
 import 'package:passkey/src/core/components/expand_buttons_actions.dart';
-import 'package:passkey/src/core/utils/utils.dart';
+import 'package:passkey/src/core/components/installed_apps/installed_app_model.dart';
+import 'package:passkey/src/core/components/show_messeger.dart';
+import 'package:passkey/src/core/router/routes.dart';
+import 'package:passkey/src/modules/configuracoes/backup_restore/controllers/backup_restore_controller.dart';
+import 'package:passkey/src/modules/register/controller/register_controller.dart';
 import 'package:passkey/src/modules/register/model/registro_model.dart';
+import 'package:provider/provider.dart';
 
 class RegisterView extends StatefulWidget {
   const RegisterView({super.key});
@@ -19,7 +25,7 @@ class _RegisterViewState extends State<RegisterView> {
   final TextEditingController _description = TextEditingController();
 
   late RegisterModel register = RegisterModel();
-
+  InstalledAppModel? selectedApp;
   bool _obscureText = true;
 
   @override
@@ -34,10 +40,11 @@ class _RegisterViewState extends State<RegisterView> {
 
   loadEdits(RegisterModel register) {
     setState(() {
-      _title.text = register.title;
+      _title.text = register.name ?? '';
       _password.text = register.password!;
-      _description.text = register.description!;
+      _description.text = register.note!;
       //  _type.text = register.type.name;
+      selectedApp = register.selectedApp;
     });
   }
 
@@ -47,11 +54,8 @@ class _RegisterViewState extends State<RegisterView> {
 
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.onPrimary,
         title: const Text('Meu Registro'),
-      ),
-      floatingActionButtonLocation: ExpandableFab.location,
-      floatingActionButton: ExpandButtonsActions(
-        registro: register,
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -63,17 +67,111 @@ class _RegisterViewState extends State<RegisterView> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  atribute('Título', register.title),
-                  const Divider(),
-                  atribute('Login', register.login ?? ''),
-                  const Divider(),
+                children: <Widget>[
+                  Row(
+                    children: [
+                      CircleAvatar(
+                        backgroundColor: Colors.red,
+                        child: Text("C", style: TextStyle(color: Colors.white)),
+                      ),
+                      SizedBox(width: 12),
+                      Text(
+                        register.name ?? '',
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.w600),
+                      ),
+                    ],
+                  ),
+                  if (selectedApp != null)
+                    ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading: selectedApp!.iconBytes != null
+                          ? Image.memory(selectedApp!.iconBytes!,
+                              width: 40, height: 40)
+                          : const Icon(Icons.apps),
+                      title: Text(selectedApp!.name),
+                      subtitle: const Text("App selecionado"),
+                      trailing: IconButton(
+                        icon: const Icon(Icons.close),
+                        onPressed: () => setState(() => selectedApp = null),
+                      ),
+                    ),
+
+                  const SizedBox(height: 32),
+
+                  label('Login'),
+                  _buildInfoField(
+                    value: register.username ?? '',
+                    icon: Icons.copy,
+                    onIconPressed: () {
+                      Clipboard.setData(
+                          ClipboardData(text: register.username ?? ''));
+                    },
+                  ),
+
+                  const SizedBox(height: 12),
+
                   inputPassword(),
-                  const Divider(),
-                  atribute('Endereço Web', register.site ?? ''),
-                  const Divider(),
-                  atribute('Observação', register.description ?? ''),
+
+                  const SizedBox(height: 12),
+                  label('Url'),
+                  _buildInfoField(
+                    value: register.url ?? '',
+                    icon: Icons.copy,
+                    onIconPressed: () {
+                      Clipboard.setData(
+                          ClipboardData(text: register.url ?? ''));
+                    },
+                  ),
+                  const SizedBox(height: 12),
+
+                  label('Observação'),
+                  _buildInfoField(
+                    value: register.note ?? '',
+                    icon: Icons.copy,
+                    onIconPressed: () {
+                      Clipboard.setData(
+                          ClipboardData(text: register.note ?? ''));
+                    },
+                  ),
+
                   const SizedBox(height: 10),
+
+                  // Botões
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.share),
+                        onPressed: () => _compartilharRegistro(register),
+                      ),
+                      Row(
+                        children: [
+                          ElevatedButton(
+                            onPressed: () => _goToEdit(register),
+                            child: const Text('Editar'),
+                          ),
+                          const SizedBox(width: 12),
+                          TextButton(
+                            onPressed: () => _excluirRegistro(register),
+                            child: const Text(
+                              'Excluir',
+                              style: TextStyle(color: Colors.red),
+                            ),
+                          ),
+                          // OutlinedButton(
+                          //   onPressed: () => _excluirRegistro(register),
+                          //   style: OutlinedButton.styleFrom(
+                          //       side: const BorderSide(
+                          //           width: 1,
+                          //           color: Colors.red), // Cor da borda
+                          //       foregroundColor: Colors.red),
+                          //   child: const Text('Excluir'),
+                          // ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),
@@ -83,62 +181,127 @@ class _RegisterViewState extends State<RegisterView> {
     );
   }
 
-  atribute(String label, String title) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-      child: Row(
-        children: [
-          Expanded(
-              child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  label,
-                  style: Theme.of(context).textTheme.labelSmall,
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    title.toString(),
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
-                )
-              ],
+  Text label(String titulo) {
+    return Text(
+      titulo,
+      style: Theme.of(context).textTheme.labelSmall,
+    );
+  }
+
+  TextField inputPassword() {
+    String senha = register.password ?? '';
+    return TextField(
+      readOnly: true,
+      obscureText: _obscureText,
+      controller: TextEditingController(text: senha),
+      decoration: InputDecoration(
+        suffixIcon: Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            IconButton(
+              icon:
+                  Icon(_obscureText ? Icons.visibility : Icons.visibility_off),
+              onPressed: () {
+                setState(() {
+                  _obscureText = !_obscureText;
+                });
+              },
             ),
-          ))
-        ],
+            IconButton(
+                icon: Icon(
+                  Icons.copy,
+                ),
+                onPressed: () => Clipboard.setData(ClipboardData(text: senha))),
+          ],
+        ),
+        filled: true,
+        fillColor: Colors.grey[200],
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
+        ),
       ),
     );
   }
 
-  Row inputPassword() {
-    String senha = register.password ?? '';
-    return Row(
-      children: [
-        Expanded(
-          child: atribute('Senha', _obscureText ? obscureText(senha) : senha),
+  String obscureText(String text) {
+    return text.replaceAll(RegExp(r'.'), '•');
+  }
+
+  Widget _buildInfoField({
+    required String value,
+    bool obscureText = false,
+    required IconData icon,
+    required VoidCallback onIconPressed,
+  }) {
+    return TextField(
+      readOnly: true,
+      obscureText: obscureText,
+      controller: TextEditingController(text: value),
+      decoration: InputDecoration(
+        suffixIcon: IconButton(icon: Icon(icon), onPressed: onIconPressed),
+        filled: true,
+        fillColor: Colors.grey[200],
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
         ),
-        IconButton(
-          icon: Icon(_obscureText ? Icons.visibility : Icons.visibility_off),
-          onPressed: () {
-            setState(() {
-              _obscureText = !_obscureText;
-            });
-          },
-        ),
-        IconButton(
-          onPressed: () => Utils.copyToClipboard(senha, context),
-          icon: const Icon(Icons.copy),
-        ),
-      ],
+      ),
     );
   }
 
-  String obscureText(String text) {
-    return text.replaceAll(
-        RegExp(r'.'), '•'); // Substitui cada caractere por "•"
+  _compartilharRegistro(RegisterModel register) async {
+    final exportarImportarService =
+        Provider.of<BackupRestoreController>(context, listen: false);
+
+    exportarImportarService.exportarUmRegistro(register);
+
+    // ignore: use_build_context_synchronously
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Registro compartilhado com sucesso!')),
+    );
+  }
+
+  _goToEdit(RegisterModel register) async {
+    await GoRouter.of(context).push(RoutesPaths.register, extra: register);
+  }
+
+  Future<void> _excluirRegistro(RegisterModel register) async {
+    return showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Confirmar Exclusão'),
+          content: const Text('Tem certeza que deseja excluir este registro?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancelar'),
+            ),
+            TextButton(
+              onPressed: () async {
+                bool result = true;
+
+                result = await context
+                    .read<RegisterController>()
+                    .deleteRegisterController(register);
+
+                if (context.mounted) {
+                  if (result == true) {
+                    ShowMessager.show(context, 'Registro removido');
+                  }
+                  Navigator.of(context).pop();
+                  Navigator.of(context).pop();
+                }
+              },
+              child: const Text('Excluir'),
+            ),
+          ],
+        );
+      },
+    );
   }
 }

@@ -10,15 +10,5 @@ Future<Either<RepositoryException, bool>> saveListRegisterRepository(List<Regist
 Future<Either<RepositoryException, bool>> updateRegisterRepository(RegisterModel updatedRegistro);
 Future<Either<RepositoryException, bool>> deleteRegisterRepository(RegisterModel deleteRegistro);
 
-
-
-//Future<ShareResultStatus> exportarViaArquivoRepository();
-/*
-Future<Either<RepositoryException, bool>> importarViaArquivoRepository();
-
-Future<bool> exportarUmRegistroRepository(RegisterModel registro);
-
-Future<Either<RepositoryException, bool>> importarUmRegistroRepository();
-*/
 }
 

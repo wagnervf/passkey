@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -10,7 +8,7 @@ import 'package:passkey/src/modules/register/model/registro_model.dart';
 
 class ListRegisters extends StatefulWidget {
   const ListRegisters({super.key});
-
+  //final AuthUserModel? user;
   @override
   State<ListRegisters> createState() => _ListRegistersState();
 }
@@ -28,6 +26,7 @@ class _ListRegistersState extends State<ListRegisters> {
 
   @override
   Widget build(BuildContext context) {
+    final tema = Theme.of(context).textTheme;
     return BlocBuilder<RegisterController, RegisterState>(
       builder: (context, state) {
         switch (state) {
@@ -45,25 +44,41 @@ class _ListRegistersState extends State<ListRegisters> {
 
             return informacoes.isEmpty
                 ? emptyRegisters(context)
-                : Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      fieldPesquisar(),
-                      const SizedBox(height: 10),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 8.0),
-                        child: Text('Meus Registros',
-                            style: Theme.of(context).textTheme.titleSmall),
-                      ),
-                      const SizedBox(height: 10),
-                      listRegistros(informacoes),
-                      const SizedBox(height: 10),
-                    ],
+                : Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        fieldPesquisar(),
+                        const SizedBox(height: 10),
+                        // Text('Meus Registros',
+                        //     style: Theme.of(context).textTheme.titleSmall),
+                        _barraDeAcoes(),
+
+                        listRegistros(informacoes),
+                        const SizedBox(height: 10),
+                      ],
+                    ),
                   );
         }
         return SizedBox.shrink();
       },
+    );
+  }
+
+  _barraDeAcoes() {
+    return ListTile(
+      dense: true,
+      contentPadding: EdgeInsets.symmetric(horizontal: 4, vertical: 0),
+      leading: TextButton.icon(
+        onPressed: () {},
+        label: Text('Nome', style: Theme.of(context).textTheme.titleSmall),
+        icon: Icon(
+          Icons.arrow_circle_up_sharp,
+          color: Theme.of(context).colorScheme.secondary,
+        ),
+      ),
     );
   }
 
@@ -120,16 +135,14 @@ class _ListRegistersState extends State<ListRegisters> {
             leading: iconDay(register, context, corDeFundo),
             dense: false,
             title: Text(
-              register.title,
+              register.name ?? '',
               style: Theme.of(context).textTheme.titleMedium,
             ),
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(register.title,
+                Text(register.username ?? '',
                     style: Theme.of(context).textTheme.bodySmall),
-                // Text(register.id.toString(),
-                //     style: Theme.of(context).textTheme.bodySmall)
               ],
             ),
             trailing: const Icon(Icons.remove_red_eye),
@@ -153,7 +166,7 @@ class _ListRegistersState extends State<ListRegisters> {
       radius: 25,
       child: Center(
         child: Text(
-          register.title[0]
+          register.name?[0] ?? ''
               .toUpperCase(), // Pega a primeira letra e coloca maiúscula
           style:
               const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
@@ -166,40 +179,33 @@ class _ListRegistersState extends State<ListRegisters> {
     var borderSide = const BorderSide(color: Colors.transparent);
     var borderRadius = const BorderRadius.all(Radius.circular(16.0));
     return Container(
-      padding: const EdgeInsets.all(6),
+      padding: const EdgeInsets.symmetric(horizontal: 6),
+      margin: const EdgeInsets.symmetric(horizontal: 6),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(20),
+        color: Theme.of(context).colorScheme.onPrimary,
       ),
-      child: Row(
-        children: [
-          Expanded(
-            child: TextFormField(
-              decoration: InputDecoration(
-                  hintText: 'Pesquisar',
-                  border: OutlineInputBorder(
-                    borderSide: borderSide,
-                    borderRadius: borderRadius,
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: borderSide,
-                    borderRadius: borderRadius,
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: borderSide,
-                    borderRadius: borderRadius,
-                  ),
-                  filled: true,
-                  fillColor: Theme.of(context).colorScheme.surface,
-                  contentPadding: const EdgeInsets.all(8),
-                  hintStyle: const TextStyle(fontWeight: FontWeight.normal)),
+      child: TextFormField(
+        decoration: InputDecoration(
+            hintText: '   Pesquisar',
+            prefixIcon: Icon(Icons.search),
+            prefixIconConstraints: BoxConstraints.loose(const Size(20, 20)),
+            border: OutlineInputBorder(
+              borderSide: borderSide,
+              borderRadius: borderRadius,
             ),
-          ),
-          // const SizedBox(
-          //   width: 10,
-          // ),
-          // const Icon(Icons.filter_alt_outlined)
-        ],
+            enabledBorder: OutlineInputBorder(
+              borderSide: borderSide,
+              borderRadius: borderRadius,
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderSide: borderSide,
+              borderRadius: borderRadius,
+            ),
+            filled: true,
+            fillColor: Theme.of(context).colorScheme.onPrimary,
+            contentPadding: const EdgeInsets.all(8),
+            hintStyle: const TextStyle(fontWeight: FontWeight.normal)),
       ),
     );
   }

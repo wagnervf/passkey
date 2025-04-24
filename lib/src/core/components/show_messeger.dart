@@ -5,20 +5,20 @@ class ShowMessager {
     BuildContext context,
     String message,
   ) {
-    return ScaffoldMessenger.of(context).showSnackBar(
-  SnackBar(
-    content: Text(message),
-    duration: const Duration(seconds: 3),
-    elevation: 5,
+    
+      return ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(message),
+          duration: const Duration(seconds: 3),
+          elevation: 5,
 
-   
-    // action: SnackBarAction(
-    //   label: 'Desfazer',
-    //   onPressed: () {
-    //   },
-    // ),
-  ),
-);
-
+          // action: SnackBarAction(
+          //   label: 'Desfazer',
+          //   onPressed: () {
+          //   },
+          // ),
+        ),
+      );
+    
   }
 }

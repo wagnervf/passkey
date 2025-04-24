@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:passkey/src/modules/home/home_page.dart';
-import 'package:passkey/src/modules/profile/Profile.dart';
+import 'package:passkey/src/modules/profile/profile_page.dart';
 
 class HomeNavigationPage extends StatefulWidget {
   const HomeNavigationPage({super.key});
@@ -24,8 +24,9 @@ class _HomeNavigationPageState extends State<HomeNavigationPage> {
     return Scaffold(
       body: _pages[_selectedIndex],
       bottomNavigationBar: NavigationBar(
+        
         backgroundColor: Theme.of(context).colorScheme.onTertiary,
-        elevation: 0,
+        elevation: 5,
         selectedIndex: _selectedIndex,
         onDestinationSelected: (int index) {
           setState(() {

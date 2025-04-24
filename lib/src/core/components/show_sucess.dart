@@ -1,12 +1,9 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-
 
 class DialogUtils {
   static void showSuccessDialog(BuildContext context, String message) {
     showDialog(
-
       context: context,
       barrierDismissible: false,
       useSafeArea: true,
@@ -36,17 +33,16 @@ class DialogUtils {
             ),
             const Padding(
               padding: EdgeInsets.all(28.0),
-              child: LinearProgressIndicator(backgroundColor: Colors.green,),
+              child: LinearProgressIndicator(
+                backgroundColor: Colors.green,
+              ),
             )
           ],
         ),
       ),
     );
-
-    Future.delayed(const Duration(seconds: 2), () {
+    if (context.mounted) {
       Navigator.pop(context);
-    //  GoRouter.of(context).pop();
-      //GoRouter.of(context).pushReplacement(RoutesPaths.home);
-    });
+    }
   }
 }

@@ -153,6 +153,7 @@ class Utils {
       case 'tiktok':
         return FontAwesomeIcons.tiktok;
       case 'shoppingCart':
+        // ignore: deprecated_member_use
         return FontAwesomeIcons.shoppingCart; // eBay
       case 'discord':
         return FontAwesomeIcons.discord;
@@ -168,29 +169,11 @@ class Utils {
         return FontAwesomeIcons.tv; // Hulu
       case 'gamepad':
         return FontAwesomeIcons.gamepad;
-      case 'facebook':
-        return FontAwesomeIcons.facebook;
-      case 'instagram':
-        return FontAwesomeIcons.instagram;
-      case 'twitter':
-        return FontAwesomeIcons.twitter;
-      case 'youtube':
-        return FontAwesomeIcons.youtube;
-      case 'whatsapp':
-        return FontAwesomeIcons.whatsapp;
-      case 'telegram':
-        return FontAwesomeIcons.telegram;
-      case 'spotify':
-        return FontAwesomeIcons.spotify;
-      case 'apple':
-        return FontAwesomeIcons.apple;
-      case 'amazon':
-        return FontAwesomeIcons.amazon;
-      case 'github':
-        return FontAwesomeIcons.github;
+    
 
       // 🛍️ E-commerce
       case 'mercadolivre':
+        // ignore: deprecated_member_use
         return FontAwesomeIcons.shoppingCart;
       case 'shopee':
         return FontAwesomeIcons.store;
@@ -220,10 +203,8 @@ class Utils {
       case 'xbox':
         return FontAwesomeIcons.xbox;
 
-      // 🏦 Bancos e Pagamentos
-      case 'paypal':
-        return FontAwesomeIcons.paypal;
       case 'nubank':
+        // ignore: deprecated_member_use
         return FontAwesomeIcons.university;
       case 'bradesco':
         return FontAwesomeIcons.buildingColumns;
@@ -249,8 +230,6 @@ class Utils {
       case 'alexa':
         return FontAwesomeIcons.amazon;
 
-      case 'dropbox':
-        return FontAwesomeIcons.dropbox;
 
       // 📶 Redes e Wi-Fi
       case 'wifi':
@@ -266,9 +245,6 @@ class Utils {
       case 'hulu':
         return FontAwesomeIcons.video;
 
-      // 🛠️ Outros
-      case 'key':
-        return FontAwesomeIcons.key;
       case 'lock':
         return FontAwesomeIcons.lock;
       case 'unlock':

@@ -8,6 +8,7 @@ class CreditCardForm extends StatefulWidget {
   const CreditCardForm({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _CreditCardFormPageState createState() => _CreditCardFormPageState();
 }
 
@@ -17,10 +18,10 @@ class _CreditCardFormPageState extends State<CreditCardForm> {
   final _cardHolderNameController = TextEditingController();
   final _expiryDateController = TextEditingController();
   final _cvvController = TextEditingController();
-  bool _showCardNumber = false;
-  bool _showExpiryDate = false;
-  bool _showCVV = false;
-  List<Map<String, String>> _savedCards = [];
+  final bool _showCardNumber = false;
+  final bool _showExpiryDate = false;
+  final bool _showCVV = false;
+  final List<Map<String, String>> _savedCards = [];
   String _selectedCardType = '';
   final ScrollController scroll = ScrollController();
 

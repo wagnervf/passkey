@@ -3,11 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:passkey/src/modules/auth/pages/auth_page.dart';
 import 'package:passkey/src/modules/auth/pages/register_auth_page.dart';
-import 'package:passkey/src/modules/splash/initial_screen.dart';
+import 'package:passkey/src/modules/configuracoes/backup_restore/import_one_register_page.dart';
+import 'package:passkey/src/modules/register/views/widgets/list_registers.dart';
 import 'package:passkey/src/modules/splash/splash_page.dart';
 import 'package:passkey/src/modules/configuracoes/views/pages/configuracoes_page.dart';
 import 'package:passkey/src/modules/home/home_navigation_page.dart';
-import 'package:passkey/src/modules/profile/Profile.dart';
+import 'package:passkey/src/modules/profile/profile_page.dart';
 import 'package:passkey/src/modules/register/forms/credit_card_form.dart';
 import 'package:passkey/src/modules/register/views/pages/register_form.dart';
 import 'package:passkey/src/modules/register/views/pages/register_view.dart';
@@ -22,7 +23,6 @@ final routes = GoRouter(
   initialLocation: initial,
   navigatorKey: navigatorKey,
   routes: <RouteBase>[
-
     // GoRoute(
     //   path: RoutesPaths.initial,
     //   name: 'Initial Screen',
@@ -47,14 +47,14 @@ final routes = GoRouter(
       parentNavigatorKey: navigatorKey,
       builder: (context, state) => const AuthPage(),
     ),
-    
-     GoRoute(
+
+    GoRoute(
       path: RoutesPaths.authRegister,
       name: 'Auth Register',
       parentNavigatorKey: navigatorKey,
       pageBuilder: (context, state) => CustomTransitionPage(
         key: state.pageKey,
-        child:  const RegisterAuthPage(),
+        child: const RegisterAuthPage(),
         transitionDuration: const Duration(milliseconds: 300),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           return FadeThroughTransition(
@@ -110,11 +110,10 @@ final routes = GoRouter(
     GoRoute(
       path: RoutesPaths.registerView,
       name: 'Register View',
-      parentNavigatorKey: navigatorKey, 
-
+      parentNavigatorKey: navigatorKey,
       pageBuilder: (context, state) => CustomTransitionPage(
         key: state.pageKey,
-        child:  const RegisterView(),
+        child: const RegisterView(),
         transitionDuration: const Duration(milliseconds: 300),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           return FadeThroughTransition(
@@ -138,8 +137,43 @@ final routes = GoRouter(
       name: 'Configurações',
       parentNavigatorKey: navigatorKey,
       builder: (context, state) {
-        return  ConfiguracoesPage();
+        return ConfiguracoesPage();
       },
+    ),
+    GoRoute(
+      path: RoutesPaths.importOneRegister,
+      name: 'Importar Registro',
+      parentNavigatorKey: navigatorKey,
+      pageBuilder: (context, state) => CustomTransitionPage(
+        key: state.pageKey,
+        child: const ImportOneRegisterPage(),
+        transitionDuration: const Duration(milliseconds: 300),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return FadeThroughTransition(
+            animation: animation,
+            secondaryAnimation: secondaryAnimation,
+            child: child,
+          );
+        },
+      ),
+    ),
+
+    GoRoute(
+      path: RoutesPaths.listRegisters,
+      name: 'Lista de Registros',
+      parentNavigatorKey: navigatorKey,
+      pageBuilder: (context, state) => CustomTransitionPage(
+        key: state.pageKey,
+        child: ListRegisters(),
+        transitionDuration: const Duration(milliseconds: 300),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return FadeThroughTransition(
+            animation: animation,
+            secondaryAnimation: secondaryAnimation,
+            child: child,
+          );
+        },
+      ),
     ),
   ],
 );

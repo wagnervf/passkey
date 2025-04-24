@@ -62,7 +62,7 @@ class InitialScreen extends StatelessWidget {
       width: MediaQuery.of(context).size.width * .9,
       height: 50,
       child: ElevatedButton(
-        onPressed: () => _registrar(context),
+        onPressed: () => _criarConta(context),
         style: Utils.styleButtonElevated(),
         child: const Text(
           "Criar Conta",
@@ -76,7 +76,7 @@ class InitialScreen extends StatelessWidget {
   //   GoRouter.of(context).pushReplacement(RoutesPaths.auth);
   // }
 
-  void _registrar(BuildContext context) {
+  void _criarConta(BuildContext context) {
     GoRouter.of(context)
         .pushReplacement(RoutesPaths.authRegister, extra: AuthUserModel());
   }

@@ -43,12 +43,15 @@ class _BackupRestorePageState extends State<BackupRestorePage> {
           children: [
             ItemCardWithIcon(
                 text: 'Exportar Registros',
+                subtTitle: 'Exportar registros para o Google Drive',
                 icon: Icons.download,
                 onTap: () => buttonExport(exportarImportarService)),
             ItemCardWithIcon(
                 text: 'Importar Registros',
+                subtTitle: 'Importar registros do Google Drive',
                 icon: Icons.upload_file,
                 onTap: () => _restoredBackup(context, exportarImportarService)),
+                //onTap: () => _restoredBackup(context, exportarImportarService)),
           ],
         );
       },
@@ -60,9 +63,9 @@ class _BackupRestorePageState extends State<BackupRestorePage> {
     await Future.delayed(const Duration(seconds: 2));
     final String status = await exportarImportarService.exportBackup();
 
-    return ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(status.toString())),
-    );
+    if (mounted) {
+      ShowMessager.show(context, status.toString());
+    }
   }
 
   void _restoredBackup(BuildContext context,
@@ -70,17 +73,17 @@ class _BackupRestorePageState extends State<BackupRestorePage> {
     final authController = context.read<AuthController>();
     final registerController = context.read<RegisterController>();
 
-    final result = await exportarImportarService.restoreBackup(
-        authController, registerController);
+    //final result = await exportarImportarService.restoreBackup(authController, registerController);
+    final result = await exportarImportarService.importCsv();
 
     if (!mounted) return; // Evita erro se o widget foi desmontado
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(result != null
-            ? 'Importação concluída!'
-            : 'Erro ao importar os dados.'),
-      ),
-    );
+    // if (context.mounted) {
+    //   ShowMessager.show(
+    //       context,
+    //       result != null
+    //           ? 'Importação concluída!'
+    //           : 'Erro ao importar os dados.');
+    // }
   }
 }
