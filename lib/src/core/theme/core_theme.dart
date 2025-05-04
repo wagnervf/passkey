@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:passkey/src/core/theme/color_schemes.g.dart';
-//import 'package:passkey/src/core/theme/theme.dart';
+import 'package:keezy/src/core/theme/color_schemes.g.dart';
+//import 'package:keezy/src/core/theme/theme.dart';
 
 // final pageTransitionsTheme = const PageTransitionsTheme(
 //   builders: <TargetPlatform, PageTransitionsBuilder>{
@@ -46,6 +46,7 @@ ThemeData get lightTheme => ThemeData(
       //   bodyMedium: TextStyle(color: Colors.black87),
       //   titleLarge: TextStyle(color: Colors.black),
       // ),
+    // Removed invalid SystemUiOverlayStyle usage
       dividerColor: Colors.grey[300],
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
         backgroundColor: Color(0xFFFFFFFF),

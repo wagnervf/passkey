@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:passkey/src/modules/home/home_page.dart';
-import 'package:passkey/src/modules/profile/profile_page.dart';
+import 'package:keezy/src/modules/home/home_page.dart';
+import 'package:keezy/src/modules/profile/profile_page.dart';
 
 class HomeNavigationPage extends StatefulWidget {
   const HomeNavigationPage({super.key});

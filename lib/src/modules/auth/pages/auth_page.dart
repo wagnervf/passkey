@@ -4,12 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:go_router/go_router.dart';
-import 'package:passkey/src/core/components/form_field_input_password.dart';
-import 'package:passkey/src/core/components/show_messeger.dart';
-import 'package:passkey/src/core/router/routes.dart';
-import 'package:passkey/src/core/utils/utils.dart';
-import 'package:passkey/src/modules/auth/controllers/auth_controller.dart';
-import 'package:passkey/src/modules/auth/controllers/auth_state.dart';
+import 'package:keezy/src/core/components/form_field_input_password.dart';
+import 'package:keezy/src/core/components/show_messeger.dart';
+import 'package:keezy/src/core/router/routes.dart';
+import 'package:keezy/src/core/utils/utils.dart';
+import 'package:keezy/src/modules/auth/controllers/auth_controller.dart';
+import 'package:keezy/src/modules/auth/controllers/auth_state.dart';
 
 class AuthPage extends StatefulWidget {
   const AuthPage({super.key});
@@ -94,7 +94,7 @@ class AuthPageState extends State<AuthPage> {
                       margin: const EdgeInsets.all(2.0),
                       height: size.height * .2,
                       child: Image.asset(
-                        'assets/images/passkey.png',
+                        'assets/images/keezy.png',
                         fit: BoxFit.scaleDown,
                         color: Colors.teal,
                       ),

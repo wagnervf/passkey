@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:passkey/src/modules/register/model/registro_model.dart';
+import 'package:keezy/src/modules/register/model/registro_model.dart';
 
 abstract class ImportRegistersCsvState extends Equatable {}
 

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:form_field_validator/form_field_validator.dart';
-import 'package:passkey/src/core/utils/utils.dart' show Utils;
+import 'package:keezy/src/core/utils/utils.dart' show Utils;
 
 // ignore: must_be_immutable
 class FormFieldInputPassword extends StatefulWidget {

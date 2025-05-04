@@ -1,6 +1,6 @@
 {
-    "name": "passkey",
-    "short_name": "passkey",
+    "name": "keezy",
+    "short_name": "keezy",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#FFFFFF",

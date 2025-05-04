@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:passkey/src/core/components/item_card_with_icon.dart';
-import 'package:passkey/src/core/router/routes.dart';
-import 'package:passkey/src/core/utils/utils.dart';
-import 'package:passkey/src/modules/auth/controllers/auth_controller.dart';
-import 'package:passkey/src/modules/auth/controllers/auth_state.dart';
-import 'package:passkey/src/modules/auth/model/auth_user_model.dart';
+import 'package:keezy/src/core/components/item_card_with_icon.dart';
+import 'package:keezy/src/core/router/routes.dart';
+import 'package:keezy/src/core/utils/utils.dart';
+import 'package:keezy/src/modules/auth/controllers/auth_controller.dart';
+import 'package:keezy/src/modules/auth/controllers/auth_state.dart';
+import 'package:keezy/src/modules/auth/model/auth_user_model.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});

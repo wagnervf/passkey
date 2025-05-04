@@ -1,14 +1,18 @@
+// ignore_for_file: library_private_types_in_public_api, use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:installed_apps/app_info.dart';
-import 'package:passkey/src/core/components/installed_apps/installed_app_model.dart';
-import 'package:passkey/src/core/components/installed_apps/installed_apps_page.dart';
-import 'package:passkey/src/core/components/show_messeger.dart';
-import 'package:passkey/src/core/router/routes.dart';
-import 'package:passkey/src/modules/register/controller/register_controller.dart';
-import 'package:passkey/src/modules/register/model/registro_model.dart';
+import 'package:keezy/src/core/components/action_button.dart';
+import 'package:keezy/src/core/components/action_type.dart';
+import 'package:keezy/src/core/components/installed_apps/installed_app_model.dart';
+import 'package:keezy/src/core/components/installed_apps/installed_apps_page.dart';
+import 'package:keezy/src/core/components/show_confirm_action_bottom_sheet.dart';
+import 'package:keezy/src/core/components/show_messeger.dart';
+import 'package:keezy/src/core/router/routes.dart';
+import 'package:keezy/src/modules/register/controller/register_controller.dart';
+import 'package:keezy/src/modules/register/model/registro_model.dart';
 import 'package:provider/provider.dart';
-import 'package:uuid/uuid.dart';
 
 class RegisterForm extends StatefulWidget {
   const RegisterForm({super.key});
@@ -24,14 +28,13 @@ class _RegisterFormState extends State<RegisterForm> {
   final _passwordController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _siteController = TextEditingController();
-  
 
   bool _obscureText = true;
   bool edit = false;
   bool carregando = false;
 
   RegisterModel? register;
- // InstalledAppModel? _selectedApp;
+  // InstalledAppModel? _selectedApp;
   InstalledAppModel? selectedApp;
 
   @override
@@ -53,7 +56,7 @@ class _RegisterFormState extends State<RegisterForm> {
       _passwordController.text = register.password ?? '';
       _descriptionController.text = register.note ?? '';
       _siteController.text = register.url ?? '';
-      selectedApp = register.selectedApp;
+    //  selectedApp = register.selectedApp;
     });
   }
 
@@ -69,7 +72,6 @@ class _RegisterFormState extends State<RegisterForm> {
 
   @override
   Widget build(BuildContext context) {
-    final primaryColor = Theme.of(context).primaryColor;
 
     return Scaffold(
       appBar: AppBar(
@@ -91,12 +93,11 @@ class _RegisterFormState extends State<RegisterForm> {
             const SizedBox(height: 6),
             _buildField(_siteController, "Site"),
             const SizedBox(height: 20),
-
             if (selectedApp != null)
               ListTile(
                 contentPadding: EdgeInsets.zero,
                 leading: selectedApp!.iconBytes != null
-                    ? Image.memory(selectedApp!.iconBytes!,
+                    ? Image.memory((selectedApp!.iconBytes!),
                         width: 40, height: 40)
                     : const Icon(Icons.apps),
                 title: Text(selectedApp!.name),
@@ -130,24 +131,36 @@ class _RegisterFormState extends State<RegisterForm> {
             const SizedBox(height: 12),
             _buildField(_descriptionController, "Observação"),
             const SizedBox(height: 32),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                TextButton(
-                  onPressed: _clearInputs,
-                  child: const Text(
-                    'Cancelar',
-                  ),
-                ),
-                const SizedBox(width: 12),
-                ElevatedButton(
-                  onPressed: () => acaoSalvarRegistro(context),
-                  child: const Text(
-                    'Salvar',
-                  ),
-                ),
-              ],
+           
+            ActionButton(
+              title: 'Salvar',
+              type: ActionType.salvar,
+              onPressed: () async {
+                acaoSalvarRegistro(context);
+                await Future.delayed(const Duration(seconds: 2));
+              },
             ),
+            ActionButton(
+              title: 'Cancelar',
+              type: ActionType.editar,
+              onPressed: () async => _clearInputs(),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                showConfirmActionBottomSheet(
+                  context: context,
+                  title: 'Confirmar exclusão',
+                  description:
+                      'Tem certeza que deseja excluir esta senha? Esta ação é irreversível.',
+                  onConfirm: () async {
+                    // lógica de excluir
+                    await Future.delayed(const Duration(seconds: 2));
+                  },
+                  actionType: ActionType.excluir,
+                );
+              },
+              child: const Text('Excluir senha'),
+            )
           ],
         ),
       ),
@@ -192,8 +205,6 @@ class _RegisterFormState extends State<RegisterForm> {
     Navigator.of(context).pop();
   }
 
-
-
   Future<void> _showAppPicker(BuildContext context) async {
     final AppInfo? selected = await showModalBottomSheet<AppInfo>(
       context: context,
@@ -220,20 +231,20 @@ class _RegisterFormState extends State<RegisterForm> {
     }
   }
 
-    Future<void> acaoSalvarRegistro(BuildContext context) async {
+  Future<void> acaoSalvarRegistro(BuildContext context) async {
     setState(() {
       carregando = true;
     });
 
     RegisterModel formQuery = RegisterModel(
-      id: edit ? register!.id : const Uuid().v4(),
-      name: _titleController.text,
-      username: _loginController.text,
-      password: _passwordController.text,
-      note: _descriptionController.text,
-      url: _siteController.text,
-      selectedApp: selectedApp
-    );
+       // id: edit ? register!.id : const Uuid().v4(),
+        name: _titleController.text,
+        username: _loginController.text,
+        password: _passwordController.text,
+        note: _descriptionController.text,
+        url: _siteController.text,
+        //selectedApp: selectedApp,
+        );
 
     bool result;
     if (edit) {

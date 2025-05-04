@@ -1,4 +1,4 @@
-import 'package:passkey/src/modules/auth/model/google_auth_user_model.dart';
+import 'package:keezy/src/modules/auth/model/google_auth_user_model.dart';
 
 abstract class TokenStorageInterface {
   //Future<bool> saveToken(String token);

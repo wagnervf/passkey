@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:passkey/src/core/utils/utils.dart';
+import 'package:keezy/src/core/utils/utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class CreditCardForm extends StatefulWidget {
@@ -322,53 +322,53 @@ class _CreditCardFormPageState extends State<CreditCardForm> {
     });
   }
 
-  void _editCard(int index) {
-    final card = _savedCards[index];
-    _cardNumberController.text = card['cardNumber']!;
-    _cardHolderNameController.text = card['cardHolderName']!;
-    _expiryDateController.text = card['expiryDate']!;
-    _cvvController.text = card['cvv']!;
-    setState(() {
-      _selectedCardType = card['cardType']!;
-    });
-  }
+  // void _editCard(int index) {
+  //   final card = _savedCards[index];
+  //   _cardNumberController.text = card['cardNumber']!;
+  //   _cardHolderNameController.text = card['cardHolderName']!;
+  //   _expiryDateController.text = card['expiryDate']!;
+  //   _cvvController.text = card['cvv']!;
+  //   setState(() {
+  //     _selectedCardType = card['cardType']!;
+  // //   });
+  // // }
 
-  Future<void> _confirmDeleteCard(int index) async {
-    final confirmDelete = await showDialog<bool>(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Confirm Delete'),
-          content: const Text('Are you sure you want to delete this card?'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              child: const Text('Delete'),
-            ),
-          ],
-        );
-      },
-    );
-    if (confirmDelete == true) {
-      _deleteCard(index);
-    }
-  }
+  // Future<void> _confirmDeleteCard(int index) async {
+  //   final confirmDelete = await showDialog<bool>(
+  //     context: context,
+  //     builder: (context) {
+  //       return AlertDialog(
+  //         title: const Text('Confirm Delete'),
+  //         content: const Text('Are you sure you want to delete this card?'),
+  //         actions: [
+  //           TextButton(
+  //             onPressed: () => Navigator.of(context).pop(false),
+  //             child: const Text('Cancel'),
+  //           ),
+  //           TextButton(
+  //             onPressed: () => Navigator.of(context).pop(true),
+  //             child: const Text('Delete'),
+  //           ),
+  //         ],
+  //       );
+  //     },
+  //   );
+  //   if (confirmDelete == true) {
+  //     _deleteCard(index);
+  //   }
+  // }
 
-  void _deleteCard(int index) async {
-    final prefs = await SharedPreferences.getInstance();
-    final savedCardsJson = prefs.getStringList('savedCards');
-    if (savedCardsJson != null) {
-      savedCardsJson.removeAt(index);
-      await prefs.setStringList('savedCards', savedCardsJson);
-      setState(() {
-        _savedCards.removeAt(index);
-      });
-    }
-  }
+  // void _deleteCard(int index) async {
+  //   final prefs = await SharedPreferences.getInstance();
+  //   final savedCardsJson = prefs.getStringList('savedCards');
+  //   if (savedCardsJson != null) {
+  //     savedCardsJson.removeAt(index);
+  //     await prefs.setStringList('savedCards', savedCardsJson);
+  //     setState(() {
+  //       _savedCards.removeAt(index);
+  //     });
+  //   }
+  // }
 
   void _clearForm() {
     _cardNumberController.clear();

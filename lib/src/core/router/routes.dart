@@ -1,17 +1,18 @@
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:passkey/src/modules/auth/pages/auth_page.dart';
-import 'package:passkey/src/modules/auth/pages/register_auth_page.dart';
-import 'package:passkey/src/modules/configuracoes/backup_restore/import_one_register_page.dart';
-import 'package:passkey/src/modules/register/views/widgets/list_registers.dart';
-import 'package:passkey/src/modules/splash/splash_page.dart';
-import 'package:passkey/src/modules/configuracoes/views/pages/configuracoes_page.dart';
-import 'package:passkey/src/modules/home/home_navigation_page.dart';
-import 'package:passkey/src/modules/profile/profile_page.dart';
-import 'package:passkey/src/modules/register/forms/credit_card_form.dart';
-import 'package:passkey/src/modules/register/views/pages/register_form.dart';
-import 'package:passkey/src/modules/register/views/pages/register_view.dart';
+import 'package:keezy/src/modules/auth/pages/auth_page.dart';
+import 'package:keezy/src/modules/auth/pages/register_auth_page.dart';
+import 'package:keezy/src/modules/configuracoes/backup_restore/import_one_register_page.dart';
+import 'package:keezy/src/modules/register/views/widgets/list_registers.dart';
+import 'package:keezy/src/modules/splash/initial_screen.dart';
+import 'package:keezy/src/modules/splash/splash_page.dart';
+import 'package:keezy/src/modules/configuracoes/views/pages/configuracoes_page.dart';
+import 'package:keezy/src/modules/home/home_navigation_page.dart';
+import 'package:keezy/src/modules/profile/profile_page.dart';
+import 'package:keezy/src/modules/register/forms/credit_card_form.dart';
+import 'package:keezy/src/modules/register/views/pages/register_form.dart';
+import 'package:keezy/src/modules/register/views/pages/register_view.dart';
 
 part 'routes_pages.dart';
 
@@ -165,6 +166,24 @@ final routes = GoRouter(
       pageBuilder: (context, state) => CustomTransitionPage(
         key: state.pageKey,
         child: ListRegisters(),
+        transitionDuration: const Duration(milliseconds: 300),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return FadeThroughTransition(
+            animation: animation,
+            secondaryAnimation: secondaryAnimation,
+            child: child,
+          );
+        },
+      ),
+    ),
+
+    GoRoute(
+      path: RoutesPaths.initialScreen,
+      name: 'Initial Screen',
+      parentNavigatorKey: navigatorKey,
+      pageBuilder: (context, state) => CustomTransitionPage(
+        key: state.pageKey,
+        child: InitialScreen(),
         transitionDuration: const Duration(milliseconds: 300),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           return FadeThroughTransition(

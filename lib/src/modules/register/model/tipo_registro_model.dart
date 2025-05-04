@@ -32,7 +32,7 @@ class TipoRegisterModel {
       'id': id,
       'name': name,
       'icon': icon,
-      'color': color.value,
+      'color': color.withValues(),
     };
   }
 

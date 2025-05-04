@@ -7,18 +7,18 @@
         
 
         {
-            "name": "passkey",
+            "name": "keezy",
             "request": "launch",
             "type": "dart"
         },
         {
-            "name": "passkey (profile mode)",
+            "name": "keezy (profile mode)",
             "request": "launch",
             "type": "dart",
             "flutterMode": "profile"
         },
         {
-            "name": "passkey (release mode)",
+            "name": "keezy (release mode)",
             "request": "launch",
             "type": "dart",
             "flutterMode": "release"

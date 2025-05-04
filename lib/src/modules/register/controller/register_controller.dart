@@ -2,12 +2,12 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:passkey/src/core/either/either.dart';
-import 'package:passkey/src/core/either/unit.dart';
-import 'package:passkey/src/core/exceptions/repository_exception.dart';
-import 'package:passkey/src/modules/register/controller/register_state.dart';
-import 'package:passkey/src/modules/register/model/registro_model.dart';
-import 'package:passkey/src/modules/register/repositories/register_repository.dart';
+import 'package:keezy/src/core/either/either.dart';
+import 'package:keezy/src/core/either/unit.dart';
+import 'package:keezy/src/core/exceptions/repository_exception.dart';
+import 'package:keezy/src/modules/register/controller/register_state.dart';
+import 'package:keezy/src/modules/register/model/registro_model.dart';
+import 'package:keezy/src/modules/register/repositories/register_repository.dart';
 
 class RegisterController extends Cubit<RegisterState> {
   final RegisterRepository registerRepository;
@@ -23,6 +23,8 @@ class RegisterController extends Cubit<RegisterState> {
       emit(RegisterLoading());
 
       final register = await registerRepository.getAllRegisterRepository();
+
+      log(register.toString());
 
       switch (register) {
         case Left(value: RepositoryException(:final message)):

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:passkey/src/core/components/item_card_with_icon.dart';
-import 'package:passkey/src/core/theme/controller/theme_controller.dart';
+import 'package:keezy/src/core/components/item_card_with_icon.dart';
+import 'package:keezy/src/core/theme/controller/theme_controller.dart';
 
 class IconChangeTheme extends StatelessWidget {
   const IconChangeTheme({

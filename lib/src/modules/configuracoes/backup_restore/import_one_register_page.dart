@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:passkey/src/core/components/show_messeger.dart';
-import 'package:passkey/src/modules/register/controller/register_controller.dart';
+import 'package:keezy/src/core/components/show_messeger.dart';
+import 'package:keezy/src/modules/register/controller/register_controller.dart';
 import 'package:provider/provider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'dart:io';

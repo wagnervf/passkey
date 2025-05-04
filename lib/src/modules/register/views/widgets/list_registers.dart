@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:passkey/src/core/router/routes.dart';
-import 'package:passkey/src/modules/register/controller/register_controller.dart';
-import 'package:passkey/src/modules/register/controller/register_state.dart';
-import 'package:passkey/src/modules/register/model/registro_model.dart';
+import 'package:keezy/src/core/router/routes.dart';
+import 'package:keezy/src/modules/register/controller/register_controller.dart';
+import 'package:keezy/src/modules/register/controller/register_state.dart';
+import 'package:keezy/src/modules/register/model/registro_model.dart';
 
 class ListRegisters extends StatefulWidget {
   const ListRegisters({super.key});
@@ -26,7 +26,7 @@ class _ListRegistersState extends State<ListRegisters> {
 
   @override
   Widget build(BuildContext context) {
-    final tema = Theme.of(context).textTheme;
+    //final tema = Theme.of(context).textTheme;
     return BlocBuilder<RegisterController, RegisterState>(
       builder: (context, state) {
         switch (state) {
@@ -156,9 +156,9 @@ class _ListRegistersState extends State<ListRegisters> {
     await GoRouter.of(context).push(RoutesPaths.registerView, extra: registers);
   }
 
-  _goToEdit(RegisterModel register) async {
-    await GoRouter.of(context).push(RoutesPaths.register, extra: register);
-  }
+  // _goToEdit(RegisterModel register) async {
+  //   await GoRouter.of(context).push(RoutesPaths.register, extra: register);
+  // }
 
   CircleAvatar iconDay(RegisterModel register, context, Color cor) {
     return CircleAvatar(

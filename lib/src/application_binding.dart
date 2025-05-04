@@ -1,25 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:passkey/src/modules/auth/providers/auth_user_provider.dart';
-import 'package:passkey/src/modules/configuracoes/backup_restore/controllers/backup_restore_controller.dart';
-import 'package:passkey/src/core/shared_preferences/shared_preferences_service.dart';
-import 'package:passkey/src/core/storage/i_token_storage.dart';
-import 'package:passkey/src/core/storage/token_storage.dart';
-import 'package:passkey/src/core/theme/controller/theme_controller.dart';
-import 'package:passkey/src/core/theme/services/theme_service.dart';
-import 'package:passkey/src/core/theme/services/theme_service_impl.dart';
-import 'package:passkey/src/modules/auth/controllers/auth_controller.dart';
-import 'package:passkey/src/modules/auth/controllers/auth_state.dart';
-import 'package:passkey/src/modules/auth/repositories/auth_repository.dart';
-import 'package:passkey/src/modules/configuracoes/controllers/configuracoes_controller.dart';
-import 'package:passkey/src/modules/import_registers_csv/controllers/import_register_csv_controller.dart';
-import 'package:passkey/src/modules/import_registers_csv/repositories/import_registers_csv_repository.dart';
-import 'package:passkey/src/modules/import_registers_csv/repositories/import_registers_csv_repository_impl.dart';
-import 'package:passkey/src/modules/import_registers_csv/services/import_registers_csv_services.dart';
-import 'package:passkey/src/modules/import_registers_csv/services/import_registers_csv_services_impl.dart';
-import 'package:passkey/src/modules/register/controller/register_controller.dart';
-import 'package:passkey/src/modules/register/repositories/register_repository.dart';
-import 'package:passkey/src/modules/register/repositories/register_repository_impl.dart';
+import 'package:keezy/src/modules/auth/providers/auth_user_provider.dart';
+import 'package:keezy/src/modules/configuracoes/backup_restore/controllers/backup_restore_controller.dart';
+import 'package:keezy/src/core/shared_preferences/shared_preferences_service.dart';
+import 'package:keezy/src/core/storage/i_token_storage.dart';
+import 'package:keezy/src/core/storage/token_storage.dart';
+import 'package:keezy/src/core/theme/controller/theme_controller.dart';
+import 'package:keezy/src/core/theme/services/theme_service.dart';
+import 'package:keezy/src/core/theme/services/theme_service_impl.dart';
+import 'package:keezy/src/modules/auth/controllers/auth_controller.dart';
+import 'package:keezy/src/modules/auth/controllers/auth_state.dart';
+import 'package:keezy/src/modules/auth/repositories/auth_repository.dart';
+import 'package:keezy/src/modules/configuracoes/controllers/configuracoes_controller.dart';
+import 'package:keezy/src/modules/import_registers_csv/controllers/import_register_csv_controller.dart';
+import 'package:keezy/src/modules/import_registers_csv/repositories/import_registers_csv_repository.dart';
+import 'package:keezy/src/modules/import_registers_csv/repositories/import_registers_csv_repository_impl.dart';
+import 'package:keezy/src/modules/import_registers_csv/services/import_registers_csv_services.dart';
+import 'package:keezy/src/modules/import_registers_csv/services/import_registers_csv_services_impl.dart';
+import 'package:keezy/src/modules/register/controller/register_controller.dart';
+import 'package:keezy/src/modules/register/repositories/register_repository.dart';
+import 'package:keezy/src/modules/register/repositories/register_repository_impl.dart';
 
 import 'package:provider/provider.dart';
 
@@ -35,6 +35,7 @@ class ApplicationBinding extends StatelessWidget {
   Widget build(BuildContext context) {
     final sharedPreferences = SharedPreferencesService().sharedPreferences;
     return MultiProvider(
+
       providers: [
         // Provider<RestClient>(create: (context) => RestClient()),
         Provider<TokenStorageInterface>(

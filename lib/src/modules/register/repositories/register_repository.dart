@@ -1,6 +1,6 @@
-import 'package:passkey/src/core/either/either.dart';
-import 'package:passkey/src/core/exceptions/repository_exception.dart';
-import 'package:passkey/src/modules/register/model/registro_model.dart';
+import 'package:keezy/src/core/either/either.dart';
+import 'package:keezy/src/core/exceptions/repository_exception.dart';
+import 'package:keezy/src/modules/register/model/registro_model.dart';
 
 abstract interface class RegisterRepository {
 Future<Either<RepositoryException, List<RegisterModel>>> getAllRegisterRepository();

@@ -1,7 +1,7 @@
 import 'dart:convert';
 
-import 'package:passkey/src/core/storage/i_token_storage.dart';
-import 'package:passkey/src/modules/auth/model/google_auth_user_model.dart';
+import 'package:keezy/src/core/storage/i_token_storage.dart';
+import 'package:keezy/src/modules/auth/model/google_auth_user_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class TokenStorage implements TokenStorageInterface {

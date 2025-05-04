@@ -3,10 +3,9 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:passkey/src/core/router/routes.dart';
-import 'package:passkey/src/modules/auth/controllers/auth_controller.dart';
-import 'package:passkey/src/modules/auth/controllers/auth_state.dart';
-import 'package:passkey/src/modules/splash/initial_screen.dart';
+import 'package:keezy/src/core/router/routes.dart';
+import 'package:keezy/src/modules/auth/controllers/auth_controller.dart';
+import 'package:keezy/src/modules/auth/controllers/auth_state.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
@@ -36,27 +35,38 @@ class SplashPageState extends State<SplashPage> {
     );
   }
 
-  BlocBuilder<AuthController, AuthState> _blocBuilder(BuildContext context) {
-    return BlocBuilder<AuthController, AuthState>(
-      builder: (contx, state) {
-        log('SplashPage: $state');
-        if (state is AuthLoadingState) {
-          return loading();
-        } else if (state is AuthUnauthenticatedState) {
-          //_notUser(context);
-          return InitialScreen();
-        } else if (state is AuthSuccessState) {
-          _authSucess(context);
-          return loading();
-        } else {
-          _noAuthenticated(context);
+BlocBuilder<AuthController, AuthState> _blocBuilder(BuildContext context) {
+  return BlocBuilder<AuthController, AuthState>(
+    builder: (contx, state) {
+      log('SplashPage: $state');
 
-          return loading();
-        }
-      },
-    );
-  }
-
+      if (state is AuthUnauthenticatedState) {
+        // Navegar após o frame atual
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          GoRouter.of(contx).pushReplacement(RoutesPaths.initialScreen);
+        });
+        return const SizedBox.shrink();
+      } 
+      
+      if (state is AuthLoadingState) {
+        return loading();
+      } 
+      
+      if (state is AuthSuccessState) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _authSucess(contx);
+        });
+        return loading();
+      } 
+      
+      // Caso padrão
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _noAuthenticated(contx);
+      });
+      return loading();
+    },
+  );
+}
   // void _notUser(BuildContext context) {
   //   WidgetsBinding.instance.addPostFrameCallback((_) {
   //     GoRouter.of(context).pushReplacement(RoutesPaths.initial);
@@ -74,7 +84,7 @@ class SplashPageState extends State<SplashPage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       GoRouter.of(context).pushReplacement(
         RoutesPaths.home,
-       // RoutesPaths.listRegisters,
+        // RoutesPaths.listRegisters,
       );
     });
   }

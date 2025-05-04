@@ -1,16 +1,17 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:passkey/src/core/components/item_card_with_icon.dart';
-import 'package:passkey/src/core/components/show_messeger.dart';
-import 'package:passkey/src/core/router/routes.dart';
-import 'package:passkey/src/core/utils/utils.dart';
-import 'package:passkey/src/modules/auth/controllers/auth_controller.dart';
-import 'package:passkey/src/modules/auth/controllers/auth_state.dart';
-import 'package:passkey/src/modules/auth/model/auth_user_model.dart';
-import 'package:passkey/src/modules/configuracoes/backup_restore/views/backup_restore_page.dart';
-import 'package:passkey/src/modules/configuracoes/views/widgets/icon_change_theme.dart';
-import 'package:passkey/src/modules/import_registers_csv/pages/import_register_csv_page.dart';
+import 'package:keezy/src/core/components/item_card_with_icon.dart';
+import 'package:keezy/src/core/components/show_messeger.dart';
+import 'package:keezy/src/core/router/routes.dart';
+import 'package:keezy/src/core/utils/utils.dart';
+import 'package:keezy/src/modules/auth/controllers/auth_controller.dart';
+import 'package:keezy/src/modules/auth/controllers/auth_state.dart';
+import 'package:keezy/src/modules/auth/model/auth_user_model.dart';
+import 'package:keezy/src/modules/configuracoes/views/widgets/icon_change_theme.dart';
+import 'package:keezy/src/modules/import_registers_csv/pages/import_register_csv_page.dart';
 
 class ConfiguracoesPage extends StatefulWidget {
   const ConfiguracoesPage({super.key});
@@ -102,7 +103,7 @@ class _ConfiguracoesPageState extends State<ConfiguracoesPage> {
 
                           Center(
                             child: Text(
-                              '© $currentYear PassKey seu gerenciador de senhas particular e privativo. Todos os direitos reservados.',
+                              '© $currentYear keezy seu gerenciador de senhas particular e privativo. Todos os direitos reservados.',
                               style: Theme.of(context)
                                   .textTheme
                                   .bodySmall

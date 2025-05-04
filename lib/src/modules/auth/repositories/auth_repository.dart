@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'dart:developer';
-import 'package:passkey/src/core/components/encrypt/encrypt_decrypt_services.dart';
-import 'package:passkey/src/core/data/services/secure_storage_service.dart';
-import 'package:passkey/src/modules/auth/model/auth_user_model.dart';
+import 'package:keezy/src/core/components/encrypt/encrypt_decrypt_services.dart';
+import 'package:keezy/src/core/data/services/secure_storage_service.dart';
+import 'package:keezy/src/modules/auth/model/auth_user_model.dart';
 
 class AuthRepository {
   static const _userKey = 'auth_user';

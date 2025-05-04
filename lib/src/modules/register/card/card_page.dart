@@ -3,8 +3,8 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:passkey/src/core/router/routes.dart';
-import 'package:passkey/src/modules/configuracoes/views/widgets/icon_change_theme.dart';
+import 'package:keezy/src/core/router/routes.dart';
+import 'package:keezy/src/modules/configuracoes/views/widgets/icon_change_theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class CardPage extends StatefulWidget {

@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:passkey/src/core/components/drawer_custom.dart';
-import 'package:passkey/src/core/router/routes.dart';
-import 'package:passkey/src/modules/auth/controllers/auth_controller.dart';
-import 'package:passkey/src/modules/auth/controllers/auth_state.dart';
-import 'package:passkey/src/modules/auth/model/auth_user_model.dart';
-import 'package:passkey/src/modules/auth/providers/auth_user_provider.dart';
-import 'package:passkey/src/modules/register/views/widgets/list_registers.dart';
+import 'package:keezy/src/core/router/routes.dart';
+import 'package:keezy/src/modules/auth/controllers/auth_controller.dart';
+import 'package:keezy/src/modules/auth/controllers/auth_state.dart';
+import 'package:keezy/src/modules/auth/model/auth_user_model.dart';
+import 'package:keezy/src/modules/auth/providers/auth_user_provider.dart';
+import 'package:keezy/src/modules/register/views/widgets/list_registers.dart';
 import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {

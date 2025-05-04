@@ -1,5 +1,5 @@
 
-import 'package:passkey/src/core/theme/services/theme_service.dart';
+import 'package:keezy/src/core/theme/services/theme_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ThemeServiceImpl implements ThemeService{

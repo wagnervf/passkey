@@ -3,11 +3,11 @@
 import 'dart:convert';
 import 'dart:developer';
 
-import 'package:passkey/src/core/data/services/secure_storage_service.dart';
-import 'package:passkey/src/core/either/either.dart';
-import 'package:passkey/src/core/exceptions/repository_exception.dart';
-import 'package:passkey/src/modules/register/model/registro_model.dart';
-import 'package:passkey/src/modules/register/repositories/register_repository.dart';
+import 'package:keezy/src/core/data/services/secure_storage_service.dart';
+import 'package:keezy/src/core/either/either.dart';
+import 'package:keezy/src/core/exceptions/repository_exception.dart';
+import 'package:keezy/src/modules/register/model/registro_model.dart';
+import 'package:keezy/src/modules/register/repositories/register_repository.dart';
 
 class RegisterRepositoryImpl implements RegisterRepository {
   RegisterRepositoryImpl();

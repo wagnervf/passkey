@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:passkey/src/core/components/show_messeger.dart';
+import 'package:keezy/src/core/components/show_messeger.dart';
 
 class Utils {
   static bool isDarkMode(BuildContext context) {
@@ -70,6 +70,7 @@ class Utils {
 
   static InputDecoration decorationField(String description, IconData? icon) {
     return InputDecoration(
+      
       prefixIcon: icon == null
           ? null
           : Icon(
@@ -77,10 +78,12 @@ class Utils {
             ),
       hintText: description,
       border: UnderlineInputBorder(
+          
           borderSide: BorderSide(color: Colors.teal, width: 0.3),
           borderRadius: BorderRadius.circular(10)),
       contentPadding: EdgeInsets.all(18),
       filled: true,
+      
      // fillColor: const Color.fromARGB(255, 235, 253, 252),
       // hintStyle: TextStyle(
       //   color: Colors.teal[700],

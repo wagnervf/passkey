@@ -1,14 +1,13 @@
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
 import 'package:go_router/go_router.dart';
-import 'package:passkey/src/core/components/expand_buttons_actions.dart';
-import 'package:passkey/src/core/components/installed_apps/installed_app_model.dart';
-import 'package:passkey/src/core/components/show_messeger.dart';
-import 'package:passkey/src/core/router/routes.dart';
-import 'package:passkey/src/modules/configuracoes/backup_restore/controllers/backup_restore_controller.dart';
-import 'package:passkey/src/modules/register/controller/register_controller.dart';
-import 'package:passkey/src/modules/register/model/registro_model.dart';
+import 'package:keezy/src/core/components/installed_apps/installed_app_model.dart';
+import 'package:keezy/src/core/components/show_messeger.dart';
+import 'package:keezy/src/core/router/routes.dart';
+import 'package:keezy/src/modules/configuracoes/backup_restore/controllers/backup_restore_controller.dart';
+import 'package:keezy/src/modules/register/controller/register_controller.dart';
+import 'package:keezy/src/modules/register/model/registro_model.dart';
 import 'package:provider/provider.dart';
 
 class RegisterView extends StatefulWidget {
@@ -44,7 +43,7 @@ class _RegisterViewState extends State<RegisterView> {
       _password.text = register.password!;
       _description.text = register.note!;
       //  _type.text = register.type.name;
-      selectedApp = register.selectedApp;
+      //selectedApp = register.selectedApp;
     });
   }
 
@@ -86,7 +85,7 @@ class _RegisterViewState extends State<RegisterView> {
                     ListTile(
                       contentPadding: EdgeInsets.zero,
                       leading: selectedApp!.iconBytes != null
-                          ? Image.memory(selectedApp!.iconBytes!,
+                          ? Image.memory((selectedApp!.iconBytes!),
                               width: 40, height: 40)
                           : const Icon(Icons.apps),
                       title: Text(selectedApp!.name),

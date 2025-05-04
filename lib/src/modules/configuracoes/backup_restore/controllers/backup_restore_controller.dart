@@ -9,15 +9,15 @@ import 'package:csv/csv.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:passkey/src/core/components/encrypt/encrypt_decrypt_services.dart';
-import 'package:passkey/src/core/data/services/secure_storage_service.dart';
-import 'package:passkey/src/core/either/either.dart';
-import 'package:passkey/src/core/exceptions/repository_exception.dart';
-import 'package:passkey/src/modules/auth/controllers/auth_controller.dart';
-import 'package:passkey/src/modules/auth/model/auth_user_model.dart';
-import 'package:passkey/src/modules/configuracoes/backup_restore/controllers/backup_restore_state.dart';
-import 'package:passkey/src/modules/register/controller/register_controller.dart';
-import 'package:passkey/src/modules/register/model/registro_model.dart';
+import 'package:keezy/src/core/components/encrypt/encrypt_decrypt_services.dart';
+import 'package:keezy/src/core/data/services/secure_storage_service.dart';
+import 'package:keezy/src/core/either/either.dart';
+import 'package:keezy/src/core/exceptions/repository_exception.dart';
+import 'package:keezy/src/modules/auth/controllers/auth_controller.dart';
+import 'package:keezy/src/modules/auth/model/auth_user_model.dart';
+import 'package:keezy/src/modules/configuracoes/backup_restore/controllers/backup_restore_state.dart';
+import 'package:keezy/src/modules/register/controller/register_controller.dart';
+import 'package:keezy/src/modules/register/model/registro_model.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -143,7 +143,7 @@ class BackupRestoreController extends Cubit<BackupRestoreState> {
 
       // Obtendo diretório
       final Directory directory = await getApplicationDocumentsDirectory();
-      final String filePath = '${directory.path}/passkey_backup.enc';
+      final String filePath = '${directory.path}/keezy_backup.enc';
       final File file = File(filePath);
 
       await file.writeAsString(encryptedData);

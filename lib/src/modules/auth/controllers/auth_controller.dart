@@ -2,13 +2,13 @@
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:local_auth/local_auth.dart';
-import 'package:passkey/src/core/storage/i_token_storage.dart';
-import 'package:passkey/src/modules/auth/controllers/auth_state.dart';
-import 'package:passkey/src/modules/auth/model/auth_user_model.dart';
-import 'package:passkey/src/modules/auth/repositories/auth_repository.dart';
+import 'package:keezy/src/core/storage/i_token_storage.dart';
+import 'package:keezy/src/modules/auth/controllers/auth_state.dart';
+import 'package:keezy/src/modules/auth/model/auth_user_model.dart';
+import 'package:keezy/src/modules/auth/repositories/auth_repository.dart';
 import 'package:local_auth_android/local_auth_android.dart';
 import 'package:local_auth_darwin/local_auth_darwin.dart';
-import 'package:passkey/src/modules/auth/providers/auth_user_provider.dart';
+import 'package:keezy/src/modules/auth/providers/auth_user_provider.dart';
 
 class AuthController extends Cubit<AuthState> {
   AuthController({

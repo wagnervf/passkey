@@ -4,14 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:go_router/go_router.dart';
-import 'package:passkey/src/core/components/form_field_input_password.dart';
-import 'package:passkey/src/core/components/help/help_view.dart';
-import 'package:passkey/src/core/router/routes.dart';
-import 'package:passkey/src/core/utils/utils.dart';
-import 'package:passkey/src/core/components/show_sucess.dart';
-import 'package:passkey/src/modules/auth/controllers/auth_controller.dart';
-import 'package:passkey/src/modules/auth/controllers/auth_state.dart';
-import 'package:passkey/src/modules/auth/model/auth_user_model.dart';
+import 'package:keezy/src/core/components/form_field_input_password.dart';
+import 'package:keezy/src/core/components/help/help_view.dart';
+import 'package:keezy/src/core/router/routes.dart';
+import 'package:keezy/src/core/utils/utils.dart';
+import 'package:keezy/src/core/components/show_sucess.dart';
+import 'package:keezy/src/modules/auth/controllers/auth_controller.dart';
+import 'package:keezy/src/modules/auth/controllers/auth_state.dart';
+import 'package:keezy/src/modules/auth/model/auth_user_model.dart';
 
 class RegisterAuthPage extends StatefulWidget {
   const RegisterAuthPage({super.key});
@@ -222,7 +222,7 @@ class _RegisterAuthPageState extends State<RegisterAuthPage> {
                       SizedBox(
                         width: size.width * .9,
                         height: 50,
-                        child: TextButton(
+                        child: OutlinedButton(
                           child: Text(
                             "Já possuo uma conta",
                             style: Theme.of(context).textTheme.displaySmall,

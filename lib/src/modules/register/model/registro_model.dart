@@ -1,10 +1,9 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
-import 'package:uuid/uuid.dart';
+import 'package:keezy/src/core/components/installed_apps/installed_app_model.dart';
+import 'package:keezy/src/modules/register/model/tipo_registro_model.dart';
 
-import 'package:passkey/src/core/components/installed_apps/installed_app_model.dart';
-import 'package:passkey/src/modules/register/model/tipo_registro_model.dart';
 
 class RegisterModel {
   final String id;

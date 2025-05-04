@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:passkey/src/modules/auth/model/auth_user_model.dart';
+import 'package:keezy/src/modules/auth/model/auth_user_model.dart';
 
 class AuthUserProvider extends ChangeNotifier {
   AuthUserModel? _user;

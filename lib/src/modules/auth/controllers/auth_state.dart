@@ -1,7 +1,7 @@
 //import 'package:firebase_auth/firebase_auth.dart';
 
 
-import 'package:passkey/src/modules/auth/model/auth_user_model.dart';
+import 'package:keezy/src/modules/auth/model/auth_user_model.dart';
 
 abstract class AuthState {}
 

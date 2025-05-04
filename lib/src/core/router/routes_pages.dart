@@ -16,5 +16,6 @@ abstract class RoutesPaths {
   static const formCard = '/formCard';
   static const importOneRegister = '/importOneRegister';
   static const listRegisters ='/listRegister';
+  static const initialScreen ='/initial_screen';
  
 }

@@ -1,4 +1,4 @@
-package passkey.brcriativi.com.br.passkey
+package keezy.brcriativi.com.br.keezy
 
 import io.flutter.embedding.android.FlutterFragmentActivity
 

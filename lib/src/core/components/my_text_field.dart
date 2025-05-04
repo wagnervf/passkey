@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:passkey/src/core/utils/utils.dart';
+import 'package:keezy/src/core/utils/utils.dart';
 
 // ignore: must_be_immutable
 class MyTextField extends StatelessWidget {

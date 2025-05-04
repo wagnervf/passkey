@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:passkey/src/core/utils/utils.dart';
+import 'package:keezy/src/core/utils/utils.dart';
 
 import '../../model/tipo_registro_model.dart';
 

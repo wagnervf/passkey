@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:passkey/src/core/theme/services/theme_service.dart';
+import 'package:keezy/src/core/theme/services/theme_service.dart';
 
 class ThemeController extends ChangeNotifier {
   ThemeController({
