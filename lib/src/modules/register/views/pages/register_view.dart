@@ -2,12 +2,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
-import 'package:keezy/src/core/components/installed_apps/installed_app_model.dart';
+import 'package:keezy/src/core/installed_apps/installed_app_model.dart';
 import 'package:keezy/src/core/components/show_messeger.dart';
 import 'package:keezy/src/core/router/routes.dart';
 import 'package:keezy/src/modules/configuracoes/backup_restore/controllers/backup_restore_controller.dart';
 import 'package:keezy/src/modules/register/controller/register_controller.dart';
-import 'package:keezy/src/modules/register/model/registro_model.dart';
+import 'package:keezy/src/modules/register/model/register_model.dart';
 import 'package:provider/provider.dart';
 
 class RegisterView extends StatefulWidget {
@@ -23,7 +23,7 @@ class _RegisterViewState extends State<RegisterView> {
   final TextEditingController _password = TextEditingController();
   final TextEditingController _description = TextEditingController();
 
-  late RegisterModel register = RegisterModel();
+  late RegisterModel register;
   InstalledAppModel? selectedApp;
   bool _obscureText = true;
 
@@ -43,7 +43,7 @@ class _RegisterViewState extends State<RegisterView> {
       _password.text = register.password!;
       _description.text = register.note!;
       //  _type.text = register.type.name;
-      //selectedApp = register.selectedApp;
+      selectedApp = register.selectedApp;
     });
   }
 
@@ -94,7 +94,8 @@ class _RegisterViewState extends State<RegisterView> {
                         icon: const Icon(Icons.close),
                         onPressed: () => setState(() => selectedApp = null),
                       ),
-                    ),
+                    ) else SizedBox.shrink(),
+
 
                   const SizedBox(height: 32),
 
@@ -214,12 +215,7 @@ class _RegisterViewState extends State<RegisterView> {
                 onPressed: () => Clipboard.setData(ClipboardData(text: senha))),
           ],
         ),
-        filled: true,
-        fillColor: Colors.grey[200],
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide.none,
-        ),
+      
       ),
     );
   }
@@ -240,12 +236,7 @@ class _RegisterViewState extends State<RegisterView> {
       controller: TextEditingController(text: value),
       decoration: InputDecoration(
         suffixIcon: IconButton(icon: Icon(icon), onPressed: onIconPressed),
-        filled: true,
-        fillColor: Colors.grey[200],
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide.none,
-        ),
+        
       ),
     );
   }

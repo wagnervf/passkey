@@ -6,7 +6,7 @@ import 'package:keezy/src/core/either/either.dart';
 import 'package:keezy/src/core/either/unit.dart';
 import 'package:keezy/src/core/exceptions/repository_exception.dart';
 import 'package:keezy/src/modules/register/controller/register_state.dart';
-import 'package:keezy/src/modules/register/model/registro_model.dart';
+import 'package:keezy/src/modules/register/model/register_model.dart';
 import 'package:keezy/src/modules/register/repositories/register_repository.dart';
 
 class RegisterController extends Cubit<RegisterState> {
@@ -47,27 +47,29 @@ class RegisterController extends Cubit<RegisterState> {
     }
   }
 
-  Future<bool> saveRegisterController(RegisterModel novoRegister) async {
+  Future<bool> saveAndUpdateRegisterController(RegisterModel novoRegister) async {
     emit(RegisterLoading());
     try {
       final register =
           await registerRepository.saveRegisterRepository(novoRegister);
 
       switch (register) {
-        case Left():
+        case Left<RepositoryException, bool>():
           return false;
 
         case Right<RepositoryException, bool>():
           getRegisterController();
           return true;
       }
-    } on Exception catch (e) {
-      log(e.toString());
-      const message = 'Erro ao buscar Register';
-      emit(RegisterError(message));
-      return false;
+
+      
+    } catch (e, s) {
+    log('Exceção inesperada ao salvar registro: $e\n$s');
+    emit(RegisterError('Erro inesperado ao salvar registro.'));
+    return false;
     }
   }
+
 
     Future<bool> saveListRegisterController(List<RegisterModel> registers) async {
     emit(RegisterLoading());
@@ -93,28 +95,28 @@ class RegisterController extends Cubit<RegisterState> {
   }
 
 
-  Future<bool> updateRegisterController(RegisterModel updatedRegistro) async {
-    emit(RegisterLoading());
-    try {
-      final register =
-          await registerRepository.updateRegisterRepository(updatedRegistro);
+  // Future<bool> updateRegisterController(RegisterModel updatedRegistro) async {
+  //   emit(RegisterLoading());
+  //   try {
+  //     final register =
+  //         await registerRepository.updateRegisterRepository(updatedRegistro);
 
-      switch (register) {
-        case Left():
-          return false;
+  //     switch (register) {
+  //       case Left():
+  //         return false;
 
-        case Right<RepositoryException, bool>():
-          await getRegisterController();
+  //       case Right<RepositoryException, bool>():
+  //         await getRegisterController();
 
-          return true;
-      }
-    } on Exception catch (e) {
-      log(e.toString());
-      const message = 'Erro ao buscar Register';
-      emit(RegisterError(message));
-      return false;
-    }
-  }
+  //         return true;
+  //     }
+  //   } on Exception catch (e) {
+  //     log(e.toString());
+  //     const message = 'Erro ao buscar Register';
+  //     emit(RegisterError(message));
+  //     return false;
+  //   }
+  // }
 
   Future<bool> deleteRegisterController(RegisterModel updatedRegistro) async {
     emit(RegisterLoading());
@@ -123,17 +125,17 @@ class RegisterController extends Cubit<RegisterState> {
           await registerRepository.deleteRegisterRepository(updatedRegistro);
 
       switch (register) {
-        case Left():
+        case Left<RepositoryException, Unit>():
           return false;
 
-        case Right<RepositoryException, bool>():
+        case Right<RepositoryException, Unit>():
           await getRegisterController();
 
           return true;
       }
     } on Exception catch (e) {
       log(e.toString());
-      const message = 'Erro ao buscar Register';
+      const message = 'Erro ao remover';
       emit(RegisterError(message));
       return false;
     }
@@ -148,7 +150,7 @@ class RegisterController extends Cubit<RegisterState> {
 
       var registroFormatado = RegisterModel.fromJson(registroJson);
 
-      await saveRegisterController(registroFormatado);
+      await saveAndUpdateRegisterController(registroFormatado);
     } catch (e) {
       log('Erro ao importar registro: $e');
       //  return null;

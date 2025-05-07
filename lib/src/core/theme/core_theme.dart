@@ -19,41 +19,30 @@ ThemeData get lightTheme => ThemeData(
       primaryColor: lightColorScheme.primary,
       cardColor: lightColorScheme.primaryContainer,
       listTileTheme: ListTileThemeData(iconColor: lightColorScheme.primary),
-      
-      //   iconTheme: IconThemeData(color: lightColorScheme.primary),
-      //  scaffoldBackgroundColor: Colors.grey[50],
-
       brightness: Brightness.light,
-      // primaryColor: const lightColorScheme.primary, // Verde WhatsApp
       primaryColorLight: lightColorScheme.primary,
       primaryColorDark: lightColorScheme.primary,
-      scaffoldBackgroundColor:
-          lightColorScheme.surface,
+      scaffoldBackgroundColor: lightColorScheme.surface,
       appBarTheme: AppBarTheme(
-          backgroundColor: lightColorScheme.surface,
-          titleTextStyle: const TextStyle(fontSize: 18, color: Colors.black)
-
-          //   foregroundColor: Colors.white,
-          //   iconTheme: IconThemeData(color: Colors.white),
-          ),
+        backgroundColor: lightColorScheme.surface,
+        titleTextStyle: const TextStyle(fontSize: 18, color: Colors.black),
+        systemOverlayStyle: SystemUiOverlayStyle(
+          statusBarColor: lightColorScheme.surface,
+          statusBarIconBrightness: Brightness.dark,
+          statusBarBrightness: Brightness.light,
+        ),
+      ),
       floatingActionButtonTheme: FloatingActionButtonThemeData(
         backgroundColor: lightColorScheme.primary,
-        foregroundColor: Colors.white,
+        foregroundColor: lightColorScheme.surface,
       ),
       iconTheme: IconThemeData(color: lightColorScheme.primary),
-      // textTheme: const TextTheme(
-      //   bodyLarge: TextStyle(color: Colors.black87),
-      //   bodyMedium: TextStyle(color: Colors.black87),
-      //   titleLarge: TextStyle(color: Colors.black),
-      // ),
-    // Removed invalid SystemUiOverlayStyle usage
       dividerColor: Colors.grey[300],
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
         backgroundColor: Color(0xFFFFFFFF),
         selectedItemColor: lightColorScheme.primary,
         unselectedItemColor: Colors.grey,
       ),
-
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: OutlinedButton.styleFrom(
             side: BorderSide(
@@ -64,7 +53,7 @@ ThemeData get lightTheme => ThemeData(
               borderRadius: BorderRadius.circular(15.0),
             ),
             backgroundColor: lightColorScheme.primary,
-            foregroundColor: Colors.white),
+            foregroundColor: lightColorScheme.surface),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
@@ -79,8 +68,8 @@ ThemeData get lightTheme => ThemeData(
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
-          foregroundColor: Colors.white,
-          textStyle: const TextStyle(color: Colors.white),
+          foregroundColor: lightColorScheme.surface,
+          textStyle: TextStyle(color: lightColorScheme.surface),
           // side: BorderSide(
           //   color: lightColorScheme.primary,
           //   width: 1,
@@ -90,22 +79,44 @@ ThemeData get lightTheme => ThemeData(
           ),
         ),
       ),
-
+        textSelectionTheme: TextSelectionThemeData(
+        selectionColor: lightColorScheme.tertiary,
+        cursorColor: lightColorScheme.secondary,
+        //  selectionHandleColor: darkColorScheme.primary,
+      ),
       iconButtonTheme: IconButtonThemeData(
-
-        style: ButtonStyle(iconColor:WidgetStatePropertyAll(lightColorScheme.primary),
-        foregroundColor: WidgetStatePropertyAll(lightColorScheme.primary)
-        )
-      ),
-      cardTheme: const CardTheme(color: Colors.white),
+          style: ButtonStyle(
+              iconColor: WidgetStatePropertyAll(lightColorScheme.primary),
+              foregroundColor:
+                  WidgetStatePropertyAll(lightColorScheme.primary))),
+      cardTheme: CardTheme(color: lightColorScheme.surface),
       inputDecorationTheme: InputDecorationTheme(
-        fillColor: const Color.fromARGB(255, 235, 253, 252),
-        hintStyle: TextStyle(
-           color: Colors.teal[700],
-        fontWeight: FontWeight.bold,
-        fontSize: 14,
-        )
-      ),
+          fillColor: lightColorScheme.surface,
+          //   fillColor: const Color.fromARGB(255, 235, 253, 252),
+          border: const OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(16.0)),
+            borderSide: BorderSide.none,
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(7.0)),
+            borderSide: BorderSide(
+              color: lightColorScheme.primary,
+              width: 1,
+            ),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(7.0)),
+            borderSide: BorderSide(
+              color: lightColorScheme.primary,
+              width: 1,
+            ),
+          ),
+          filled: true,
+          hintStyle: TextStyle(
+            color: lightColorScheme.primary,
+            fontWeight: FontWeight.w400,
+            fontSize: 14,
+          )),
       segmentedButtonTheme: _segmentedButtonTheme(),
       textTheme: TextTheme(
         displayLarge: TextStyle(
@@ -126,11 +137,11 @@ ThemeData get lightTheme => ThemeData(
         labelMedium: TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.bold,
-           color: lightColorScheme.primary,
+          color: lightColorScheme.primary,
         ),
         labelSmall: TextStyle(
           color: lightColorScheme.primary,
-           fontSize: 12,
+          fontSize: 12,
         ),
         titleLarge: const TextStyle(
           fontWeight: FontWeight.bold,
@@ -139,7 +150,7 @@ ThemeData get lightTheme => ThemeData(
           fontWeight: FontWeight.w600,
         ),
         titleSmall: const TextStyle(fontWeight: FontWeight.bold),
-        headlineSmall: const TextStyle(color: Colors.white, fontSize: 12),
+        headlineSmall: TextStyle(color: lightColorScheme.surface, fontSize: 12),
         bodySmall: TextStyle(fontSize: 12, color: lightColorScheme.outline),
         bodyMedium: const TextStyle(
           fontSize: 16,
@@ -155,11 +166,12 @@ ThemeData get lightTheme => ThemeData(
 ThemeData get darkTheme => ThemeData(
       useMaterial3: true,
       colorScheme: darkColorScheme,
+
       // fontFamily: 'Roboto',
       // pageTransitionsTheme: pageTransitionsTheme,
       brightness: Brightness.dark,
       primaryColor: darkColorScheme.primary,
-      primaryColorLight: darkColorScheme.primary,
+      primaryColorLight: lightColorScheme.primary,
       primaryColorDark: const Color(0xFF0B141A),
       scaffoldBackgroundColor: const Color(0xFF121B22),
 
@@ -168,8 +180,8 @@ ThemeData get darkTheme => ThemeData(
         foregroundColor: Colors.white,
       ),
       iconTheme: const IconThemeData(color: Colors.white),
-     // listTileTheme: ListTileThemeData(tileColor: Colors.amber),
-     cardTheme: CardTheme(color: darkColorScheme.onPrimaryContainer),
+      // listTileTheme: ListTileThemeData(tileColor: Colors.amber),
+      cardTheme: CardTheme(color: darkColorScheme.onPrimaryContainer),
 
       dividerColor: Colors.grey[700],
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
@@ -202,20 +214,44 @@ ThemeData get darkTheme => ThemeData(
         ),
       ),
       segmentedButtonTheme: _segmentedButtonTheme(),
+      textSelectionTheme: TextSelectionThemeData(
+        selectionColor: darkColorScheme.tertiary,
+        cursorColor: darkColorScheme.secondary,
+        //  selectionHandleColor: darkColorScheme.primary,
+      ),
       inputDecorationTheme: InputDecorationTheme(
-        //fillColor: const Color.fromARGB(255, 235, 253, 252),
-        hintStyle: TextStyle(
-        //   color: Colors.teal[700],
-        fontWeight: FontWeight.bold,
-        fontSize: 14,
-        )
-      ),
+          fillColor: darkColorScheme.surface,
+          //   fillColor: const Color.fromARGB(255, 235, 253, 252),
+          border: const OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(16.0)),
+            borderSide: BorderSide.none,
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(7.0)),
+            borderSide: BorderSide(
+              color: darkColorScheme.primary,
+              width: 1,
+            ),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(7.0)),
+            borderSide: BorderSide(
+              color: darkColorScheme.primary,
+              width: 1,
+            ),
+          ),
+          filled: true,
+          hintStyle: TextStyle(
+            color: lightColorScheme.primary,
+            fontWeight: FontWeight.w400,
+            fontSize: 14,
+          )),
       iconButtonTheme: IconButtonThemeData(
-
-        style: ButtonStyle(iconColor:WidgetStatePropertyAll(Colors.white, ),
-        foregroundColor: WidgetStatePropertyAll(Colors.white)
-        )
-      ),
+          style: ButtonStyle(
+              iconColor: WidgetStatePropertyAll(
+                Colors.white,
+              ),
+              foregroundColor: WidgetStatePropertyAll(Colors.white))),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: OutlinedButton.styleFrom(
             side: BorderSide(
@@ -229,7 +265,6 @@ ThemeData get darkTheme => ThemeData(
             foregroundColor: Colors.white),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
-        
         style: OutlinedButton.styleFrom(
           side: BorderSide(
             color: Colors.white,
@@ -240,7 +275,6 @@ ThemeData get darkTheme => ThemeData(
           ),
           foregroundColor: Colors.white,
         ),
-        
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
@@ -274,10 +308,11 @@ ThemeData get darkTheme => ThemeData(
           fontWeight: FontWeight.bold,
           // color: lightColorScheme.primary,
         ),
-        labelSmall: TextStyle(color: darkColorScheme.secondary,
-         fontSize: 12,
-            //   color: lightColorScheme.primary,
-            ),
+        labelSmall: TextStyle(
+          color: darkColorScheme.secondary,
+          fontSize: 12,
+          //   color: lightColorScheme.primary,
+        ),
         titleLarge: const TextStyle(
           fontWeight: FontWeight.bold,
         ),

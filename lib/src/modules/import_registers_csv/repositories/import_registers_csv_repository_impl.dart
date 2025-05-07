@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:csv/csv.dart';
 import 'package:keezy/src/modules/import_registers_csv/repositories/import_registers_csv_repository.dart';
-import 'package:keezy/src/modules/register/model/registro_model.dart';
+import 'package:keezy/src/modules/register/model/register_model.dart';
 
 class ImportRegistersCsvRepositoryImpl implements ImportRegistersCsvRepository {
   @override

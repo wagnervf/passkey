@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:keezy/src/modules/import_registers_csv/controllers/import_registers_csv_state.dart';
 import 'package:keezy/src/modules/import_registers_csv/services/import_registers_csv_services.dart';
 import 'package:keezy/src/modules/register/controller/register_controller.dart';
-import 'package:keezy/src/modules/register/model/registro_model.dart';
+import 'package:keezy/src/modules/register/model/register_model.dart';
 
 class ImportRegisterCsvController extends Cubit<ImportRegistersCsvState> {
   final ImportRegistersCsvServices importRegistersCsvServices;

@@ -3,16 +3,13 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:installed_apps/app_info.dart';
-import 'package:keezy/src/core/components/action_button.dart';
-import 'package:keezy/src/core/components/action_type.dart';
-import 'package:keezy/src/core/components/installed_apps/installed_app_model.dart';
-import 'package:keezy/src/core/components/installed_apps/installed_apps_page.dart';
-import 'package:keezy/src/core/components/show_confirm_action_bottom_sheet.dart';
+import 'package:keezy/src/core/installed_apps/installed_app_model.dart';
 import 'package:keezy/src/core/components/show_messeger.dart';
-import 'package:keezy/src/core/router/routes.dart';
+import 'package:keezy/src/core/installed_apps/installed_apps_page.dart';
 import 'package:keezy/src/modules/register/controller/register_controller.dart';
-import 'package:keezy/src/modules/register/model/registro_model.dart';
+import 'package:keezy/src/modules/register/model/register_model.dart';
 import 'package:provider/provider.dart';
+import 'package:uuid/uuid.dart';
 
 class RegisterForm extends StatefulWidget {
   const RegisterForm({super.key});
@@ -32,6 +29,7 @@ class _RegisterFormState extends State<RegisterForm> {
   bool _obscureText = true;
   bool edit = false;
   bool carregando = false;
+  bool buscandoApps = false;
 
   RegisterModel? register;
   // InstalledAppModel? _selectedApp;
@@ -56,7 +54,7 @@ class _RegisterFormState extends State<RegisterForm> {
       _passwordController.text = register.password ?? '';
       _descriptionController.text = register.note ?? '';
       _siteController.text = register.url ?? '';
-    //  selectedApp = register.selectedApp;
+      selectedApp = register.selectedApp;
     });
   }
 
@@ -72,109 +70,129 @@ class _RegisterFormState extends State<RegisterForm> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.close),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () {
+            _clearInputs();
+          },
         ),
-        title: const Text('Adicionar senha'),
+        title: const Text('Adicionar Registro'),
         elevation: 0,
         backgroundColor: Colors.transparent,
         foregroundColor: Colors.black,
       ),
-      body: Form(
-        key: _formularioKey,
-        child: ListView(
-          padding: const EdgeInsets.all(16),
-          children: [
-            const Text("Site ou app"),
-            const SizedBox(height: 6),
-            _buildField(_siteController, "Site"),
-            const SizedBox(height: 20),
-            if (selectedApp != null)
-              ListTile(
-                contentPadding: EdgeInsets.zero,
-                leading: selectedApp!.iconBytes != null
-                    ? Image.memory((selectedApp!.iconBytes!),
-                        width: 40, height: 40)
-                    : const Icon(Icons.apps),
-                title: Text(selectedApp!.name),
-                subtitle: const Text("App selecionado"),
-                trailing: IconButton(
-                  icon: const Icon(Icons.close),
-                  onPressed: () => setState(() => selectedApp = null),
+      body: SafeArea(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                child: IntrinsicHeight(
+                  child: carregando
+                      ? CircularProgressIndicator()
+                      : Form(
+                          key: _formularioKey,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Divider(thickness: 4, color: Colors.grey[200]),
+                              const SizedBox(height: 15),
+
+                              (selectedApp == null)
+                                  ? selecionarApp()
+                                  : appSelecionado(),
+
+                              const SizedBox(height: 16),
+                              const Text("Nome, app ou site"),
+                              const SizedBox(height: 8),
+                              _buildTextField(
+                                  _titleController, "Nome do app ou site"),
+                              const SizedBox(height: 24),
+                              const Text("Usuário e senha"),
+                              const SizedBox(height: 8),
+                              _buildTextField(
+                                  _loginController, "Usuário/Login"),
+                              const SizedBox(height: 12),
+                              _buildPasswordField(),
+                              const SizedBox(height: 24),
+                              const Text("Observação"),
+                              _buildTextField(
+                                  _descriptionController, "Observação"),
+                              const Spacer(),
+
+                              // ActionButton(
+                              //   actionType: edit
+                              //       ? ActionType.editar
+                              //       : ActionType.salvar,
+                              //   title: edit ? 'Atualizar' : 'Salvar',
+                              //   onPressed: () => acaoSalvarRegistro(context),
+                              // ),
+
+                              Padding(
+                                padding:
+                                    const EdgeInsets.only(top: 32, bottom: 24),
+                                child: ElevatedButton(
+                                  onPressed: () => acaoSalvarRegistro(context),
+                                  child: const Text("Salvar"),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                 ),
-              )
-            else
-              Row(
-                children: [
-                  Icon(Icons.apps),
-                  TextButton(
-                    onPressed: () => _showAppPicker(context),
-                    child: const Text("Selecionar app"),
-                  ),
-                ],
               ),
-            const SizedBox(height: 20),
-            Divider(
-              thickness: 4,
-              color: Colors.grey[200],
-            ),
-            const SizedBox(height: 20),
-            const Text("Salve a senha atual"),
-            const SizedBox(height: 8),
-            _buildField(_loginController, "Nome de usuário"),
-            const SizedBox(height: 12),
-            _buildPasswordField(),
-            const SizedBox(height: 12),
-            _buildField(_descriptionController, "Observação"),
-            const SizedBox(height: 32),
-           
-            ActionButton(
-              title: 'Salvar',
-              type: ActionType.salvar,
-              onPressed: () async {
-                acaoSalvarRegistro(context);
-                await Future.delayed(const Duration(seconds: 2));
-              },
-            ),
-            ActionButton(
-              title: 'Cancelar',
-              type: ActionType.editar,
-              onPressed: () async => _clearInputs(),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                showConfirmActionBottomSheet(
-                  context: context,
-                  title: 'Confirmar exclusão',
-                  description:
-                      'Tem certeza que deseja excluir esta senha? Esta ação é irreversível.',
-                  onConfirm: () async {
-                    // lógica de excluir
-                    await Future.delayed(const Duration(seconds: 2));
-                  },
-                  actionType: ActionType.excluir,
-                );
-              },
-              child: const Text('Excluir senha'),
-            )
-          ],
+            );
+          },
         ),
       ),
     );
   }
 
-  Widget _buildField(TextEditingController controller, String hint) {
+  Column selecionarApp() {
+    return Column(
+      children: [
+        const Text("Selecionar um App do celular"),
+        const SizedBox(height: 8),
+        SizedBox(
+          width: double.maxFinite,
+          child: OutlinedButton.icon(
+            icon: const Icon(Icons.apps),
+            onPressed: () async {
+              setState(() {
+                buscandoApps = true;
+              });
+              await _showAppDialog(context);
+            },
+            label: const Text("Buscar app"),
+          ),
+        ),
+      ],
+    );
+  }
+
+  ListTile appSelecionado() {
+    return ListTile(
+      contentPadding: EdgeInsets.zero,
+      leading: selectedApp!.iconBytes != null
+          ? Image.memory((selectedApp!.iconBytes!), width: 40, height: 40)
+          : const Icon(Icons.apps),
+      title: Text(selectedApp!.name),
+      subtitle: const Text("App selecionado"),
+      trailing: IconButton(
+        icon: const Icon(Icons.close),
+        onPressed: () => setState(() => selectedApp = null),
+      ),
+    );
+  }
+
+  Widget _buildTextField(TextEditingController controller, String hint) {
     return TextField(
       controller: controller,
       decoration: InputDecoration(
         hintText: hint,
-        filled: true,
-        fillColor: const Color(0xFFE0E6E8),
-        border: const OutlineInputBorder(borderSide: BorderSide.none),
       ),
     );
   }
@@ -185,9 +203,6 @@ class _RegisterFormState extends State<RegisterForm> {
       obscureText: _obscureText,
       decoration: InputDecoration(
         hintText: "Senha",
-        filled: true,
-        fillColor: const Color(0xFFE0E6E8),
-        border: const OutlineInputBorder(borderSide: BorderSide.none),
         suffixIcon: IconButton(
           icon: Icon(_obscureText ? Icons.visibility : Icons.visibility_off),
           onPressed: () => setState(() => _obscureText = !_obscureText),
@@ -205,20 +220,23 @@ class _RegisterFormState extends State<RegisterForm> {
     Navigator.of(context).pop();
   }
 
-  Future<void> _showAppPicker(BuildContext context) async {
-    final AppInfo? selected = await showModalBottomSheet<AppInfo>(
+  Future<void> _showAppDialog(BuildContext context) async {
+    final AppInfo? selected = await showDialog<AppInfo>(
       context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
       builder: (context) {
-        return DraggableScrollableSheet(
-          expand: false,
-          initialChildSize: 0.6,
-          builder: (context, scrollController) {
-            return InstalledAppsPage(scrollController: scrollController);
-          },
+        return AlertDialog(
+          contentPadding: EdgeInsets.all(2),
+          title: const Text("Selecionar App"),
+          titlePadding: const EdgeInsets.all(16),
+          titleTextStyle: Theme.of(context).textTheme.titleSmall,
+          content:
+              SizedBox(width: double.maxFinite, child: InstalledAppsPage()),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text("Cancelar"),
+            ),
+          ],
         );
       },
     );
@@ -226,41 +244,44 @@ class _RegisterFormState extends State<RegisterForm> {
     if (selected != null) {
       setState(() {
         selectedApp = InstalledAppModel(
-            name: selected.name, iconPath: "", iconBytes: selected.icon);
+          name: selected.name,
+          iconPath: "",
+          iconBytes: selected.icon,
+          id: 4,
+        );
+        _titleController.text = selected.name;
       });
     }
   }
 
-  Future<void> acaoSalvarRegistro(BuildContext context) async {
-    setState(() {
-      carregando = true;
-    });
+  Future<bool> acaoSalvarRegistro(BuildContext context) async {
+    setState(() => carregando = true);
+    final controller = context.read<RegisterController>();
 
-    RegisterModel formQuery = RegisterModel(
-       // id: edit ? register!.id : const Uuid().v4(),
-        name: _titleController.text,
-        username: _loginController.text,
-        password: _passwordController.text,
-        note: _descriptionController.text,
-        url: _siteController.text,
-        //selectedApp: selectedApp,
-        );
+    final formQuery = RegisterModel(
+      id: edit ? register!.id : const Uuid().v4(),
+      name: _titleController.text.trim(),
+      username: _loginController.text.trim(),
+      password: _passwordController.text.trim(),
+      note: _descriptionController.text.trim(),
+      url: _siteController.text.trim(),
+      selectedApp: selectedApp,
+    );
 
-    bool result;
-    if (edit) {
-      result = await context
-          .read<RegisterController>()
-          .updateRegisterController(formQuery);
-    } else {
-      result = await context
-          .read<RegisterController>()
-          .saveRegisterController(formQuery);
-    }
+    final success = await controller.saveAndUpdateRegisterController(formQuery);
 
-    if (result) {
+    setState(() => carregando = false);
+
+    if (success) {
       ShowMessager.show(
-          context, edit ? 'Registro atualizado!' : 'Registro salvo!');
-      GoRouter.of(context).pushReplacement(RoutesPaths.home);
+          context, edit ? 'Registro Atualizado!' : 'Registro Salvo!');
+      Navigator.of(context).pop();
+    } else {
+      ShowMessager.show(context, 'Erro ao salvar Registro, tente novamente.');
     }
+
+    return success;
   }
+
+
 }

@@ -17,7 +17,7 @@ import 'package:keezy/src/modules/auth/controllers/auth_controller.dart';
 import 'package:keezy/src/modules/auth/model/auth_user_model.dart';
 import 'package:keezy/src/modules/configuracoes/backup_restore/controllers/backup_restore_state.dart';
 import 'package:keezy/src/modules/register/controller/register_controller.dart';
-import 'package:keezy/src/modules/register/model/registro_model.dart';
+import 'package:keezy/src/modules/register/model/register_model.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 

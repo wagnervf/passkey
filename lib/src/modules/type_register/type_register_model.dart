@@ -1,25 +1,43 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
-import 'package:flutter/material.dart';
 
-class TipoRegisterModel {
+import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
+
+part 'type_register_model.g.dart';
+
+@HiveType(typeId: 1)
+class TypeRegiterModel extends HiveObject {
+  @HiveField(0)
   final int id;
+
+  @HiveField(1)
   final String name;
+
+  @HiveField(2)
   final String icon;
-  final Color color;
-  TipoRegisterModel({
-    this.id = 0,
-    this.name = '',
+
+  @HiveField(3)
+  final Color color; // Armazena o valor da cor como int
+
+  TypeRegiterModel({
+    required this.id,
+    required this.name,
     required this.icon,
     required this.color,
   });
 
-  TipoRegisterModel copyWith({
+
+
+
+
+  TypeRegiterModel copyWith({
     int? id,
     String? name,
     String? icon,
     Color? color,
   }) {
-    return TipoRegisterModel(
+    return TypeRegiterModel(
       id: id ?? this.id,
       name: name ?? this.name,
       icon: icon ?? this.icon,
@@ -32,12 +50,12 @@ class TipoRegisterModel {
       'id': id,
       'name': name,
       'icon': icon,
-      'color': color.withValues(),
+      'color': color.value,
     };
   }
 
-  factory TipoRegisterModel.fromMap(Map<String, dynamic> map) {
-    return TipoRegisterModel(
+  factory TypeRegiterModel.fromMap(Map<String, dynamic> map) {
+    return TypeRegiterModel(
       id: map['id'] as int,
       name: map['name'] as String,
       icon: map['icon'] as String,
@@ -47,404 +65,424 @@ class TipoRegisterModel {
 
   String toJson() => json.encode(toMap());
 
-  factory TipoRegisterModel.fromJson(String source) =>
-      TipoRegisterModel.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory TypeRegiterModel.fromJson(String source) => TypeRegiterModel.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
   String toString() {
-    return 'TipoRegisterModel(id: $id, name: $name, icon: $icon, color: $color)';
+    return 'TypeRegiterModel(id: $id, name: $name, icon: $icon, color: $color)';
+  }
+
+  @override
+  bool operator ==(covariant TypeRegiterModel other) {
+    if (identical(this, other)) return true;
+  
+    return 
+      other.id == id &&
+      other.name == name &&
+      other.icon == icon &&
+      other.color == color;
+  }
+
+  @override
+  int get hashCode {
+    return id.hashCode ^
+      name.hashCode ^
+      icon.hashCode ^
+      color.hashCode;
   }
 }
-  final List<TipoRegisterModel> tipoRegisterList = [
-    TipoRegisterModel(
+
+
+  final List<TypeRegiterModel> tipoRegisterList = [
+    TypeRegiterModel(
         id: 7,
         name: 'AliExpress',
         icon: 'aliexpress',
         color: const Color(0xFFFF4500)),
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 3,
         name: 'Americanas',
         icon: 'americanas',
         color: const Color(0xFFE60014)),
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 2, name: 'Amazon Brasil', icon: 'amazon', color: const Color(0xFF232F3E)),
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 9, name: 'Carrefour', icon: 'carrefour', color: const Color(0xFF003087)),
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 6,
         name: 'Casas Bahia',
         icon: 'casasbahia',
         color: const Color(0xFF004AAD)),
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 20, name: 'Centauro', icon: 'centauro', color: const Color(0xFFDA291C)),
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 14, name: 'Dafiti', icon: 'dafiti', color: const Color(0xFF000000)),
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 19, name: 'Elo7', icon: 'elo7', color: const Color(0xFFFFB347)),
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 11, name: 'Extra', icon: 'extra', color: const Color(0xFFEC1C24)),
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 13, name: 'Fast Shop', icon: 'fastshop', color: const Color(0xFFE30613)),
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 1,
         name: 'Mercado Livre',
         icon: 'mercadolivre',
         color: const Color(0xFFFFDF00)),
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 10, name: 'Netshoes', icon: 'netshoes', color: const Color(0xFF5A2D82)),
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 12,
         name: 'Ponto Frio',
         icon: 'pontofrio',
         color: const Color(0xFFE60014)),
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 5, name: 'Shopee', icon: 'shopee', color: const Color(0xFFFF5722)),
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 8, name: 'Submarino', icon: 'submarino', color: const Color(0xFF0078D7)),
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 17, name: 'Zattini', icon: 'zattini', color: const Color(0xFF000000)),
 
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 21, name: 'Discord', icon: 'discord', color: const Color(0xFF5865F2)),
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 22, name: 'Facebook', icon: 'facebook', color: const Color(0xFF1877F2)),
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 23, name: 'Instagram', icon: 'instagram', color: const Color(0xFFC13584)),
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 26, name: 'LinkedIn', icon: 'linkedin', color: const Color(0xFF0A66C2)),
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 29, name: 'Pinterest', icon: 'pinterest', color: const Color(0xFFE60023)),
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 28, name: 'Reddit', icon: 'reddit', color: const Color(0xFFFF4500)),
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 24, name: 'Snapchat', icon: 'snapchat', color: const Color(0xFFFFFC00)),
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 25, name: 'Telegram', icon: 'telegram', color: const Color(0xFF0088CC)),
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 4, name: 'TikTok', icon: 'tiktok', color: const Color(0xFF000000)),
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 27, name: 'Tumblr', icon: 'tumblr', color: const Color(0xFF35465C)),
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 5, name: 'Twitter (X)', icon: 'twitter', color: const Color(0xFF1DA1F2)),
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 6, name: 'WhatsApp', icon: 'whatsapp', color: const Color(0xFF25D366)),
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 31, name: 'YouTube', icon: 'youtube', color: const Color(0xFFFF0000)),
 
     // 🏦 BANCOS
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 61, name: 'Banco do Brasil', icon: 'bb', color: const Color(0xFFFFD700)),
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 63, name: 'Bradesco', icon: 'bradesco', color: const Color(0xFFE30613)),
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 62, name: 'Itaú', icon: 'itau', color: const Color(0xFFF58220)),
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 65, name: 'Nubank', icon: 'nubank', color: const Color(0xFF820AD1)),
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 64, name: 'Santander', icon: 'santander', color: const Color(0xFFE30613)),
 
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 10000,
         name: 'Outros',
         icon: 'key',
         color: const Color.fromARGB(255, 250, 112, 0)),
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 100,
         name: 'Google',
         icon: 'google',
         color: const Color(0xFF4285F4)), // Azul do Google
 
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 106,
         name: 'Netflix',
         icon: 'film',
         color: const Color(0xFFE50914)), // Vermelho do Netflix
 
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 108,
         name: 'Apple',
         icon: 'apple',
         color: const Color(0xFF000000)), // Preto do Apple
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 109,
         name: 'Spotify',
         icon: 'spotify',
         color: const Color(0xFF1DB954)), // Verde do Spotify
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 110,
         name: 'Microsoft',
         icon: 'microsoft',
         color: const Color(0xFFF25022)), // Laranja do Microsoft
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 111,
         name: 'PayPal',
         icon: 'paypal',
         color: const Color(0xFF003087)), // Azul do PayPal
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 112,
         name: 'Dropbox',
         icon: 'dropbox',
         color: const Color(0xFF0061FF)), // Azul do Dropbox
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 113,
         name: 'GitHub',
         icon: 'github',
         color: const Color(0xFF171515)), // Preto do GitHub
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 114,
         name: 'Slack',
         icon: 'slack',
         color: const Color(0xFF4A154B)), // Roxo do Slack
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 115,
         name: 'Zoom',
         icon: 'video',
         color: const Color(0xFF2D8CFF)), // Azul do Zoom
 
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 117,
         name: 'Reddit',
         icon: 'reddit',
         color: const Color(0xFFFF4500)), // Laranja do Reddit
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 118,
         name: 'Pinterest',
         icon: 'pinterest',
         color: const Color(0xFFE60023)), // Vermelho do Pinterest
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 119,
         name: 'Twitch',
         icon: 'twitch',
         color: const Color(0xFF6441A5)), // Roxo do Twitch
 
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 122,
         name: 'eBay',
         icon: 'shoppingCart',
         color: const Color(0xFFE53238)), // Vermelho do eBay
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 123,
         name: 'Discord',
         icon: 'discord',
         color: const Color(0xFF7289DA)), // Azul do Discord
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 124,
         name: 'WhatsApp',
         icon: 'whatsapp',
         color: const Color(0xFF25D366)), // Verde do WhatsApp
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 125,
         name: 'Telegram',
         icon: 'telegram',
         color: const Color(0xFF0088CC)), // Azul do Telegram
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 126,
         name: 'Uber',
         icon: 'car',
         color: const Color(0xFF000000)), // Preto do Uber
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 127,
         name: 'Airbnb',
         icon: 'house',
         color: const Color(0xFFFF5A5F)), // Rosa do Airbnb
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 129,
         name: 'Hulu',
         icon: 'tv',
         color: const Color(0xFF1CE783)), // Verde do Hulu
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 130,
         name: 'Steam',
         icon: 'gamepad',
         color: const Color(0xFF171A21)), // Preto do Steam
 
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 131,
         name: 'Wi-Fi Doméstico',
         icon: 'wifi',
         color: const Color(0xFF4CAF50)),
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 132,
         name: 'Admin Roteador',
         icon: 'router',
         color: const Color(0xFF607D8B)),
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 133, name: 'Steam', icon: 'steam', color: const Color(0xFF000000)),
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 134,
         name: 'Google Drive',
         icon: 'google_drive',
         color: const Color(0xFF4285F4)),
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 135, name: 'Netflix', icon: 'netflix', color: const Color(0xFFE50914)),
 
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 405,
         name: '99 Táxi',
         icon: '99',
         color: const Color(0xFFFFCC00)), // Amarelo
     
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 408, name: 'Uber', icon: 'uber', color: const Color(0xFF000000)), // Preto
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 409,
         name: 'Waze',
         icon: 'waze',
         color: const Color(0xFF1CA1F1)), // Azul Claro
 
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 410,
         name: 'Apple Pay',
         icon: 'apple_pay',
         color: const Color(0xFF000000)), // Preto
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 411,
         name: 'Google Pay',
         icon: 'google_pay',
         color: const Color(0xFF4285F4)), // Azul
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 412,
         name: 'Mercado Pago',
         icon: 'mercadopago',
         color: const Color(0xFF009EE3)), // Azul
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 413,
         name: 'PagSeguro',
         icon: 'pagseguro',
         color: const Color(0xFFFFC400)), // Amarelo
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 414,
         name: 'PayPal',
         icon: 'paypal',
         color: const Color(0xFF003087)), // Azul Escuro
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 415,
         name: 'PicPay',
         icon: 'picpay',
         color: const Color(0xFF21C25E)), // Verde
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 416,
         name: 'Bluehost',
         icon: 'bluehost',
         color: const Color(0xFF0066FF)), // Azul
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 417,
         name: 'Cloudflare',
         icon: 'cloudflare',
         color: const Color(0xFFFF7300)), // Laranja
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 418,
         name: 'GoDaddy',
         icon: 'godaddy',
         color: const Color(0xFF7DB701)), // Verde
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 419,
         name: 'HostGator',
         icon: 'hostgator',
         color: const Color(0xFF002D5E)), // Azul Escuro
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 420,
         name: 'SiteGround',
         icon: 'siteground',
         color: const Color(0xFF00A855)), // Verde
 
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 421,
         name: 'Claro',
         icon: 'claro',
         color: const Color(0xFFE60012)), // Vermelho
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 422, name: 'Oi', icon: 'oi', color: const Color(0xFFFF6600)), // Laranja
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 423,
         name: 'Sky',
         icon: 'sky',
         color: const Color(0xFFDC0000)), // Vermelho
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 424, name: 'Tim', icon: 'tim', color: const Color(0xFF0048B0)), // Azul
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 425, name: 'Vivo', icon: 'vivo', color: const Color(0xFF6E1E9D)), // Roxo
 
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 426,
         name: 'Detran',
         icon: 'detran',
         color: const Color(0xFF003399)), // Azul
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 427,
         name: 'Gov.br',
         icon: 'govbr',
         color: const Color(0xFF005DAA)), // Azul
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 428,
         name: 'INSS',
         icon: 'inss',
         color: const Color(0xFF1B75BB)), // Azul Claro
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 429,
         name: 'Receita Federal',
         icon: 'receita',
         color: const Color(0xFF003399)), // Azul
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 430,
         name: 'Amazon Prime Video',
         icon: 'primevideo',
         color: const Color(0xFF00A8E1)), // Azul
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 431,
         name: 'Disney+',
         icon: 'disney',
         color: const Color(0xFF113CCF)), // Azul Escuro
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 432,
         name: 'Netflix',
         icon: 'netflix',
         color: const Color(0xFFE50914)), // Vermelho
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 433,
         name: 'Spotify',
         icon: 'spotify',
         color: const Color(0xFF1DB954)), // Verde
 
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 434,
         name: 'Microsoft Teams',
         icon: 'teams',
         color: const Color(0xFF464EB8)), // Roxo
 
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 435, name: 'Dropbox', icon: 'dropbox', color: const Color(0xFF0061FF)),
 
 // 🎮 Games
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 437,
         name: 'PlayStation Network',
         icon: 'psn',
         color: const Color(0xFF00439C)),
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 438, name: 'Steam', icon: 'steam', color: const Color(0xFF000000)),
 
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 400,
         name: 'Alexa',
         icon: 'alexa',
         color: const Color(0xFF0F9D58)), // Verde
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 401,
         name: 'Google Home',
         icon: 'google_home',
         color: const Color(0xFF4285F4)), // Azul
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 402,
         name: 'Philips Hue',
         icon: 'philips_hue',
         color: const Color(0xFFFFA000)), // Laranja
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 403,
         name: 'SmartThings',
         icon: 'smartthings',
         color: const Color(0xFF1C8EF9)), // Azul Claro
-    TipoRegisterModel(
+    TypeRegiterModel(
         id: 404,
         name: 'Xiaomi Home',
         icon: 'xiaomi_home',

@@ -1,48 +1,70 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
-import 'package:keezy/src/core/components/installed_apps/installed_app_model.dart';
-import 'package:keezy/src/modules/register/model/tipo_registro_model.dart';
+import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
+import 'package:uuid/uuid.dart';
 
+import 'package:keezy/src/core/installed_apps/installed_app_model.dart';
+import 'package:keezy/src/modules/type_register/type_register_model.dart';
 
-class RegisterModel {
+part 'register_model.g.dart';
+
+@HiveType(typeId: 0)
+class RegisterModel extends HiveObject {
+  @HiveField(0)
   final String id;
+
+  @HiveField(1) 
   final String? name;
+
+  @HiveField(2)
   final String? username;
+
+  @HiveField(3)
   final String? password;
+
+  @HiveField(4)
   final String? url;
+
+  @HiveField(5)
   final String? note;
-  final TipoRegisterModel? type;
+
+  @HiveField(6)
+  final TypeRegiterModel? type;
+
+  @HiveField(7)
   final InstalledAppModel? selectedApp;
 
-  RegisterModel({
-    this.id = '',
+      RegisterModel({
+    required this.id,
     this.name,
     this.username,
     this.password,
     this.url,
     this.note,
     this.type,
-    this.selectedApp,
+    this.selectedApp
   });
 
-  // // Gerar um novo registro com ID único
-  // factory RegisterModel.newRegister({
-  //   required String title,
-  //   String? login,
-  //   String? password,
-  //   String? description,
-  //   String? site,
-  //   required TipoRegisterModel type,
-  // }) {
-  //   return RegisterModel(
-  //     id: const Uuid().v4(), // Gera um UUID
-  //     title: title,
-  //     password: password,
-  //     site: site,
-  //     type: type,
-  //   );
-  // }
+
+
+
+
+  factory RegisterModel.fromCsv(List<dynamic> row) {
+    return RegisterModel(
+      name: row[0] ?? '',
+      url: row[1] ?? '',
+      username: row[2] ?? '',
+      password: row[3] ?? '',
+      note: row[4] ?? '',
+       id: Uuid().v4()
+    );
+  }
+
+  
+
+
 
   RegisterModel copyWith({
     String? id,
@@ -51,7 +73,7 @@ class RegisterModel {
     String? password,
     String? url,
     String? note,
-    TipoRegisterModel? type,
+    TypeRegiterModel? type,
     InstalledAppModel? selectedApp,
   }) {
     return RegisterModel(
@@ -65,6 +87,7 @@ class RegisterModel {
       selectedApp: selectedApp ?? this.selectedApp,
     );
   }
+
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
@@ -87,55 +110,19 @@ class RegisterModel {
       password: map['password'] != null ? map['password'] as String : null,
       url: map['url'] != null ? map['url'] as String : null,
       note: map['note'] != null ? map['note'] as String : null,
-      type: map['type'] != null ? TipoRegisterModel.fromMap(map['type'] as Map<String,dynamic>) : null,
+      type: map['type'] != null ? TypeRegiterModel.fromMap(map['type'] as Map<String,dynamic>) : null,
       selectedApp: map['selectedApp'] != null ? InstalledAppModel.fromMap(map['selectedApp'] as Map<String,dynamic>) : null,
     );
   }
 
-  String toJson() => json.encode(toMap());
 
-  factory RegisterModel.fromJson(String source) =>
-      RegisterModel.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory RegisterModel.fromJson(String source) => RegisterModel.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
   String toString() {
     return 'RegisterModel(id: $id, name: $name, username: $username, password: $password, url: $url, note: $note, type: $type, selectedApp: $selectedApp)';
   }
 
-  factory RegisterModel.fromCsv(List<dynamic> row) {
-    return RegisterModel(
-      name: row[0] ?? '',
-      url: row[1] ?? '',
-      username: row[2] ?? '',
-      password: row[3] ?? '',
-      note: row[4] ?? '',
-    );
-  }
-
-  // @override
-  // bool operator ==(covariant RegisterModel other) {
-  //   if (identical(this, other)) return true;
-
-  //   return
-  //     other.id == id &&
-  //     other.title == title &&
-  //     other.login == login &&
-  //     other.password == password &&
-  //     other.description == description &&
-  //     other.site == site &&
-  //     other.type == type;
-  // }
-
-  // @override
-  // int get hashCode {
-  //   return id.hashCode ^
-  //     title.hashCode ^
-  //     login.hashCode ^
-  //     password.hashCode ^
-  //     description.hashCode ^
-  //     site.hashCode ^
-  //     type.hashCode;
-  // }
 
   @override
   bool operator ==(covariant RegisterModel other) {
@@ -163,4 +150,9 @@ class RegisterModel {
       type.hashCode ^
       selectedApp.hashCode;
   }
+
+@override
+List<Object?> get props => [id, name, username, password, url, note, type, selectedApp];
+
+  String toJson() => json.encode(toMap());
 }

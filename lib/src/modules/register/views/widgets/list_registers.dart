@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:keezy/src/core/router/routes.dart';
 import 'package:keezy/src/modules/register/controller/register_controller.dart';
 import 'package:keezy/src/modules/register/controller/register_state.dart';
-import 'package:keezy/src/modules/register/model/registro_model.dart';
+import 'package:keezy/src/modules/register/model/register_model.dart';
 
 class ListRegisters extends StatefulWidget {
   const ListRegisters({super.key});
@@ -52,11 +52,15 @@ class _ListRegistersState extends State<ListRegisters> {
                       children: [
                         fieldPesquisar(),
                         const SizedBox(height: 10),
-                        // Text('Meus Registros',
-                        //     style: Theme.of(context).textTheme.titleSmall),
+                        Text(
+                          'Meus Registros',
+                          style: Theme.of(context).textTheme.titleSmall,
+                        ),
                         _barraDeAcoes(),
-
-                        listRegistros(informacoes),
+                        SizedBox(
+                          height: 600,
+                          child: listRegistros(informacoes),
+                        ),
                         const SizedBox(height: 10),
                       ],
                     ),
@@ -121,7 +125,7 @@ class _ListRegistersState extends State<ListRegisters> {
   ListView listRegistros(List<RegisterModel> registers) {
     return ListView.builder(
       shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
+      scrollDirection: Axis.vertical,
       itemCount: registers.length,
       itemBuilder: (BuildContext context, int index) {
         RegisterModel register = registers[index];
@@ -132,12 +136,21 @@ class _ListRegistersState extends State<ListRegisters> {
           child: ListTile(
             onTap: () => _goToView(register),
             shape: const Border(),
-            leading: iconDay(register, context, corDeFundo),
+         //  leading: iconDay(register, context, corDeFundo),
+             leading: register.selectedApp!.iconBytes != null
+                                ? Image.memory((register.selectedApp!.iconBytes!),
+                                    width: 40, height: 40)
+                                : iconDay(register, context, corDeFundo),
             dense: false,
             title: Text(
-              register.name ?? '',
+              register.selectedApp?.name.toString() ?? '',
               style: Theme.of(context).textTheme.titleMedium,
             ),
+
+            // Text(
+            //   register.name ?? '',
+            //   style: Theme.of(context).textTheme.titleMedium,
+            // ),
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -152,22 +165,20 @@ class _ListRegistersState extends State<ListRegisters> {
     );
   }
 
-  _goToView(RegisterModel registers) async {
-    await GoRouter.of(context).push(RoutesPaths.registerView, extra: registers);
+  _goToView(RegisterModel register) async {
+    await GoRouter.of(context).push(RoutesPaths.register, extra: register);
   }
 
-  // _goToEdit(RegisterModel register) async {
-  //   await GoRouter.of(context).push(RoutesPaths.register, extra: register);
-  // }
-
   CircleAvatar iconDay(RegisterModel register, context, Color cor) {
+    final String? name =
+        register.name != '' ? register.name : register.username;
     return CircleAvatar(
       backgroundColor: cor,
       radius: 25,
       child: Center(
         child: Text(
-          register.name?[0] ?? ''
-              .toUpperCase(), // Pega a primeira letra e coloca maiúscula
+          " name",
+          //name?[0] ?? 'R' .toUpperCase(),
           style:
               const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),

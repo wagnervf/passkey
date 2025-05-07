@@ -5,33 +5,31 @@ import 'dart:developer';
 
 import 'package:keezy/src/core/data/services/secure_storage_service.dart';
 import 'package:keezy/src/core/either/either.dart';
+import 'package:keezy/src/core/either/unit.dart';
 import 'package:keezy/src/core/exceptions/repository_exception.dart';
-import 'package:keezy/src/modules/register/model/registro_model.dart';
+import 'package:keezy/src/modules/register/data/register_hive.dart';
+import 'package:keezy/src/modules/register/model/register_model.dart';
 import 'package:keezy/src/modules/register/repositories/register_repository.dart';
 
 class RegisterRepositoryImpl implements RegisterRepository {
   RegisterRepositoryImpl();
 
   final SecureStorageService _secureStorageService = SecureStorageService();
+
+  final RegisterHive _registerHive = RegisterHive();
+
   static const _keyRegistros = 'registers';
 
-  /// Obtém todos os registros salvos
   Future<List<RegisterModel>> _getListRegister() async {
     try {
-      final List<String>? registrosString =
-          await _secureStorageService.getStringList(_keyRegistros);
+      final List<RegisterModel>? listRegisters =
+           _registerHive.getAllRegisters();
 
-      if (registrosString == null || registrosString.isEmpty) {
+      if (listRegisters == null || listRegisters.isEmpty) {
         return [];
       }
 
-      return registrosString
-          .map(
-            (registro) => RegisterModel.fromMap(
-              jsonDecode(registro),
-            ),
-          )
-          .toList();
+      return listRegisters;
     } catch (e, s) {
       log("Erro ao buscar registros: $e", error: e, stackTrace: s);
       return [];
@@ -74,11 +72,9 @@ class RegisterRepositoryImpl implements RegisterRepository {
   Future<Either<RepositoryException, bool>> saveRegisterRepository(
       RegisterModel register) async {
     try {
-      final List<RegisterModel> listRegisters = await _getListRegister();
-      listRegisters.add(register);
+      await _registerHive.addRegister(register);
 
-      final bool result = await _salvarLocalmente(listRegisters);
-      return Right(result);
+      return Right(true);
     } catch (e, s) {
       log("Erro ao salvar registro: $e", error: e, stackTrace: s);
       return Left(RepositoryException(message: 'Erro ao salvar o registro.'));
@@ -90,7 +86,7 @@ class RegisterRepositoryImpl implements RegisterRepository {
       List<RegisterModel> listRegisters) async {
     try {
       //final List<RegisterModel> listRegisters = await _getListRegister();
-     // listRegisters.add(register);
+      // listRegisters.add(register);
 
       final bool result = await _salvarLocalmente(listRegisters);
       return Right(result);
@@ -99,9 +95,6 @@ class RegisterRepositoryImpl implements RegisterRepository {
       return Left(RepositoryException(message: 'Erro ao salvar o registro.'));
     }
   }
-
-
-  
 
   @override
   Future<Either<RepositoryException, bool>> updateRegisterRepository(
@@ -126,7 +119,7 @@ class RegisterRepositoryImpl implements RegisterRepository {
   }
 
   @override
-  Future<Either<RepositoryException, bool>> deleteRegisterRepository(
+  Future<Either<RepositoryException, Unit>> deleteRegisterRepository(
       RegisterModel registro) async {
     try {
       final List<RegisterModel> listRegisters = await _getListRegister();
@@ -138,8 +131,10 @@ class RegisterRepositoryImpl implements RegisterRepository {
         return Left(RepositoryException(message: 'Registro não encontrado.'));
       }
 
-      final bool result = await _salvarLocalmente(listRegisters);
-      return Right(result);
+      _registerHive.deleteRegister(registro.id);
+     // final bool result = await _salvarLocalmente(listRegisters);
+      return Right(unit);
+
     } catch (e, s) {
       log("Erro ao remover registro: $e", error: e, stackTrace: s);
       return Left(RepositoryException(message: 'Erro ao remover o registro.'));

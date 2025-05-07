@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:keezy/src/core/utils/utils.dart';
 
-import '../../model/tipo_registro_model.dart';
+import '../../../type_register/type_register_model.dart';
 
 class TipoListView extends StatefulWidget {
   const TipoListView({super.key});
@@ -14,7 +14,7 @@ class TipoListView extends StatefulWidget {
 
 class _TipoListViewState extends State<TipoListView> {
 
-late List<TipoRegisterModel> displayedAccounts;
+late List<TypeRegiterModel> displayedAccounts;
 
   @override
   void initState() {

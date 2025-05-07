@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:keezy/src/core/components/action_type.dart';
 
-//enum Action { salvar, editar, excluir }
+//enum ActionType { salvar, editar, excluir }
 
 class ActionButton extends StatefulWidget {
-  final Future<void> Function() onPressed;
+  final Future<bool> Function() onPressed;
+  final ActionType actionType;
   final String title;
-  final ActionType type;
 
   const ActionButton({
     super.key,
     required this.onPressed,
+    required this.actionType,
     required this.title,
-    required this.type,
   });
 
   @override
@@ -20,63 +20,61 @@ class ActionButton extends StatefulWidget {
 }
 
 class _ActionButtonState extends State<ActionButton> {
-  bool _isLoading = false;
+  bool _loading = false;
 
   Color _getColor() {
-    switch (widget.type) {
+    switch (widget.actionType) {
       case ActionType.salvar:
         return Colors.teal;
       case ActionType.editar:
-        return Colors.blue;
+        return const Color.fromRGBO(255, 160, 0, 1);
       case ActionType.excluir:
         return Colors.red;
     }
   }
 
-  Future<void> _handlePressed() async {
-    setState(() {
-      _isLoading = true;
-    });
-    try {
-      await widget.onPressed();
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${widget.title} realizado com sucesso!')),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erro ao ${widget.title.toLowerCase()}!')),
-        );
-      }
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
+  IconData _getIcon() {
+    switch (widget.actionType) {
+      case ActionType.salvar:
+        return Icons.save;
+      case ActionType.editar:
+        return Icons.edit;
+      case ActionType.excluir:
+        return Icons.delete;
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton(
+    return ElevatedButton.icon(
       style: ElevatedButton.styleFrom(
         backgroundColor: _getColor(),
-        padding: const EdgeInsets.symmetric(vertical: 16),
+        minimumSize: const Size(double.infinity, 48),
+        side:  BorderSide(
+          color: _getColor(),
+        ),
       ),
-      onPressed: _isLoading ? null : _handlePressed,
-      child: _isLoading
+      icon: _loading
           ? const SizedBox(
-              height: 20,
-              width: 20,
+              width: 18,
+              height: 18,
               child: CircularProgressIndicator(
                 color: Colors.white,
                 strokeWidth: 2,
               ),
             )
-          : Text(widget.title),
+          : Icon(_getIcon()),
+      label: Text(_loading ? 'Aguarde...' : widget.title),
+      onPressed: _loading
+          ? null
+          : () async {
+              setState(() => _loading = true);
+              final result = await widget.onPressed();
+
+              if (mounted) {
+                setState(() => _loading = false);
+              }
+            },
     );
   }
 }
