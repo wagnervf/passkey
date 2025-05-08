@@ -105,7 +105,8 @@ class _RegisterFormState extends State<RegisterForm> {
                                   ? selecionarApp()
                                   : appSelecionado(),
 
-                              const SizedBox(height: 16),
+                              const SizedBox(height: 24),
+                              
                               const Text("Nome, app ou site"),
                               const SizedBox(height: 8),
                               _buildTextField(
@@ -153,6 +154,7 @@ class _RegisterFormState extends State<RegisterForm> {
 
   Column selecionarApp() {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text("Selecionar um App do celular"),
         const SizedBox(height: 8),

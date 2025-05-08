@@ -24,8 +24,10 @@ class _HomeNavigationPageState extends State<HomeNavigationPage> {
     return Scaffold(
       body: _pages[_selectedIndex],
       bottomNavigationBar: NavigationBar(
-        
+        height: 65,
+        indicatorColor: Theme.of(context).colorScheme.tertiary,
         backgroundColor: Theme.of(context).colorScheme.onTertiary,
+        labelPadding: EdgeInsets.only(bottom: 0),
         elevation: 5,
         selectedIndex: _selectedIndex,
         onDestinationSelected: (int index) {
@@ -35,17 +37,16 @@ class _HomeNavigationPageState extends State<HomeNavigationPage> {
         },
         destinations: <NavigationDestination>[
           NavigationDestination(
-            icon:
-                Icon(_selectedIndex == 0 ? Icons.house : Icons.house_outlined),
+            icon: Icon(Icons.house),
             label: 'Início',
-          ),
-          // const NavigationDestination(
-          //   icon: Icon(Icons.credit_card),
-          //   label: 'Cartão',
-          // ),
+            selectedIcon: Icon(Icons.house),
+            tooltip: 'Início',
+          ),        
           const NavigationDestination(
-            icon: Icon(Icons.account_circle),
+            icon: Icon(Icons.account_circle_outlined),
             label: 'Perfil',
+            selectedIcon: Icon(Icons.account_circle),
+            tooltip: 'Meu Perfil',
           ),
         ],
       ),

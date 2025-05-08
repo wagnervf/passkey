@@ -69,9 +69,7 @@ class _HomePageState extends State<HomePage> {
               //    });
               //  });
         
-              return SingleChildScrollView(
-                child: ListRegisters(
-                ),
+              return ListRegisters(
               );
             } else if (state is AuthErrorState) {
               return Text('Erro: ${state.message}');

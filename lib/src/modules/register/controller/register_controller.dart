@@ -36,6 +36,11 @@ class RegisterController extends Cubit<RegisterState> {
           ):
           _listRegisters = result;
 
+       _listRegisters.sort((a, b) => b.id.compareTo(a.id));
+    
+
+
+
           emit(RegisterLoaded(register: _listRegisters));
           return Right(unit);
       }

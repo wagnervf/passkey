@@ -14,10 +14,19 @@ class ListRegisters extends StatefulWidget {
 }
 
 class _ListRegistersState extends State<ListRegisters> {
+  final TextEditingController _searchController = TextEditingController();
+  List<RegisterModel> todosRegistros = [];
+  List<RegisterModel> registrosFiltrados = [];
+
+  OrdemRegistros _ordemAtual = OrdemRegistros.data;
+
   @override
   void initState() {
     super.initState();
     getAllRegister();
+     WidgetsBinding.instance.addPostFrameCallback((_) { 
+            _ordenarRegistros(OrdemRegistros.data);
+          });
   }
 
   getAllRegister() async {
@@ -26,62 +35,153 @@ class _ListRegistersState extends State<ListRegisters> {
 
   @override
   Widget build(BuildContext context) {
-    //final tema = Theme.of(context).textTheme;
     return BlocBuilder<RegisterController, RegisterState>(
       builder: (context, state) {
-        switch (state) {
-          case RegisterLoading():
-            return SizedBox(
-              height: MediaQuery.of(context).size.height * .8,
-              child: const Center(
-                child: CircularProgressIndicator(),
-              ),
-            );
-          case RegisterError():
-            return const Text('Erro');
-          case RegisterLoaded():
-            final informacoes = state.register;
-
-            return informacoes.isEmpty
-                ? emptyRegisters(context)
-                : Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        fieldPesquisar(),
-                        const SizedBox(height: 10),
-                        Text(
-                          'Meus Registros',
-                          style: Theme.of(context).textTheme.titleSmall,
-                        ),
-                        _barraDeAcoes(),
-                        SizedBox(
-                          height: 600,
-                          child: listRegistros(informacoes),
-                        ),
-                        const SizedBox(height: 10),
-                      ],
-                    ),
-                  );
+        if (state is RegisterLoading) {
+          return const Center(
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: 40),
+              child: CircularProgressIndicator(),
+            ),
+          );
         }
-        return SizedBox.shrink();
+
+        if (state is RegisterError) {
+          return const Center(
+            child: Text('Ocorreu um erro ao carregar os registros.'),
+          );
+        }
+
+        if (state is RegisterLoaded) {
+          todosRegistros = state.register;
+          if (todosRegistros.isEmpty) {
+            return emptyRegisters(context);
+          }
+         
+
+          if (_searchController.text.isEmpty) {
+            registrosFiltrados = todosRegistros;
+          } else {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              _filtrarRegistros(_searchController.text);
+            });
+          }
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              fieldPesquisar(),
+              const SizedBox(height: 12),
+              _barraDeAcoes(),
+              const SizedBox(height: 8),
+              Expanded(
+                child: listRegistros(registrosFiltrados),
+              ),
+              const SizedBox(height: 10),
+            ],
+          );
+        }
+
+        return const SizedBox.shrink();
+      },
+    );
+  }
+
+  Widget listRegistros(List<RegisterModel> registers) {
+    return ListView.separated(
+      itemCount: registers.length,
+      padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 12),
+      separatorBuilder: (_, __) => const SizedBox(height: 8),
+      itemBuilder: (BuildContext context, int index) {
+        final register = registers[index];
+        final corDeFundo = cores[index % cores.length];
+        final nome = register.selectedApp?.name ?? register.name ?? '';
+
+        return ListTile(
+          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 0),
+          onTap: () => _goToView(register),
+          leading: register.selectedApp?.iconBytes != null
+              ? ClipRRect(
+                  borderRadius: BorderRadius.circular(25),
+                  child: Image.memory(
+                    register.selectedApp!.iconBytes!,
+                    width: 50,
+                    height: 50,
+                    fit: BoxFit.cover,
+                  ),
+                )
+              : iconDay(register, context, corDeFundo),
+          title: Text(
+            nome,
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+          subtitle: register.username?.isNotEmpty == true
+              ? Text(
+                  register.username!,
+                  style: Theme.of(context).textTheme.bodySmall,
+                )
+              : null,
+          trailing: const Icon(Icons.remove_red_eye),
+        );
       },
     );
   }
 
   _barraDeAcoes() {
-    return ListTile(
-      dense: true,
-      contentPadding: EdgeInsets.symmetric(horizontal: 4, vertical: 0),
-      leading: TextButton.icon(
-        onPressed: () {},
-        label: Text('Nome', style: Theme.of(context).textTheme.titleSmall),
-        icon: Icon(
-          Icons.arrow_circle_up_sharp,
-          color: Theme.of(context).colorScheme.secondary,
-        ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 0.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        spacing: 8.0,
+        children: [
+          SizedBox(
+              //width: 100,
+              height: 30,
+              child: OutlinedButton.icon(
+                // style: ButtonStyle(
+                //     backgroundColor: WidgetStatePropertyAll(
+                //   Theme.of(context).colorScheme.tertiary,
+                // )),
+
+                style: OutlinedButton.styleFrom(
+                    backgroundColor: _ordemAtual == OrdemRegistros.nome
+                        ? Theme.of(context).colorScheme.tertiary
+                        : Colors.white,
+                    foregroundColor: _ordemAtual == OrdemRegistros.nome
+                        ? Colors.black
+                        : Colors.grey.shade800,
+                    side: BorderSide(
+                        color: Theme.of(context).colorScheme.tertiary)),
+                onPressed: () => _ordenarRegistros(OrdemRegistros.nome),
+                label:
+                    Text('Nome', style: Theme.of(context).textTheme.bodySmall),
+                icon: Icon(
+                  Icons.arrow_circle_up_sharp,
+                  color: Theme.of(context).colorScheme.secondary,
+                ),
+              )),
+          SizedBox(
+              //width: 100,
+              height: 30,
+              child: OutlinedButton.icon(
+                style: OutlinedButton.styleFrom(
+                    backgroundColor: _ordemAtual == OrdemRegistros.data
+                        ? Theme.of(context).colorScheme.tertiary
+                        : Colors.white,
+                    foregroundColor: _ordemAtual == OrdemRegistros.data
+                        ? Colors.black
+                        : Colors.grey.shade800,
+                    side: BorderSide(
+                        color: Theme.of(context).colorScheme.tertiary)),
+                onPressed: () => _ordenarRegistros(OrdemRegistros.data),
+                label: Text('Criação',
+                    style: Theme.of(context).textTheme.bodySmall),
+                icon: Icon(
+                  Icons.arrow_circle_up_sharp,
+                  color: Theme.of(context).colorScheme.secondary,
+                ),
+              )),
+        ],
       ),
     );
   }
@@ -122,49 +222,6 @@ class _ListRegistersState extends State<ListRegisters> {
     Colors.brown
   ];
 
-  ListView listRegistros(List<RegisterModel> registers) {
-    return ListView.builder(
-      shrinkWrap: true,
-      scrollDirection: Axis.vertical,
-      itemCount: registers.length,
-      itemBuilder: (BuildContext context, int index) {
-        RegisterModel register = registers[index];
-        Color corDeFundo = cores[index % cores.length];
-        return Card(
-          elevation: 1,
-          margin: const EdgeInsets.all(1),
-          child: ListTile(
-            onTap: () => _goToView(register),
-            shape: const Border(),
-         //  leading: iconDay(register, context, corDeFundo),
-             leading: register.selectedApp!.iconBytes != null
-                                ? Image.memory((register.selectedApp!.iconBytes!),
-                                    width: 40, height: 40)
-                                : iconDay(register, context, corDeFundo),
-            dense: false,
-            title: Text(
-              register.selectedApp?.name.toString() ?? '',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-
-            // Text(
-            //   register.name ?? '',
-            //   style: Theme.of(context).textTheme.titleMedium,
-            // ),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(register.username ?? '',
-                    style: Theme.of(context).textTheme.bodySmall),
-              ],
-            ),
-            trailing: const Icon(Icons.remove_red_eye),
-          ),
-        );
-      },
-    );
-  }
-
   _goToView(RegisterModel register) async {
     await GoRouter.of(context).push(RoutesPaths.register, extra: register);
   }
@@ -177,8 +234,7 @@ class _ListRegistersState extends State<ListRegisters> {
       radius: 25,
       child: Center(
         child: Text(
-          " name",
-          //name?[0] ?? 'R' .toUpperCase(),
+          name?[0].toUpperCase() ?? 'R',
           style:
               const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
@@ -186,20 +242,20 @@ class _ListRegistersState extends State<ListRegisters> {
     );
   }
 
-  Container fieldPesquisar() {
+  Padding fieldPesquisar() {
     var borderSide = const BorderSide(color: Colors.transparent);
     var borderRadius = const BorderRadius.all(Radius.circular(16.0));
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6),
-      margin: const EdgeInsets.symmetric(horizontal: 6),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        color: Theme.of(context).colorScheme.onPrimary,
-      ),
-      child: TextFormField(
+
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: TextField(
+        controller: _searchController,
+        onChanged: _filtrarRegistros,
         decoration: InputDecoration(
             hintText: '   Pesquisar',
-            prefixIcon: Icon(Icons.search),
+            prefixIcon: Icon(
+              Icons.search,
+            ),
             prefixIconConstraints: BoxConstraints.loose(const Size(20, 20)),
             border: OutlineInputBorder(
               borderSide: borderSide,
@@ -214,10 +270,49 @@ class _ListRegistersState extends State<ListRegisters> {
               borderRadius: borderRadius,
             ),
             filled: true,
+            //fillColor: Colors.grey[100],
             fillColor: Theme.of(context).colorScheme.onPrimary,
-            contentPadding: const EdgeInsets.all(8),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16),
             hintStyle: const TextStyle(fontWeight: FontWeight.normal)),
       ),
     );
   }
+
+  void _filtrarRegistros(String query) {
+    final queryLower = query.toLowerCase();
+
+    setState(() {
+      registrosFiltrados = todosRegistros.where((registro) {
+        final username = registro.username?.toLowerCase() ?? '';
+        final nome = registro.name?.toLowerCase() ?? '';
+        final app = registro.selectedApp?.name.toLowerCase() ?? '';
+        final login = registro.username?.toLowerCase() ?? '';
+        return username.contains(queryLower) ||
+            nome.contains(queryLower) ||
+            app.contains(queryLower) ||
+            login.contains(queryLower);
+      }).toList();
+
+      print(registrosFiltrados.toString());
+    });
+  }
+
+  void _ordenarRegistros(OrdemRegistros ordem) {
+    setState(() {
+      _ordemAtual = ordem;
+
+      registrosFiltrados.sort((a, b) {
+        if (ordem == OrdemRegistros.nome) {
+          final nomeA = a.name?.toLowerCase() ?? '';
+          final nomeB = b.name?.toLowerCase() ?? '';
+          return nomeA.compareTo(nomeB);
+        } else {
+          return b.id
+              .compareTo(a.id); // Supondo que `id` seja crescente com o tempo
+        }
+      });
+    });
+  }
 }
+
+enum OrdemRegistros { nome, data }
