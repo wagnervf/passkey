@@ -6,6 +6,8 @@ import 'package:keezy/src/modules/import_registers_csv/services/import_registers
 import 'package:keezy/src/modules/register/controller/register_controller.dart';
 import 'package:keezy/src/modules/register/model/register_model.dart';
 
+
+
 class ImportRegisterCsvController extends Cubit<ImportRegistersCsvState> {
   final ImportRegistersCsvServices importRegistersCsvServices;
   final RegisterController registerController;
@@ -15,46 +17,51 @@ class ImportRegisterCsvController extends Cubit<ImportRegistersCsvState> {
     required this.registerController,
   }) : super(ImportCsvInitial());
 
-  importFromCsv() async {
+  Future<List<RegisterModel>?> importFromCsv() async {
     emit(ImportCsvLoading());
     try {
       final registers = await importRegistersCsvServices.importFromCsv();
+        if (registers == null || registers.isEmpty) {
+        const msg = 'Falha ao importar os dados.';
+        emit(ImportCsvError(msg));
+        return null;
+      }
 
-      log(registers.toString());
-
+      log('Registros importados: ${registers.length}');
       emit(ImportCsvLoaded());
       return registers;
     } catch (e) {
-      emit(ImportCsvError(e.toString()));
+      final errorMsg = 'Erro ao importar CSV: $e';
+      log(errorMsg);
+      emit(ImportCsvError(errorMsg));
+      return null;
     }
   }
 
   Future<String?> restoreBackupFromFileCsv() async {
+    emit(ImportCsvLoading());
+
     try {
-      emit(ImportCsvLoading());
-      // name	url	username	password	note
+      final List<RegisterModel>? registers = await importFromCsv();
 
-      final resultado = await importFromCsv();
-
-      if (resultado != null) {
-        List<RegisterModel> registros = resultado;
-
-        log('Registros importados: ${registros.length}');
-
-        // Salvar usuário corretamente via AuthController
-        await registerController.saveListRegisterController(registros);
-
-        emit(ImportCsvLoaded());
-
-        return 'Usuário importado!';
-      } else {
-        log('Falha ao importar os dados.');
-        emit(ImportCsvError('Falha ao importar os dados.'));
-        return 'Falha ao importar os dados.';
+      if (registers == null || registers.isEmpty) {
+        const msg = 'Falha ao importar os dados.';
+        emit(ImportCsvError(msg));
+        return msg;
       }
+
+      for (final register in registers) {
+        log('Salvando registro: ${register.name}');
+        await registerController.saveAndUpdateRegisterController(register);
+      }
+
+      emit(ImportCsvLoaded());
+      return 'Dados importados com sucesso!';
     } catch (e) {
-      emit(ImportCsvError("Erro ao importar backup: $e"));
-      return "Erro ao importar backup: $e";
+      final errorMsg = 'Erro ao importar backup: $e';
+      emit(ImportCsvError(errorMsg));
+      return errorMsg;
     }
   }
 }
+

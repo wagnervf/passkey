@@ -7,10 +7,9 @@ import 'package:keezy/src/modules/register/model/register_model.dart';
 class ImportRegistersCsvRepositoryImpl implements ImportRegistersCsvRepository {
   @override
   Future<List<RegisterModel>> importFromCsv(File file) async {
-    // Verifica se o arquivo existe
     if (!await file.exists()) {
       throw Exception('Arquivo CSV não encontrado');
-    }    
+    }
 
     final csvString = await file.readAsString();
     final csvTable = const CsvToListConverter(
@@ -18,20 +17,33 @@ class ImportRegistersCsvRepositoryImpl implements ImportRegistersCsvRepository {
       eol: '\n',
       shouldParseNumbers: false,
     ).convert(csvString);
-    // Verifica se o arquivo CSV está vazio
+
     if (csvTable.isEmpty) {
-      throw Exception('Arquivo CSV vazio');
+      throw Exception('Arquivo CSV vazio.');
     }
 
-    // Verifica se o arquivo CSV tem cabeçalho
-    if (csvTable.first.isEmpty) {
-      throw Exception('Arquivo CSV sem cabeçalho');
-    }
-    
-    // Verfica se o arquivo está no formato correto
-    
+    final header =
+        csvTable.first.map((e) => e.toString().trim().toLowerCase()).toList();
 
-    final rows = csvTable.skip(1).toList();
-    return rows.map((row) => RegisterModel.fromCsv(row)).toList();
+    const requiredHeaders = ['name', 'url', 'username', 'password', 'note'];
+
+    final missingColumns =
+        requiredHeaders.where((h) => !header.contains(h)).toList();
+    if (missingColumns.isNotEmpty) {
+      // throw Exception('Colunas ausentes no CSV: ${missingColumns.join(', ')}');
+      throw Exception(
+          'Verifique se o arquivo CSV possui as coluns corretas e tente novamente');
+    }
+
+    final dataRows = csvTable.skip(1).toList();
+    if (dataRows.isEmpty) {
+      throw Exception(
+          'Verifique se o arquivo CSV possui dados e tente novamente');
+    }
+
+    final entries = dataRows.map((row) => RegisterModel.fromCsv(row)).toList();
+
+    return entries;
+
   }
 }

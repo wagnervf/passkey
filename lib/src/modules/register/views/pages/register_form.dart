@@ -106,7 +106,7 @@ class _RegisterFormState extends State<RegisterForm> {
                                   : appSelecionado(),
 
                               const SizedBox(height: 24),
-                              
+
                               const Text("Nome, app ou site"),
                               const SizedBox(height: 8),
                               _buildTextField(
@@ -132,6 +132,8 @@ class _RegisterFormState extends State<RegisterForm> {
                               //   onPressed: () => acaoSalvarRegistro(context),
                               // ),
 
+                              
+                              
                               Padding(
                                 padding:
                                     const EdgeInsets.only(top: 32, bottom: 24),
@@ -140,6 +142,14 @@ class _RegisterFormState extends State<RegisterForm> {
                                   child: const Text("Salvar"),
                                 ),
                               ),
+
+                              TextButton(
+                            onPressed: () => _excluirRegistro(register!),
+                            child: const Text(
+                              'Excluir',
+                              style: TextStyle(color: Colors.red),
+                            ),
+                          ),
                             ],
                           ),
                         ),
@@ -285,5 +295,41 @@ class _RegisterFormState extends State<RegisterForm> {
     return success;
   }
 
+  Future<void> _excluirRegistro(RegisterModel register) async {
+    return showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Confirmar Exclusão'),
+          content: const Text('Tem certeza que deseja excluir este registro?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancelar'),
+            ),
+            TextButton(
+              onPressed: () async {
+                bool result = true;
 
+                result = await context
+                    .read<RegisterController>()
+                    .deleteRegisterController(register);
+
+                if (context.mounted) {
+                  if (result == true) {
+                    ShowMessager.show(context, 'Registro removido');
+                  }
+                  Navigator.of(context).pop();
+                  Navigator.of(context).pop();
+                }
+              },
+              child: const Text('Excluir'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 }

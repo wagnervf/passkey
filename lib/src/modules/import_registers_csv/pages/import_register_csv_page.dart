@@ -5,7 +5,6 @@ import 'package:keezy/src/core/components/show_messeger.dart';
 import 'package:keezy/src/modules/import_registers_csv/controllers/import_register_csv_controller.dart';
 import 'package:keezy/src/modules/import_registers_csv/controllers/import_registers_csv_state.dart';
 import 'package:provider/provider.dart';
-
 class ImportRegisterCsvPage extends StatefulWidget {
   const ImportRegisterCsvPage({super.key});
 
@@ -16,50 +15,71 @@ class ImportRegisterCsvPage extends StatefulWidget {
 class _ImportRegisterCsvPageState extends State<ImportRegisterCsvPage> {
   @override
   Widget build(BuildContext context) {
-    final exportarImportarService =
-        Provider.of<ImportRegisterCsvController>(context, listen: false);
+    final controller = Provider.of<ImportRegisterCsvController>(context, listen: false);
 
     return BlocConsumer<ImportRegisterCsvController, ImportRegistersCsvState>(
       listener: (context, state) {
+        if (state is ImportCsvLoading) {
+          _showLoadingDialog(context);
+        } else {
+          Navigator.of(context, rootNavigator: true).pop();
+        }
+
         if (state is ImportCsvLoaded) {
-          ShowMessager.show(
-            context,
-            'Backup realizado com sucesso!',
-          );
+          //ShowMessager.show(context, 'Backup realizado com sucesso!');
+       // Navigator.of(context).pop();
+
         } else if (state is ImportCsvError) {
-          ShowMessager.show(
-            context,
-            state.message,
-          );
+          ShowMessager.show(context, state.message);
         }
       },
       builder: (context, state) {
-        if (state is ImportCsvLoading) {
-          return const Center(child: CircularProgressIndicator());
-        }
         return Column(
           children: [
-            // ItemCardWithIcon(
-            //     text: 'Exportar Registros',
-            //     subtTitle: 'Exportar registros para o Google Drive',
-            //     icon: Icons.download,
-            //     onTap: () => buttonExport(exportarImportarService)),
             ItemCardWithIcon(
               text: 'Importar Registros',
-              subtTitle: 'Selecione um arquivo ".csv" que contém suas senhas prar importá-las.',
+              subtTitle: 'Selecione um arquivo ".csv" que contém suas senhas para importá-las.',
               icon: Icons.upload_file,
-              onTap: () => _restoredBackup(
-                context,
-                exportarImportarService,
-              ),
+              onTap: () => _restoreBackup(controller),
             ),
-            
-            //onTap: () => _restoredBackup(context, exportarImportarService)),
           ],
         );
       },
     );
   }
+
+  void _restoreBackup(ImportRegisterCsvController controller) async {
+    await controller.restoreBackupFromFileCsv();
+  }
+
+  void _showLoadingDialog(BuildContext context, {String message = 'Carregando...'}) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => WillPopScope(
+        onWillPop: () async => false,
+        child: AlertDialog(
+          content: Row(
+            children: [
+              const CircularProgressIndicator(),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Text(
+                  message,
+                  style: const TextStyle(fontSize: 16),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+
+
+
 
   // buttonExport(ImportRegisterCsvController exportarImportarService) async {
   //   CircularProgressIndicator();
@@ -71,21 +91,3 @@ class _ImportRegisterCsvPageState extends State<ImportRegisterCsvPage> {
   //   }
   // }
 
-  void _restoredBackup(BuildContext context,
-      ImportRegisterCsvController exportarImportarService) async {
-    // final authController = context.read<AuthController>();
-    // final registerController = context.read<RegisterController>();
-
-    //final result = await exportarImportarService.restoreBackup(authController, registerController);
-  //  final result = await exportarImportarService.restoreBackupFromFileCsv();
-
-
-    // if (context.mounted) {
-    //   ShowMessager.show(
-    //       context,
-    //       result != null
-    //           ? 'Importação concluída!'
-    //           : 'Erro ao importar os dados.');
-    // }
-  }
-}

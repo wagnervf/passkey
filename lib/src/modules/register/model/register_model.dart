@@ -52,6 +52,7 @@ class RegisterModel extends HiveObject {
 
 
   factory RegisterModel.fromCsv(List<dynamic> row) {
+    
     return RegisterModel(
       name: row[0] ?? '',
       url: row[1] ?? '',
