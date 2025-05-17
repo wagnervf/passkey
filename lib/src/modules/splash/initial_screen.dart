@@ -11,9 +11,10 @@ class InitialScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    return SafeArea(
-      child: Scaffold(
-        body: Padding(
+    return Scaffold(
+      appBar: AppBar( toolbarHeight: 10,),
+      body: SafeArea(
+        child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -33,7 +34,7 @@ class InitialScreen extends StatelessWidget {
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.displayLarge,
               ),
-      
+            
               const SizedBox(height: 10),
               Text(
                 "Armazenamento criptografado e acesso fácil quando precisar",
@@ -41,11 +42,11 @@ class InitialScreen extends StatelessWidget {
                 style: Theme.of(context).textTheme.titleSmall,
               ),
               const SizedBox(height: 80),
-      
+            
               buttonCriarConta(context),
               const SizedBox(height: 20),
               buttonAcessar(context),
-      
+            
             ],
           ),
         ),

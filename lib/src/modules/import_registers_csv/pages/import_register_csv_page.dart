@@ -5,6 +5,7 @@ import 'package:keezy/src/core/components/show_messeger.dart';
 import 'package:keezy/src/modules/import_registers_csv/controllers/import_register_csv_controller.dart';
 import 'package:keezy/src/modules/import_registers_csv/controllers/import_registers_csv_state.dart';
 import 'package:provider/provider.dart';
+
 class ImportRegisterCsvPage extends StatefulWidget {
   const ImportRegisterCsvPage({super.key});
 
@@ -15,7 +16,8 @@ class ImportRegisterCsvPage extends StatefulWidget {
 class _ImportRegisterCsvPageState extends State<ImportRegisterCsvPage> {
   @override
   Widget build(BuildContext context) {
-    final controller = Provider.of<ImportRegisterCsvController>(context, listen: false);
+    final controller =
+        Provider.of<ImportRegisterCsvController>(context, listen: false);
 
     return BlocConsumer<ImportRegisterCsvController, ImportRegistersCsvState>(
       listener: (context, state) {
@@ -27,10 +29,12 @@ class _ImportRegisterCsvPageState extends State<ImportRegisterCsvPage> {
 
         if (state is ImportCsvLoaded) {
           //ShowMessager.show(context, 'Backup realizado com sucesso!');
-       // Navigator.of(context).pop();
-
-        } else if (state is ImportCsvError) {
+          // Navigator.of(context).pop();
+        }
+        if (state is ImportCsvError) {
           ShowMessager.show(context, state.message);
+        } else {
+          SizedBox.shrink();
         }
       },
       builder: (context, state) {
@@ -38,9 +42,20 @@ class _ImportRegisterCsvPageState extends State<ImportRegisterCsvPage> {
           children: [
             ItemCardWithIcon(
               text: 'Importar Registros',
-              subtTitle: 'Selecione um arquivo ".csv" que contém suas senhas para importá-las.',
+              subtTitle:
+                  'Selecione um arquivo ".csv" que contém suas senhas para importá-las.',
               icon: Icons.upload_file,
               onTap: () => _restoreBackup(controller),
+            ),
+
+            SizedBox(height: 10,),
+
+            ItemCardWithIcon(
+              text: 'Exportar Registros',
+              subtTitle:
+                  'Exportará suas senhas para um arquivo ".csv". Você poderá importá-las aqui ou no Chrome.',
+              icon: Icons.file_download,
+              onTap: () => () {}
             ),
           ],
         );
@@ -52,7 +67,8 @@ class _ImportRegisterCsvPageState extends State<ImportRegisterCsvPage> {
     await controller.restoreBackupFromFileCsv();
   }
 
-  void _showLoadingDialog(BuildContext context, {String message = 'Carregando...'}) {
+  void _showLoadingDialog(BuildContext context,
+      {String message = 'Carregando...'}) {
     showDialog(
       context: context,
       barrierDismissible: false,

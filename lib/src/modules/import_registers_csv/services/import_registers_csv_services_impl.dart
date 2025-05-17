@@ -1,4 +1,4 @@
-
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
@@ -13,7 +13,6 @@ class ImportRegistersCsvServicesImpl implements ImportRegistersCsvServices {
 
   @override
   Future<List<RegisterModel>> importFromCsv() async {
-   
     FilePickerResult? result = await FilePicker.platform.pickFiles();
     if (result != null && result.files.single.path != null) {
       if (result.files.single.extension == 'csv') {
@@ -23,8 +22,10 @@ class ImportRegistersCsvServicesImpl implements ImportRegistersCsvServices {
         throw Exception('Arquivo selecionado não é um CSV válido');
       }
     } else {
-      throw Exception('Nenhum arquivo selecionado');
+      log('Nenhum arquivo selecionado');
+      return [];
+
+      // throw Exception('Nenhum arquivo selecionado');
     }
   }
-   }
-
+}

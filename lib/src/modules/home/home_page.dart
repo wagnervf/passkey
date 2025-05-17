@@ -39,6 +39,7 @@ class _HomePageState extends State<HomePage> {
         leading: SizedBox.shrink(),
         centerTitle: false,
         titleSpacing: 0,
+        elevation: 0,
         leadingWidth: 20,
         title: Consumer<AuthUserProvider>(
         builder: (context, authUserProvider, child) {
@@ -46,7 +47,7 @@ class _HomePageState extends State<HomePage> {
           if (user == null) {
             return Center(child: Text('No user logged in.'));
           }
-          return Text(user.name, style: tema.titleLarge,);
+          return Text(user.name, style: tema.titleLarge!.copyWith(color:  Theme.of(context).colorScheme.primary,),);
         },
       ),
       

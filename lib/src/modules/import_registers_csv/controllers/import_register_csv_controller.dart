@@ -21,19 +21,20 @@ class ImportRegisterCsvController extends Cubit<ImportRegistersCsvState> {
     emit(ImportCsvLoading());
     try {
       final registers = await importRegistersCsvServices.importFromCsv();
+
         if (registers == null || registers.isEmpty) {
-        const msg = 'Falha ao importar os dados.';
-        emit(ImportCsvError(msg));
+        const msg = 'Nenhum registro selecionado!';
+        emit(ImportCsvNull(msg));
         return null;
-      }
+     }
 
       log('Registros importados: ${registers.length}');
       emit(ImportCsvLoaded());
       return registers;
     } catch (e) {
-      final errorMsg = 'Erro ao importar CSV: $e';
-      log(errorMsg);
-      emit(ImportCsvError(errorMsg));
+     // final errorMsg = 'Erro ao importar CSV: $e';
+      log(e.toString());
+      emit(ImportCsvError(e.toString()));
       return null;
     }
   }
@@ -45,8 +46,8 @@ class ImportRegisterCsvController extends Cubit<ImportRegistersCsvState> {
       final List<RegisterModel>? registers = await importFromCsv();
 
       if (registers == null || registers.isEmpty) {
-        const msg = 'Falha ao importar os dados.';
-        emit(ImportCsvError(msg));
+        const msg = 'Nenhum registro encontrado!';
+        emit(ImportCsvNull(msg));
         return msg;
       }
 

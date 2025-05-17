@@ -92,22 +92,7 @@ class _RegisterAuthPageState extends State<RegisterAuthPage> {
     return Scaffold(
       appBar: AppBar(
         excludeHeaderSemantics: true,
-        // title: Padding(
-        //   padding: const EdgeInsets.all(8.0),
-        //   child: Text(
-        //     edit ? 'Editar perfil' : 'Criar conta',
-        //   ),
-        // ),
-        // actions: [
-        //   Padding(
-        //     padding: const EdgeInsets.all(8.0),
-        //     child: edit
-        //         ? TextButton(
-        //             onPressed: () => Navigator.of(context).pop(),
-        //             child: const Text('Cancelar'))
-        //         : const SizedBox.shrink(),
-        //   )
-        // ],
+        toolbarHeight: 5,
       ),
       body: SafeArea(
         child: blocConsumer(context),

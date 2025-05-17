@@ -31,3 +31,12 @@ class ImportCsvError extends ImportRegistersCsvState {
   @override
   List<Object?> get props => [message];
 }
+
+class ImportCsvNull extends ImportRegistersCsvState {
+  final String message;
+
+  ImportCsvNull(this.message);
+  
+  @override
+  List<Object?> get props => [message];
+}
