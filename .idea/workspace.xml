@@ -1,194 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="AutoImportSettings">
-    <option name="autoReloadType" value="NONE" />
-  </component>
-  <component name="ChangeListManager">
-    <list default="true" id="0e68360e-23c9-4636-9f24-689c893e249f" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.vscode/launch.json" beforeDir="false" afterPath="$PROJECT_DIR$/.vscode/launch.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/app/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/build.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/app/src/main/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/main/AndroidManifest.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/app/src/main/kotlin/passkey/brcriativi/com/br/passkey/MainActivity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/src/main/kotlin/passkey/brcriativi/com/br/passkey/MainActivity.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/flutter_launcher_icons.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/flutter_launcher_icons.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ios/Runner.xcodeproj/project.pbxproj" beforeDir="false" afterPath="$PROJECT_DIR$/ios/Runner.xcodeproj/project.pbxproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ios/Runner/Info.plist" beforeDir="false" afterPath="$PROJECT_DIR$/ios/Runner/Info.plist" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/main.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/app_widget.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/src/app_widget.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/application_binding.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/src/application_binding.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/core/components/expand_buttons_actions.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/src/core/components/expand_buttons_actions.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/core/components/form_field_input_password.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/src/core/components/form_field_input_password.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/core/components/installed_apps/installed_app_model.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/src/core/components/installed_apps/installed_app_model.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/core/components/my_text_field.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/src/core/components/my_text_field.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/core/router/routes.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/src/core/router/routes.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/core/router/routes_pages.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/src/core/router/routes_pages.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/core/storage/i_token_storage.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/src/core/storage/i_token_storage.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/core/storage/token_storage.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/src/core/storage/token_storage.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/core/theme/controller/theme_controller.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/src/core/theme/controller/theme_controller.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/core/theme/core_theme.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/src/core/theme/core_theme.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/core/theme/services/theme_service_impl.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/src/core/theme/services/theme_service_impl.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/core/utils/utils.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/src/core/utils/utils.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/modules/auth/controllers/auth_controller.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/src/modules/auth/controllers/auth_controller.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/modules/auth/controllers/auth_state.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/src/modules/auth/controllers/auth_state.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/modules/auth/pages/auth_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/src/modules/auth/pages/auth_page.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/modules/auth/pages/register_auth_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/src/modules/auth/pages/register_auth_page.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/modules/auth/providers/auth_user_provider.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/src/modules/auth/providers/auth_user_provider.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/modules/auth/repositories/auth_repository.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/src/modules/auth/repositories/auth_repository.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/modules/configuracoes/backup_restore/controllers/backup_restore_controller.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/src/modules/configuracoes/backup_restore/controllers/backup_restore_controller.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/modules/configuracoes/backup_restore/import_one_register_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/src/modules/configuracoes/backup_restore/import_one_register_page.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/modules/configuracoes/backup_restore/views/backup_restore_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/src/modules/configuracoes/backup_restore/views/backup_restore_page.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/modules/configuracoes/controllers/configuracoes_controller.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/src/modules/configuracoes/controllers/configuracoes_controller.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/modules/configuracoes/views/pages/configuracoes_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/src/modules/configuracoes/views/pages/configuracoes_page.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/modules/configuracoes/views/widgets/icon_change_theme.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/src/modules/configuracoes/views/widgets/icon_change_theme.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/modules/home/home_navigation_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/src/modules/home/home_navigation_page.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/modules/home/home_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/src/modules/home/home_page.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/modules/import_registers_csv/controllers/import_register_csv_controller.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/src/modules/import_registers_csv/controllers/import_register_csv_controller.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/modules/import_registers_csv/controllers/import_registers_csv_state.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/src/modules/import_registers_csv/controllers/import_registers_csv_state.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/modules/import_registers_csv/pages/import_register_csv_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/src/modules/import_registers_csv/pages/import_register_csv_page.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/modules/import_registers_csv/repositories/import_registers_csv_repository.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/src/modules/import_registers_csv/repositories/import_registers_csv_repository.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/modules/import_registers_csv/repositories/import_registers_csv_repository_impl.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/src/modules/import_registers_csv/repositories/import_registers_csv_repository_impl.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/modules/import_registers_csv/services/import_registers_csv_services.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/src/modules/import_registers_csv/services/import_registers_csv_services.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/modules/import_registers_csv/services/import_registers_csv_services_impl.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/src/modules/import_registers_csv/services/import_registers_csv_services_impl.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/modules/profile/profile_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/src/modules/profile/profile_page.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/modules/register/card/card_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/src/modules/register/card/card_page.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/modules/register/controller/register_controller.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/src/modules/register/controller/register_controller.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/modules/register/controller/register_state.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/src/modules/register/controller/register_state.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/modules/register/forms/credit_card_form.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/src/modules/register/forms/credit_card_form.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/modules/register/model/registro_model.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/src/modules/register/model/registro_model.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/modules/register/repositories/register_repository.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/src/modules/register/repositories/register_repository.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/modules/register/repositories/register_repository_impl.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/src/modules/register/repositories/register_repository_impl.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/modules/register/views/pages/register_form.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/src/modules/register/views/pages/register_form.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/modules/register/views/pages/register_view.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/src/modules/register/views/pages/register_view.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/modules/register/views/widgets/list_registers.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/src/modules/register/views/widgets/list_registers.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/modules/register/views/widgets/tipo_list_view.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/src/modules/register/views/widgets/tipo_list_view.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/modules/splash/csv_importer_project/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/modules/splash/initial_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/src/modules/splash/initial_screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/modules/splash/splash_page.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/src/modules/splash/splash_page.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/linux/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/linux/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/linux/flutter/generated_plugin_registrant.cc" beforeDir="false" afterPath="$PROJECT_DIR$/linux/flutter/generated_plugin_registrant.cc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/linux/flutter/generated_plugins.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/linux/flutter/generated_plugins.cmake" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/linux/my_application.cc" beforeDir="false" afterPath="$PROJECT_DIR$/linux/my_application.cc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pubspec.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/pubspec.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/widget_test.dart" beforeDir="false" afterPath="$PROJECT_DIR$/test/widget_test.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/web/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/manifest.json" beforeDir="false" afterPath="$PROJECT_DIR$/web/manifest.json" afterDir="false" />
-    </list>
-    <option name="SHOW_DIALOG" value="false" />
-    <option name="HIGHLIGHT_CONFLICTS" value="true" />
-    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
-    <option name="LAST_RESOLUTION" value="IGNORE" />
-  </component>
-  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[14292d93]" />
-  <component name="Git.Settings">
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
-  </component>
-  <component name="MarkdownSettingsMigration">
-    <option name="stateVersion" value="1" />
-  </component>
-  <component name="ProjectId" id="2wb9APnl3MtPDItS8ScMoNopj34" />
-  <component name="ProjectView">
-    <navigator currentView="ProjectPane" proportions="" version="1" />
-    <panes>
-      <pane id="ProjectPane">
-        <option name="show-excluded-files" value="false" />
-      </pane>
-    </panes>
-  </component>
-  <component name="ProjectViewState">
-    <option name="hideEmptyMiddlePackages" value="true" />
-    <option name="showLibraryContents" value="true" />
-  </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.cidr.known.project.marker": "true",
-    "cidr.known.project.marker": "true",
-    "dart.analysis.tool.window.visible": "false",
-    "last_opened_file_path": "/home/wagner/Develop/projects/keezy",
-    "settings.editor.selected.configurable": "AndroidSdkUpdater",
-    "show.migrate.to.gradle.popup": "false"
-  }
-}]]></component>
-  <component name="RunManager" selected="Flutter.main.dart">
-    <configuration name="Unnamed" type="AndroidRunConfigurationType" factoryName="Android App" nameIsGenerated="true">
-      <option name="DEPLOY" value="true" />
-      <option name="DEPLOY_APK_FROM_BUNDLE" value="false" />
-      <option name="DEPLOY_AS_INSTANT" value="false" />
-      <option name="ARTIFACT_NAME" value="" />
-      <option name="PM_INSTALL_OPTIONS" value="" />
-      <option name="ALL_USERS" value="false" />
-      <option name="ALWAYS_INSTALL_WITH_PM" value="false" />
-      <option name="CLEAR_APP_STORAGE" value="false" />
-      <option name="DYNAMIC_FEATURES_DISABLED_LIST" value="" />
-      <option name="ACTIVITY_EXTRA_FLAGS" value="" />
-      <option name="MODE" value="default_activity" />
-      <option name="CLEAR_LOGCAT" value="false" />
-      <option name="SHOW_LOGCAT_AUTOMATICALLY" value="false" />
-      <option name="INSPECTION_WITHOUT_ACTIVITY_RESTART" value="false" />
-      <option name="TARGET_SELECTION_MODE" value="SHOW_DIALOG" />
-      <option name="SELECTED_CLOUD_MATRIX_CONFIGURATION_ID" value="-1" />
-      <option name="SELECTED_CLOUD_MATRIX_PROJECT_ID" value="" />
-      <option name="DEBUGGER_TYPE" value="Auto" />
-      <Auto>
-        <option name="USE_JAVA_AWARE_DEBUGGER" value="false" />
-        <option name="SHOW_STATIC_VARS" value="true" />
-        <option name="WORKING_DIR" value="" />
-        <option name="TARGET_LOGGING_CHANNELS" value="lldb process:gdb-remote packets" />
-        <option name="SHOW_OPTIMIZED_WARNING" value="true" />
-      </Auto>
-      <Hybrid>
-        <option name="USE_JAVA_AWARE_DEBUGGER" value="false" />
-        <option name="SHOW_STATIC_VARS" value="true" />
-        <option name="WORKING_DIR" value="" />
-        <option name="TARGET_LOGGING_CHANNELS" value="lldb process:gdb-remote packets" />
-        <option name="SHOW_OPTIMIZED_WARNING" value="true" />
-      </Hybrid>
-      <Java />
-      <Native>
-        <option name="USE_JAVA_AWARE_DEBUGGER" value="false" />
-        <option name="SHOW_STATIC_VARS" value="true" />
-        <option name="WORKING_DIR" value="" />
-        <option name="TARGET_LOGGING_CHANNELS" value="lldb process:gdb-remote packets" />
-        <option name="SHOW_OPTIMIZED_WARNING" value="true" />
-      </Native>
-      <Profilers>
-        <option name="ADVANCED_PROFILING_ENABLED" value="false" />
-        <option name="STARTUP_PROFILING_ENABLED" value="false" />
-        <option name="STARTUP_CPU_PROFILING_ENABLED" value="false" />
-        <option name="STARTUP_CPU_PROFILING_CONFIGURATION_NAME" value="Java/Kotlin Method Sample (legacy)" />
-        <option name="STARTUP_NATIVE_MEMORY_PROFILING_ENABLED" value="false" />
-        <option name="NATIVE_MEMORY_SAMPLE_RATE_BYTES" value="2048" />
-      </Profilers>
-      <option name="DEEP_LINK" value="" />
-      <option name="ACTIVITY_CLASS" value="" />
-      <option name="SEARCH_ACTIVITY_IN_GLOBAL_SCOPE" value="false" />
-      <option name="SKIP_ACTIVITY_VALIDATION" value="false" />
-      <method v="2" />
-    </configuration>
-    <configuration default="true" type="FlutterTestConfigType" factoryName="Flutter Test">
-      <option name="testFile" value="" />
-      <option name="useRegexp" value="false" />
-      <option name="additionalArgs" value="" />
-      <method v="2" />
-    </configuration>
-    <list>
-      <item itemvalue="Android App.Unnamed" />
-      <item itemvalue="Flutter.main.dart" />
-    </list>
-  </component>
-  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
-  <component name="TaskManager">
-    <task active="true" id="Default" summary="Default task">
-      <changelist id="0e68360e-23c9-4636-9f24-689c893e249f" name="Changes" comment="" />
-      <created>1746299262369</created>
-      <option name="number" value="Default" />
-      <option name="presentableId" value="Default" />
-      <updated>1746299262369</updated>
-    </task>
-    <servers />
+  <component name="FileEditorManager">
+    <leaf>
+      <file leaf-file-name="main.dart" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/lib/main.dart">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="0">
+              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
   </component>
   <component name="ToolWindowManager">
     <editor active="true" />
@@ -196,15 +19,18 @@
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
     </layout>
   </component>
-  <component name="Vcs.Log.Tabs.Properties">
-    <option name="TAB_STATES">
-      <map>
-        <entry key="MAIN">
-          <value>
-            <State />
-          </value>
-        </entry>
-      </map>
-    </option>
+  <component name="ProjectView">
+    <navigator currentView="ProjectPane" proportions="" version="1">
+    </navigator>
+    <panes>
+      <pane id="ProjectPane">
+        <option name="show-excluded-files" value="false" />
+      </pane>
+    </panes>
+  </component>
+  <component name="PropertiesComponent">
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="dart.analysis.tool.window.force.activate" value="true" />
+    <property name="show.migrate.to.gradle.popup" value="false" />
   </component>
 </project>

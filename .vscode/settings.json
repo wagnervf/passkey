@@ -1,0 +1,12 @@
+{
+    "dart.flutterHotReloadOnSave": "all",
+    "editor.codeActionsOnSave": {
+        "source.organizeImports": "explicit",
+        
+
+    },
+    "git.autoStash": true,
+    "notebook.backup.sizeLimit": 100000
+      
+      
+}

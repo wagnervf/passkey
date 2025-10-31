@@ -1,1 +1,0 @@
-/home/wagner/Develop/projects/keezy/build/app/intermediates/cxx/Debug/1i365g1o/obj/x86_64

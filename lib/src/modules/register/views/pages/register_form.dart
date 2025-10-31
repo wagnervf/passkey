@@ -3,8 +3,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:installed_apps/app_info.dart';
-import 'package:keezy/src/core/installed_apps/installed_app_model.dart';
 import 'package:keezy/src/core/components/show_messeger.dart';
+import 'package:keezy/src/core/installed_apps/installed_app_model.dart';
 import 'package:keezy/src/core/installed_apps/installed_apps_page.dart';
 import 'package:keezy/src/modules/register/controller/register_controller.dart';
 import 'package:keezy/src/modules/register/model/register_model.dart';
@@ -78,10 +78,20 @@ class _RegisterFormState extends State<RegisterForm> {
             _clearInputs();
           },
         ),
-        title: const Text('Adicionar Registro'),
+        actions: [
+         edit ?
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: IconButton(
+              onPressed: () => _excluirRegistro(),
+              icon: Icon(Icons.delete, color: Colors.red),
+            ),
+          ) : const SizedBox.shrink(),
+        ],
+        title: Text(edit ? 'Editar Registro' : 'Adicionar Registro'),
         elevation: 0,
         backgroundColor: Colors.transparent,
-        foregroundColor: Colors.black,
+       // foregroundColor: Colors.black,
       ),
       body: SafeArea(
         child: LayoutBuilder(
@@ -110,18 +120,24 @@ class _RegisterFormState extends State<RegisterForm> {
                               const Text("Nome, app ou site"),
                               const SizedBox(height: 8),
                               _buildTextField(
-                                  _titleController, "Nome do app ou site"),
+                                _titleController,
+                                "Nome do app ou site",
+                              ),
                               const SizedBox(height: 24),
                               const Text("Usuário e senha"),
                               const SizedBox(height: 8),
                               _buildTextField(
-                                  _loginController, "Usuário/Login"),
+                                _loginController,
+                                "Usuário/Login",
+                              ),
                               const SizedBox(height: 12),
                               _buildPasswordField(),
                               const SizedBox(height: 24),
                               const Text("Observação"),
                               _buildTextField(
-                                  _descriptionController, "Observação"),
+                                _descriptionController,
+                                "Observação",
+                              ),
                               const Spacer(),
 
                               // ActionButton(
@@ -131,25 +147,20 @@ class _RegisterFormState extends State<RegisterForm> {
                               //   title: edit ? 'Atualizar' : 'Salvar',
                               //   onPressed: () => acaoSalvarRegistro(context),
                               // ),
-
-                              
-                              
                               Padding(
-                                padding:
-                                    const EdgeInsets.only(top: 32, bottom: 24),
-                                child: ElevatedButton(
-                                  onPressed: () => acaoSalvarRegistro(context),
-                                  child: const Text("Salvar"),
+                                padding: const EdgeInsets.only(
+                                  top: 32,
+                                  bottom: 24,
+                                ),
+                                child: SizedBox(
+                                  height: 50,
+                                  child: ElevatedButton(
+                                    onPressed: () =>
+                                        acaoSalvarRegistro(context),
+                                    child: const Text("Salvar"),
+                                  ),
                                 ),
                               ),
-
-                              TextButton(
-                            onPressed: () => _excluirRegistro(register!),
-                            child: const Text(
-                              'Excluir',
-                              style: TextStyle(color: Colors.red),
-                            ),
-                          ),
                             ],
                           ),
                         ),
@@ -203,9 +214,7 @@ class _RegisterFormState extends State<RegisterForm> {
   Widget _buildTextField(TextEditingController controller, String hint) {
     return TextField(
       controller: controller,
-      decoration: InputDecoration(
-        hintText: hint,
-      ),
+      decoration: InputDecoration(hintText: hint),
     );
   }
 
@@ -241,8 +250,10 @@ class _RegisterFormState extends State<RegisterForm> {
           title: const Text("Selecionar App"),
           titlePadding: const EdgeInsets.all(16),
           titleTextStyle: Theme.of(context).textTheme.titleSmall,
-          content:
-              SizedBox(width: double.maxFinite, child: InstalledAppsPage()),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: InstalledAppsPage(),
+          ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
@@ -286,7 +297,9 @@ class _RegisterFormState extends State<RegisterForm> {
 
     if (success) {
       ShowMessager.show(
-          context, edit ? 'Registro Atualizado!' : 'Registro Salvo!');
+        context,
+        edit ? 'Registro Atualizado!' : 'Registro Salvo!',
+      );
       Navigator.of(context).pop();
     } else {
       ShowMessager.show(context, 'Erro ao salvar Registro, tente novamente.');
@@ -295,7 +308,7 @@ class _RegisterFormState extends State<RegisterForm> {
     return success;
   }
 
-  Future<void> _excluirRegistro(RegisterModel register) async {
+  Future<void> _excluirRegistro() async {
     return showDialog(
       context: context,
       builder: (context) {
@@ -315,7 +328,7 @@ class _RegisterFormState extends State<RegisterForm> {
 
                 result = await context
                     .read<RegisterController>()
-                    .deleteRegisterController(register);
+                    .deleteRegisterController(register!);
 
                 if (context.mounted) {
                   if (result == true) {

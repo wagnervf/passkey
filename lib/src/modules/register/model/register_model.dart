@@ -1,7 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
-import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:uuid/uuid.dart';
 
@@ -15,7 +14,7 @@ class RegisterModel extends HiveObject {
   @HiveField(0)
   final String id;
 
-  @HiveField(1) 
+  @HiveField(1)
   final String? name;
 
   @HiveField(2)
@@ -36,36 +35,25 @@ class RegisterModel extends HiveObject {
   @HiveField(7)
   final InstalledAppModel? selectedApp;
 
-      RegisterModel({
-    required this.id,
-    this.name,
-    this.username,
-    this.password,
-    this.url,
-    this.note,
-    this.type,
-    this.selectedApp
-  });
-
-
-
-
+  RegisterModel(
+      {required this.id,
+      this.name,
+      this.username,
+      this.password,
+      this.url,
+      this.note,
+      this.type,
+      this.selectedApp});
 
   factory RegisterModel.fromCsv(List<dynamic> row) {
-    
     return RegisterModel(
-      name: row[0] ?? '',
-      url: row[1] ?? '',
-      username: row[2] ?? '',
-      password: row[3] ?? '',
-      note: row[4] ?? '',
-       id: Uuid().v4()
-    );
+        name: row[0] ?? '',
+        url: row[1] ?? '',
+        username: row[2] ?? '',
+        password: row[3] ?? '',
+        note: row[4] ?? '',
+        id: Uuid().v4());
   }
-
-  
-
-
 
   RegisterModel copyWith({
     String? id,
@@ -89,7 +77,6 @@ class RegisterModel extends HiveObject {
     );
   }
 
-
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'id': id,
@@ -111,49 +98,53 @@ class RegisterModel extends HiveObject {
       password: map['password'] != null ? map['password'] as String : null,
       url: map['url'] != null ? map['url'] as String : null,
       note: map['note'] != null ? map['note'] as String : null,
-      type: map['type'] != null ? TypeRegiterModel.fromMap(map['type'] as Map<String,dynamic>) : null,
-      selectedApp: map['selectedApp'] != null ? InstalledAppModel.fromMap(map['selectedApp'] as Map<String,dynamic>) : null,
+      type: map['type'] != null
+          ? TypeRegiterModel.fromMap(map['type'] as Map<String, dynamic>)
+          : null,
+      selectedApp: map['selectedApp'] != null
+          ? InstalledAppModel.fromMap(
+              map['selectedApp'] as Map<String, dynamic>)
+          : null,
     );
   }
 
-
-  factory RegisterModel.fromJson(String source) => RegisterModel.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory RegisterModel.fromJson(String source) =>
+      RegisterModel.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
   String toString() {
     return 'RegisterModel(id: $id, name: $name, username: $username, password: $password, url: $url, note: $note, type: $type, selectedApp: $selectedApp)';
   }
 
-
   @override
   bool operator ==(covariant RegisterModel other) {
     if (identical(this, other)) return true;
-  
-    return 
-      other.id == id &&
-      other.name == name &&
-      other.username == username &&
-      other.password == password &&
-      other.url == url &&
-      other.note == note &&
-      other.type == type &&
-      other.selectedApp == selectedApp;
+
+    return other.id == id &&
+        other.name == name &&
+        other.username == username &&
+        other.password == password &&
+        other.url == url &&
+        other.note == note &&
+        other.type == type &&
+        other.selectedApp == selectedApp;
   }
 
   @override
   int get hashCode {
     return id.hashCode ^
-      name.hashCode ^
-      username.hashCode ^
-      password.hashCode ^
-      url.hashCode ^
-      note.hashCode ^
-      type.hashCode ^
-      selectedApp.hashCode;
+        name.hashCode ^
+        username.hashCode ^
+        password.hashCode ^
+        url.hashCode ^
+        note.hashCode ^
+        type.hashCode ^
+        selectedApp.hashCode;
   }
 
-@override
-List<Object?> get props => [id, name, username, password, url, note, type, selectedApp];
+  @override
+  List<Object?> get props =>
+      [id, name, username, password, url, note, type, selectedApp];
 
   String toJson() => json.encode(toMap());
 }

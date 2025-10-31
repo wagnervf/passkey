@@ -2,13 +2,12 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:form_field_validator/form_field_validator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:keezy/src/core/components/form_field_input_password.dart';
 import 'package:keezy/src/core/components/help/help_view.dart';
+import 'package:keezy/src/core/components/show_sucess.dart';
 import 'package:keezy/src/core/router/routes.dart';
 import 'package:keezy/src/core/utils/utils.dart';
-import 'package:keezy/src/core/components/show_sucess.dart';
 import 'package:keezy/src/modules/auth/controllers/auth_controller.dart';
 import 'package:keezy/src/modules/auth/controllers/auth_state.dart';
 import 'package:keezy/src/modules/auth/model/auth_user_model.dart';
@@ -62,9 +61,7 @@ class _RegisterAuthPageState extends State<RegisterAuthPage> {
 
       try {
         await context.read<AuthController>().limparContaAntesDeCriarUser();
-
         await context.read<AuthController>().registerUser(user);
-
       } catch (e) {
         DialogUtils.showSuccessDialog(
           context,
@@ -82,10 +79,7 @@ class _RegisterAuthPageState extends State<RegisterAuthPage> {
     super.dispose();
   }
 
-  final emailValidator = MultiValidator([
-    RequiredValidator(errorText: 'E-mail obrigatório'),
-    EmailValidator(errorText: 'Insira um e-mail válido'),
-  ]);
+  final emailValidator = null;
 
   @override
   Widget build(BuildContext context) {
@@ -159,7 +153,7 @@ class _RegisterAuthPageState extends State<RegisterAuthPage> {
                         textAlign: TextAlign.center,
                         style: Theme.of(context).textTheme.titleSmall,
                       ),
-                      const Spacer(),
+                      const SizedBox(height: 20),
                       formField(
                         controller: _nameController,
                         hintText: 'Nome',
@@ -169,11 +163,10 @@ class _RegisterAuthPageState extends State<RegisterAuthPage> {
                             : null,
                       ),
                       SizedBox(height: size.height * 0.03),
-                      formField(
+                      TextFormField(
                         controller: _emailController,
-                        hintText: 'E-mail',
-                        icon: Icons.email_outlined,
-                        validator: emailValidator.call,
+                        decoration: Utils.decorationField(
+                            'E-mail', Icons.email_outlined,),
                       ),
                       SizedBox(height: size.height * 0.03),
                       FormFieldInputPassword(
@@ -204,26 +197,28 @@ class _RegisterAuthPageState extends State<RegisterAuthPage> {
                         ),
                       ),
                       const SizedBox(height: 10),
-                      SizedBox(
-                        width: size.width * .9,
-                        height: 50,
-                        child: OutlinedButton(
-                          child: Text(
-                            "Já possuo uma conta",
-                            style: Theme.of(context).textTheme.displaySmall,
-                          ),
-                          onPressed: () => _acessar(context),
-                        ),
-                      ),
-                      const Spacer(),
-
-                      OutlinedButton.icon(
+                      edit
+                          ? SizedBox.shrink()
+                          : SizedBox(
+                              width: size.width * .9,
+                              height: 50,
+                              child: OutlinedButton(
+                                child: Text(
+                                  "Já possuo uma conta",
+                                  style:
+                                      Theme.of(context).textTheme.displaySmall,
+                                ),
+                                onPressed: () => _acessar(context),
+                              ),
+                            ),
+                      TextButton.icon(
                         icon: const Icon(
                           Icons.help,
                           size: 16,
                         ),
                         label: Text('Porque devo criar uma conta?'),
-                        onPressed: () => HelpView.mostrarDialogCriarConta(context),
+                        onPressed: () =>
+                            HelpView.mostrarDialogCriarConta(context),
                       ),
                     ],
                   ),

@@ -67,4 +67,17 @@ class TokenStorage implements TokenStorageInterface {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('theme');
   }
+  
+  @override
+  Future<bool> getHasUser() {
+    return SharedPreferences.getInstance().then((prefs) {
+      return prefs.getBool('hasUser') ?? false;
+    });
+  }
+  
+  @override
+  Future<bool> saveHasUser(bool hasUser) async{
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.setBool('hasUser', hasUser);
+  }
 }

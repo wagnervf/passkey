@@ -29,7 +29,7 @@ class _ListRegistersState extends State<ListRegisters> {
           });
   }
 
-  getAllRegister() async {
+  Future<void> getAllRegister() async {
     await context.read<RegisterController>().getRegisterController();
   }
 
@@ -121,7 +121,10 @@ class _ListRegistersState extends State<ListRegisters> {
                   style: Theme.of(context).textTheme.bodySmall,
                 )
               : null,
-          trailing: const Icon(Icons.remove_red_eye),
+          trailing: Padding(
+            padding: const EdgeInsets.symmetric( horizontal: 8.0),
+            child: const Icon(Icons.remove_red_eye),
+          ),
         );
       },
     );
@@ -222,7 +225,7 @@ class _ListRegistersState extends State<ListRegisters> {
     Colors.brown
   ];
 
-  _goToView(RegisterModel register) async {
+  Future<void> _goToView(RegisterModel register) async {
     await GoRouter.of(context).push(RoutesPaths.register, extra: register);
   }
 
@@ -253,8 +256,11 @@ class _ListRegistersState extends State<ListRegisters> {
         onChanged: _filtrarRegistros,
         decoration: InputDecoration(
             hintText: '   Pesquisar',
-            prefixIcon: Icon(
-              Icons.search,
+            prefixIcon: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: Icon(
+                Icons.search,
+              ),
             ),
             prefixIconConstraints: BoxConstraints.loose(const Size(20, 20)),
             border: OutlineInputBorder(

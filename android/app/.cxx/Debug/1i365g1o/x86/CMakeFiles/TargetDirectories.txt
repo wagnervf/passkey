@@ -1,2 +1,0 @@
-/home/wagner/Develop/projects/keezy/android/app/.cxx/Debug/1i365g1o/x86/CMakeFiles/edit_cache.dir
-/home/wagner/Develop/projects/keezy/android/app/.cxx/Debug/1i365g1o/x86/CMakeFiles/rebuild_cache.dir

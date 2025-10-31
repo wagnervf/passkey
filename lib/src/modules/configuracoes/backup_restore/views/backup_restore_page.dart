@@ -43,7 +43,7 @@ class _BackupRestorePageState extends State<BackupRestorePage> {
                 text: 'Exportar Registros',
                 subtTitle: 'Exportar registros para o Google Drive',
                 icon: Icons.download,
-                onTap: () => buttonExport(exportarImportarService)),
+                onTap: () => dialogExportar(exportarImportarService)),
             ItemCardWithIcon(
                 text: 'Importar Registros',
                 subtTitle: 'Importar registros do Google Drive',
@@ -56,10 +56,32 @@ class _BackupRestorePageState extends State<BackupRestorePage> {
     );
   }
 
-  buttonExport(BackupRestoreController exportarImportarService) async {
+  dialogExportar(BackupRestoreController exportarImportarService){
+    return AlertDialog(
+      title: const Text('Exportar Senhas.'),
+      content: const Text('Suas senhas ficarão expostas para qualquer pessoa que tenha acesso ao arquivo exportado. Você tem certeza que deseja continuar?'),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Cancelar'),
+        ),
+        TextButton(
+          onPressed: () async{
+            await _exportarSenhas(exportarImportarService);
+            if(!mounted) return;
+            Navigator.of(context).pop();
+          },
+          child: const Text('Exportar'),
+        ),
+      ],
+    );
+  }
+
+  _exportarSenhas(BackupRestoreController exportarImportarService) async {
     CircularProgressIndicator();
-    await Future.delayed(const Duration(seconds: 2));
     final String status = await exportarImportarService.exportBackup();
+    await Future.delayed(const Duration(seconds: 2));
+
 
     if (mounted) {
       ShowMessager.show(context, status.toString());

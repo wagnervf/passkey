@@ -69,6 +69,7 @@ class _ActionButtonState extends State<ActionButton> {
           ? null
           : () async {
               setState(() => _loading = true);
+              
               final result = await widget.onPressed();
 
               if (mounted) {

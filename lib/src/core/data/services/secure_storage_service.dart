@@ -1,13 +1,15 @@
 import 'dart:convert';
 import 'dart:developer';
+
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class SecureStorageService {
   static late final FlutterSecureStorage _secureStorage;
 
-  static void init() => _secureStorage = const FlutterSecureStorage(
-        aOptions: AndroidOptions(encryptedSharedPreferences: true),
-        iOptions: IOSOptions(
+  static void init() => _secureStorage = FlutterSecureStorage(
+    
+        aOptions: AndroidOptions(),
+        iOptions: const IOSOptions(
           accessibility: KeychainAccessibility.first_unlock,
         ),
       );

@@ -28,7 +28,8 @@ class _HomeNavigationPageState extends State<HomeNavigationPage> {
         indicatorColor: Theme.of(context).colorScheme.tertiary,
         backgroundColor: Theme.of(context).colorScheme.onTertiary,
         labelPadding: EdgeInsets.only(bottom: 0),
-        elevation: 5,
+        
+        elevation: 10,
         selectedIndex: _selectedIndex,
         onDestinationSelected: (int index) {
           setState(() {
@@ -41,7 +42,8 @@ class _HomeNavigationPageState extends State<HomeNavigationPage> {
             label: 'Início',
             selectedIcon: Icon(Icons.house),
             tooltip: 'Início',
-          ),        
+          ),     
+             
           const NavigationDestination(
             icon: Icon(Icons.account_circle_outlined),
             label: 'Perfil',

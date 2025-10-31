@@ -5,7 +5,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:keezy/src/core/router/routes.dart';
 import 'package:keezy/src/modules/auth/controllers/auth_controller.dart';
-import 'package:keezy/src/modules/auth/controllers/auth_state.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
@@ -18,77 +17,76 @@ class SplashPageState extends State<SplashPage> {
   @override
   void initState() {
     super.initState();
-    checkAuthentication();
+     _checkHasUser();
   }
 
-  checkAuthentication() async {
-    await context.read<AuthController>().checkAuthentication();
-  }
+ 
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.onPrimary,
       body: SafeArea(
-        child: _blocBuilder(context),
+        child: loading(),
       ),
     );
   }
 
-BlocBuilder<AuthController, AuthState> _blocBuilder(BuildContext context) {
-  return BlocBuilder<AuthController, AuthState>(
-    builder: (contx, state) {
-      log('SplashPage: $state');
+  Future<void> _checkHasUser() async {
+    try {
+      final isAuthenticated = await context.read<AuthController>().checkExistUserLocal();
+      log('User exists: $isAuthenticated');
+      //existe usuário
+      if (isAuthenticated) {
+        if(!mounted)return;        
+        return _hasUser(context);
+      } else {
+        if(!mounted)return;        
+        return _hasNotUser(context);
+      }
+    } catch (e) {
+      log('Error during authentication: $e');
+      return;
+     // GoRouter.of(context).pushReplacement(RoutesPaths.auth);
+    }
+  }
 
-      if (state is AuthUnauthenticatedState) {
-        // Navegar após o frame atual
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          GoRouter.of(contx).pushReplacement(RoutesPaths.initialScreen);
-        });
-        return const SizedBox.shrink();
-      } 
-      
-      if (state is AuthLoadingState) {
-        return loading();
-      } 
-      
-      if (state is AuthSuccessState) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          _authSucess(contx);
-        });
-        return loading();
-      } 
-      
-      // Caso padrão
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _noAuthenticated(contx);
-      });
-      return loading();
-    },
-  );
-}
-  // void _notUser(BuildContext context) {
-  //   WidgetsBinding.instance.addPostFrameCallback((_) {
-  //     GoRouter.of(context).pushReplacement(RoutesPaths.initial);
-  //     //.pushReplacement(RoutesPaths.authRegister, extra: AuthUserModel());
-  //   });
-  // }
+ 
+// BlocConsumer<AuthController, AuthState> _blocCosumer() {
+//     return BlocConsumer<AuthController, AuthState>(
+//       listener: (context, state) {
+//         // if (state is AuthSuccessState) {
+//         //  _authSucess(context);
+//         //   return;
+//         // }
+//       },
+//       builder: (context, state) {
+//          if (state is AuthLoadingState) {
+//           return loading();
+//         }  else if (state is AuthUnauthenticatedState) {
+//           unautheticated(context);
+//           return const SizedBox.shrink();
+//         } else {
+//           _noAuthenticated(context);
+//           return loading();
+//         }
+//       },
+//     );
+//   }
 
-  void _noAuthenticated(BuildContext context) {
+  void _hasNotUser(BuildContext context) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      GoRouter.of(context).pushReplacement(RoutesPaths.initial);
+    });
+  }
+
+  void _hasUser(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       GoRouter.of(context).pushReplacement(RoutesPaths.auth);
     });
   }
 
-  void _authSucess(BuildContext context) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      GoRouter.of(context).pushReplacement(
-        RoutesPaths.home,
-        // RoutesPaths.listRegisters,
-      );
-    });
-  }
-
+ 
   Center loading() {
     return const Center(
         child: CircularProgressIndicator(

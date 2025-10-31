@@ -36,10 +36,7 @@ class RegisterController extends Cubit<RegisterState> {
           ):
           _listRegisters = result;
 
-       _listRegisters.sort((a, b) => b.id.compareTo(a.id));
-    
-
-
+          _listRegisters.sort((a, b) => b.id.compareTo(a.id));
 
           emit(RegisterLoaded(register: _listRegisters));
           return Right(unit);
@@ -52,7 +49,8 @@ class RegisterController extends Cubit<RegisterState> {
     }
   }
 
-  Future<bool> saveAndUpdateRegisterController(RegisterModel novoRegister) async {
+  Future<bool> saveAndUpdateRegisterController(
+      RegisterModel novoRegister) async {
     emit(RegisterLoading());
     try {
       final register =
@@ -66,21 +64,17 @@ class RegisterController extends Cubit<RegisterState> {
           getRegisterController();
           return true;
       }
-
-      
     } catch (e, s) {
-    log('Exceção inesperada ao salvar registro: $e\n$s');
-    emit(RegisterError('Erro inesperado ao salvar registro.'));
-    return false;
+      log('Exceção inesperada ao salvar registro: $e\n$s');
+      emit(RegisterError('Erro inesperado ao salvar registro.'));
+      return false;
     }
   }
 
-
-    Future<bool> saveListRegisterController(List<RegisterModel> registers) async {
+  Future<bool> saveListRegisterController(List<RegisterModel> registers) async {
     emit(RegisterLoading());
     try {
-      
-     final register =
+      final register =
           await registerRepository.saveListRegisterRepository(registers);
 
       switch (register) {
@@ -98,30 +92,6 @@ class RegisterController extends Cubit<RegisterState> {
       return false;
     }
   }
-
-
-  // Future<bool> updateRegisterController(RegisterModel updatedRegistro) async {
-  //   emit(RegisterLoading());
-  //   try {
-  //     final register =
-  //         await registerRepository.updateRegisterRepository(updatedRegistro);
-
-  //     switch (register) {
-  //       case Left():
-  //         return false;
-
-  //       case Right<RepositoryException, bool>():
-  //         await getRegisterController();
-
-  //         return true;
-  //     }
-  //   } on Exception catch (e) {
-  //     log(e.toString());
-  //     const message = 'Erro ao buscar Register';
-  //     emit(RegisterError(message));
-  //     return false;
-  //   }
-  // }
 
   Future<bool> deleteRegisterController(RegisterModel updatedRegistro) async {
     emit(RegisterLoading());
@@ -159,6 +129,29 @@ class RegisterController extends Cubit<RegisterState> {
     } catch (e) {
       log('Erro ao importar registro: $e');
       //  return null;
+    }
+  }
+
+  Future<List<RegisterModel>?>? getRegisterForExportCsv() async {
+    try {
+      final register = await registerRepository.getAllRegisterRepository();
+
+      log(register.toString());
+
+      switch (register) {
+        case Left(value: RepositoryException()):
+          return null;
+
+        case Right<RepositoryException, List<RegisterModel>>(
+            value: final result
+          ):
+          result.sort((a, b) => b.id.compareTo(a.id));
+
+          return result;
+      }
+    } on Exception catch (e) {
+      log(e.toString());
+      return null;
     }
   }
 }

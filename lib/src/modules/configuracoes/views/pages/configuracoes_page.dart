@@ -11,6 +11,7 @@ import 'package:keezy/src/modules/auth/controllers/auth_controller.dart';
 import 'package:keezy/src/modules/auth/controllers/auth_state.dart';
 import 'package:keezy/src/modules/auth/model/auth_user_model.dart';
 import 'package:keezy/src/modules/configuracoes/views/widgets/icon_change_theme.dart';
+import 'package:keezy/src/modules/export_registers_csv/pages/export_register_csv_page.dart';
 import 'package:keezy/src/modules/import_registers_csv/pages/import_register_csv_page.dart';
 
 class ConfiguracoesPage extends StatefulWidget {
@@ -89,7 +90,9 @@ class _ConfiguracoesPageState extends State<ConfiguracoesPage> {
 
                           ImportRegisterCsvPage(),
                           const SizedBox(height: 20),
-                          
+                          ExportRegisterCsvPage(),
+                          const SizedBox(height: 20),
+
                           ItemCardWithIcon(
                             text: 'Excluir todos os dados',
                             subtTitle:

@@ -89,7 +89,7 @@ ThemeData get lightTheme => ThemeData(
               iconColor: WidgetStatePropertyAll(lightColorScheme.primary),
               foregroundColor:
                   WidgetStatePropertyAll(lightColorScheme.primary))),
-      cardTheme: CardTheme(color: lightColorScheme.surface),
+      cardTheme: CardThemeData(color: lightColorScheme.surface),
       inputDecorationTheme: InputDecorationTheme(
           fillColor: lightColorScheme.surface,
           //   fillColor: const Color.fromARGB(255, 235, 253, 252),
@@ -181,7 +181,7 @@ ThemeData get darkTheme => ThemeData(
       ),
       iconTheme: const IconThemeData(color: Colors.white),
       // listTileTheme: ListTileThemeData(tileColor: Colors.amber),
-      cardTheme: CardTheme(color: darkColorScheme.onPrimaryContainer),
+      cardTheme: CardThemeData(color: darkColorScheme.onPrimaryContainer),
 
       dividerColor: Colors.grey[700],
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(

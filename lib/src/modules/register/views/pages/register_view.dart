@@ -2,8 +2,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
-import 'package:keezy/src/core/installed_apps/installed_app_model.dart';
 import 'package:keezy/src/core/components/show_messeger.dart';
+import 'package:keezy/src/core/installed_apps/installed_app_model.dart';
 import 'package:keezy/src/core/router/routes.dart';
 import 'package:keezy/src/modules/configuracoes/backup_restore/controllers/backup_restore_controller.dart';
 import 'package:keezy/src/modules/register/controller/register_controller.dart';
@@ -37,7 +37,7 @@ class _RegisterViewState extends State<RegisterView> {
     });
   }
 
-  loadEdits(RegisterModel register) {
+  void loadEdits(RegisterModel register) {
     setState(() {
       _title.text = register.name ?? '';
       _password.text = register.password!;

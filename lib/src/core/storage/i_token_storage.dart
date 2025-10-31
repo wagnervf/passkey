@@ -10,4 +10,9 @@ abstract class TokenStorageInterface {
 
   Future<void> saveUser(GoogleAuthUserModel user);
   Future<GoogleAuthUserModel?> getUser();
+
+
+  Future<bool> saveHasUser(bool hasUser);
+  Future<bool> getHasUser();
 }
+

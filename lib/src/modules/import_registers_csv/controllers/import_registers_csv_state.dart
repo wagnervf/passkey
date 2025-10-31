@@ -1,5 +1,4 @@
 import 'package:equatable/equatable.dart';
-import 'package:keezy/src/modules/register/model/register_model.dart';
 
 abstract class ImportRegistersCsvState extends Equatable {}
 
@@ -18,8 +17,13 @@ List<Object?> get props => [];
 
 class ImportCsvLoaded extends ImportRegistersCsvState {
 
+  final String message;
+
+  ImportCsvLoaded(this.message);
+  
   @override
-  List<RegisterModel> get props => [];
+  List<Object?> get props => [message];
+
 }
 
 

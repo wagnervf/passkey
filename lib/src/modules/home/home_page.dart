@@ -47,7 +47,7 @@ class _HomePageState extends State<HomePage> {
           if (user == null) {
             return Center(child: Text('No user logged in.'));
           }
-          return Text(user.name, style: tema.titleLarge!.copyWith(color:  Theme.of(context).colorScheme.primary,),);
+          return Text(user.name, style: tema.displayMedium,);
         },
       ),
       
@@ -82,7 +82,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  _sair() {
+  Future<Object?> _sair() {
     return GoRouter.of(context).pushReplacement(RoutesPaths.auth);
   }
 

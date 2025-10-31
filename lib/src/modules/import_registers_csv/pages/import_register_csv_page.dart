@@ -28,8 +28,8 @@ class _ImportRegisterCsvPageState extends State<ImportRegisterCsvPage> {
         }
 
         if (state is ImportCsvLoaded) {
-          //ShowMessager.show(context, 'Backup realizado com sucesso!');
-          // Navigator.of(context).pop();
+          ShowMessager.show(context, state.message);
+          Navigator.of(context).pop();
         }
         if (state is ImportCsvError) {
           ShowMessager.show(context, state.message);
@@ -38,26 +38,12 @@ class _ImportRegisterCsvPageState extends State<ImportRegisterCsvPage> {
         }
       },
       builder: (context, state) {
-        return Column(
-          children: [
-            ItemCardWithIcon(
-              text: 'Importar Registros',
-              subtTitle:
-                  'Selecione um arquivo ".csv" que contém suas senhas para importá-las.',
-              icon: Icons.upload_file,
-              onTap: () => _restoreBackup(controller),
-            ),
-
-            SizedBox(height: 10,),
-
-            ItemCardWithIcon(
-              text: 'Exportar Registros',
-              subtTitle:
-                  'Exportará suas senhas para um arquivo ".csv". Você poderá importá-las aqui ou no Chrome.',
-              icon: Icons.file_download,
-              onTap: () => () {}
-            ),
-          ],
+        return ItemCardWithIcon(
+          text: 'Importar Registros',
+          subtTitle:
+              'Selecione um arquivo ".csv" que contém suas senhas para importá-las.',
+          icon: Icons.upload_file,
+          onTap: () => _restoreBackup(controller),
         );
       },
     );
@@ -72,8 +58,8 @@ class _ImportRegisterCsvPageState extends State<ImportRegisterCsvPage> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (_) => WillPopScope(
-        onWillPop: () async => false,
+      builder: (_) => PopScope(
+        canPop: false,
         child: AlertDialog(
           content: Row(
             children: [
@@ -91,19 +77,12 @@ class _ImportRegisterCsvPageState extends State<ImportRegisterCsvPage> {
       ),
     );
   }
+
 }
 
 
 
 
 
-  // buttonExport(ImportRegisterCsvController exportarImportarService) async {
-  //   CircularProgressIndicator();
-  //   await Future.delayed(const Duration(seconds: 2));
-  //   final String status = await exportarImportarService.exportBackup();
 
-  //   if (mounted) {
-  //     ShowMessager.show(context, status.toString());
-  //   }
-  // }
 

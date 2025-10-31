@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:installed_apps/installed_apps.dart';
 import 'package:installed_apps/app_info.dart';
+import 'package:installed_apps/installed_apps.dart';
 
 class InstalledAppsPage extends StatefulWidget {
   final ScrollController? scrollController;
@@ -26,7 +26,7 @@ class _InstalledAppsPageState extends State<InstalledAppsPage> {
     });
     // Aguarda 1 segundo para simular o carregamento
     //await Future.delayed(const Duration(seconds: 1));
-    final apps = await InstalledApps.getInstalledApps(true, true);
+    final apps = await InstalledApps.getInstalledApps(withIcon: true);
     setState(() {
       _apps = apps;
       _isLoading = false;
@@ -61,9 +61,9 @@ class _InstalledAppsPageState extends State<InstalledAppsPage> {
               ? Image.memory(app.icon!, width: 40, height: 40)
               : const Icon(Icons.apps),
           title: Text(app.name),
-          subtitle: Text(app.packageName ?? 'Pacote desconhecido'),
+          subtitle: Text(app.packageName),
           onTap: () {
-            Navigator.pop(context, app); // ✅ Retorna app selecionado
+            Navigator.pop(context, app);
           },
         );
       },
