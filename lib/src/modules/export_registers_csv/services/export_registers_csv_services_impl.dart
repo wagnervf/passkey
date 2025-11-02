@@ -10,7 +10,7 @@ class ExportRegistersCsvServicesImpl implements ExportRegistersCsvServices {
   ExportRegistersCsvServicesImpl({required this.repository});
 
   @override
-  Future<File> exportRegistersCsvServices(List<RegisterModel> registros) {
+  Future<File?> exportRegistersCsvServices(List<RegisterModel> registros) {
     return repository.exportToCsv(registros);
   }
 }

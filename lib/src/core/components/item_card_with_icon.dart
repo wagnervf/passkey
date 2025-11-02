@@ -16,33 +16,21 @@ class ItemCardWithIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Color corIcon = Theme.of(context).colorScheme.primary;
-    return ListTile(
-      onTap: onTap,
-      contentPadding: const EdgeInsets.only(right: 8, left: 8),
-      leading: Icon(icon),
-      title: Text(
-        text,
-        style: Theme.of(context).textTheme.titleMedium,
-      ),
-      subtitle: Text(
-        subtTitle,
-        style: Theme.of(context).textTheme.bodySmall,
+    return Card(
+      child: ListTile(
+        onTap: onTap,
+        contentPadding: const EdgeInsets.only(right: 8, left: 8),
+        leading: Icon(icon),
+        title: Text(
+          text,
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
+        subtitle: Text(
+          subtTitle,
+          style: Theme.of(context).textTheme.bodySmall,
+        ),
       ),
     );
 
-    // Card(
-    //   child: ListTile(
-    //     minTileHeight: 60,
-    //     enabled: true,
-    //     onTap: onTap,
-    //     leading: Icon(icon, color: corIcon),
-    //     trailing: Icon(Icons.keyboard_arrow_right, color: corIcon),
-    //     title: Text(
-    //       text,
-    //       style: Theme.of(context).textTheme.displaySmall,
-    //     ),
-    //   ),
-    // );
   }
 }

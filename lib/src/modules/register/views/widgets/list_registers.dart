@@ -88,49 +88,62 @@ class _ListRegistersState extends State<ListRegisters> {
   }
 
   Widget listRegistros(List<RegisterModel> registers) {
-    return ListView.separated(
+    return ListView.builder(
+
       itemCount: registers.length,
-      padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 12),
-      separatorBuilder: (_, __) => const SizedBox(height: 8),
+        padding: const EdgeInsets.all(16),
       itemBuilder: (BuildContext context, int index) {
         final register = registers[index];
         final corDeFundo = cores[index % cores.length];
         final nome = register.selectedApp?.name ?? register.name ?? '';
+           final isFirst = index == 0;
+          final isLast = index == registers.length - 1;
 
-        return ListTile(
-          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 0),
-          onTap: () => _goToView(register),
-          leading: register.selectedApp?.iconBytes != null
-              ? ClipRRect(
-                  borderRadius: BorderRadius.circular(25),
-                  child: Image.memory(
-                    register.selectedApp!.iconBytes!,
-                    width: 50,
-                    height: 50,
-                    fit: BoxFit.cover,
-                  ),
-                )
-              : iconDay(register, context, corDeFundo),
-          title: Text(
-            nome,
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
-          subtitle: register.username?.isNotEmpty == true
-              ? Text(
-                  register.username!,
-                  style: Theme.of(context).textTheme.bodySmall,
-                )
-              : null,
-          trailing: Padding(
-            padding: const EdgeInsets.symmetric( horizontal: 8.0),
-            child: const Icon(Icons.remove_red_eye),
+        return Container(
+           decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surface,
+              borderRadius: BorderRadius.vertical(
+                top: isFirst ? const Radius.circular(16) : Radius.zero,
+                bottom: isLast ? const Radius.circular(16) : Radius.zero,
+              ),
+              border: Border.all(color: Colors.grey[300]!),
+            ),
+          child: ListTile(
+            contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 0),
+          
+            onTap: () => _goToView(register),
+            leading: register.selectedApp?.iconBytes != null
+                ? ClipRRect(
+                    borderRadius: BorderRadius.circular(25),
+                    child: Image.memory(
+                      register.selectedApp!.iconBytes!,
+                      width: 50,
+                      height: 50,
+                      fit: BoxFit.cover,
+                    ),
+                  )
+                : iconDay(register, context, corDeFundo),
+            title: Text(
+              nome,
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            subtitle: register.username?.isNotEmpty == true
+                ? Text(
+                    register.username!,
+                    style: Theme.of(context).textTheme.bodySmall,
+                  )
+                : null,
+            trailing: Padding(
+              padding: const EdgeInsets.symmetric( horizontal: 8.0),
+              child: const Icon(Icons.remove_red_eye),
+            ),
           ),
         );
       },
     );
   }
 
-  _barraDeAcoes() {
+  Padding _barraDeAcoes() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 0.0),
       child: Row(
@@ -138,15 +151,12 @@ class _ListRegistersState extends State<ListRegisters> {
         spacing: 8.0,
         children: [
           SizedBox(
-              //width: 100,
               height: 30,
               child: OutlinedButton.icon(
-                // style: ButtonStyle(
-                //     backgroundColor: WidgetStatePropertyAll(
-                //   Theme.of(context).colorScheme.tertiary,
-                // )),
-
                 style: OutlinedButton.styleFrom(
+                     shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(6), 
+    ),
                     backgroundColor: _ordemAtual == OrdemRegistros.nome
                         ? Theme.of(context).colorScheme.tertiary
                         : Colors.white,
@@ -164,10 +174,13 @@ class _ListRegistersState extends State<ListRegisters> {
                 ),
               )),
           SizedBox(
-              //width: 100,
               height: 30,
               child: OutlinedButton.icon(
+                
                 style: OutlinedButton.styleFrom(
+                     shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(6), 
+    ),
                     backgroundColor: _ordemAtual == OrdemRegistros.data
                         ? Theme.of(context).colorScheme.tertiary
                         : Colors.white,
@@ -189,7 +202,7 @@ class _ListRegistersState extends State<ListRegisters> {
     );
   }
 
-  emptyRegisters(BuildContext context) {
+  Center emptyRegisters(BuildContext context) {
     return Center(
       child: SizedBox(
         height: MediaQuery.of(context).size.height * .8,
@@ -277,7 +290,7 @@ class _ListRegistersState extends State<ListRegisters> {
             ),
             filled: true,
             //fillColor: Colors.grey[100],
-            fillColor: Theme.of(context).colorScheme.onPrimary,
+            fillColor: Theme.of(context).colorScheme.surface,
             contentPadding: const EdgeInsets.symmetric(horizontal: 16),
             hintStyle: const TextStyle(fontWeight: FontWeight.normal)),
       ),

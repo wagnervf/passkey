@@ -29,11 +29,9 @@ class _HomePageState extends State<HomePage> {
     final tema = Theme.of(context).textTheme;
 
     return Scaffold(
-      //   backgroundColor: Theme.of(context).colorScheme.onPrimary,
-      /// backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).colorScheme.onPrimary,
       floatingActionButton: buttonAdd(context),
       drawer: Drawer(),
-      //Scaffold.of(context).openDrawer(),
       appBar: AppBar(
         excludeHeaderSemantics: true,
         leading: SizedBox.shrink(),

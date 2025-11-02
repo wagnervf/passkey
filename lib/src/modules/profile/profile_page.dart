@@ -26,6 +26,8 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        backgroundColor: Theme.of(context).colorScheme.onPrimary,
+
       appBar: AppBar(
         toolbarHeight: 10,
         excludeHeaderSemantics: true,
@@ -56,7 +58,7 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  _body(BuildContext context, int currentYear, userLoged) {
+  LayoutBuilder _body(BuildContext context, int currentYear, userLoged) {
     return LayoutBuilder(builder: (context, constraint) {
       return SingleChildScrollView(
         child: ConstrainedBox(
@@ -66,7 +68,6 @@ class _ProfilePageState extends State<ProfilePage> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   profile(context, userLoged),
-                  Divider(),
                   Expanded(
                     child: Padding(
                       padding: const EdgeInsets.all(18.0),
@@ -110,7 +111,7 @@ class _ProfilePageState extends State<ProfilePage> {
     });
   }
 
-  profile(BuildContext context, AuthUserModel? userLoged) {
+  ColoredBox profile(BuildContext context, AuthUserModel? userLoged) {
     return ColoredBox(
       color: Theme.of(context).colorScheme.onTertiary,
       child: ListTile(
@@ -137,15 +138,15 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  _auth() {
+  Future<Object?> _auth() {
     return GoRouter.of(context).pushReplacement(RoutesPaths.auth);
   }
 
-  _goToEdit(AuthUserModel userLoged) async {
+  Future<void> _goToEdit(AuthUserModel userLoged) async {
     await GoRouter.of(context).push(RoutesPaths.authRegister, extra: userLoged);
   }
 
-  _goToConfig(AuthUserModel userLoged) async {
+  Future<void> _goToConfig(AuthUserModel userLoged) async {
     await GoRouter.of(context).push(RoutesPaths.config, extra: userLoged);
   }
 }
