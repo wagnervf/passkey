@@ -1,9 +1,10 @@
+import 'dart:io';
+
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:keezy/src/core/components/show_messeger.dart';
 import 'package:keezy/src/modules/register/controller/register_controller.dart';
 import 'package:provider/provider.dart';
-import 'package:file_picker/file_picker.dart';
-import 'dart:io';
 
 class ImportOneRegisterPage extends StatefulWidget {
   const ImportOneRegisterPage({super.key});
@@ -15,7 +16,7 @@ class ImportOneRegisterPage extends StatefulWidget {
 class _ImportOneRegisterPageState extends State<ImportOneRegisterPage> {
   TextEditingController jsonController = TextEditingController();
 
-  importarRegistro(String jsonContent) async {
+  Future<void> importarRegistro(String jsonContent) async {
     await context.read<RegisterController>().importarUmRegistro(jsonContent);
   }
 
@@ -117,11 +118,11 @@ class _ImportOneRegisterPageState extends State<ImportOneRegisterPage> {
                         Navigator.of(context).pop();
                         var registroImportado = await importarRegistro(jsonContent);
 
-                        if (registroImportado != null) {
-                          showMessage('Registro importado com sucesso!');
-                        } else {
-                          showMessage('Falha ao importar o registro!');
-                        }
+                        // if (registroImportado != null) {
+                        //   showMessage('Registro importado com sucesso!');
+                        // } else {
+                        //   showMessage('Falha ao importar o registro!');
+                        // }
                       },
                       child: Text('Confirmar'),
                     ),

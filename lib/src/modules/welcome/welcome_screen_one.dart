@@ -26,7 +26,7 @@ class _WelcomeScreenOneState extends State<WelcomeScreenOne> {
 
   @override
   void dispose() {
-    _timer?.cancel(); // Cancel the timer to prevent memory leaks
+    _timer?.cancel(); 
     _pageController.dispose();
     super.dispose();
   }

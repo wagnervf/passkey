@@ -151,7 +151,7 @@ ThemeData get lightTheme => ThemeData(
         ),
         titleSmall: const TextStyle(fontWeight: FontWeight.bold),
         headlineSmall: TextStyle(color: lightColorScheme.surface, fontSize: 12),
-        bodySmall: TextStyle(fontSize: 12, color: lightColorScheme.outline),
+        bodySmall: TextStyle(fontSize: 12,),
         bodyMedium: const TextStyle(
           fontSize: 16,
           //  color: Colors.white,
@@ -265,24 +265,29 @@ ThemeData get darkTheme => ThemeData(
             foregroundColor: Colors.white),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
+        
         style: OutlinedButton.styleFrom(
+          textStyle: const TextStyle(fontWeight: FontWeight.bold),
           side: BorderSide(
-            color: Colors.white,
+            color: lightColorScheme.primary,
             width: 1,
           ),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(15.0),
           ),
           foregroundColor: Colors.white,
+
         ),
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
+          textStyle: const TextStyle(fontWeight: FontWeight.bold),
+
           backgroundColor: darkColorScheme.primary,
           foregroundColor: Colors.white,
-          textStyle: const TextStyle(color: Colors.white),
+      //   textStyle: const TextStyle(color: Colors.white),
           side: BorderSide(
-            color: darkColorScheme.primary,
+            color: lightColorScheme.primary,
             width: 1,
           ),
           shape: RoundedRectangleBorder(

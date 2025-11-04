@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:keezy/src/core/components/item_card_with_icon.dart';
 import 'package:keezy/src/core/components/show_messeger.dart';
+import 'package:keezy/src/core/router/routes.dart';
 import 'package:keezy/src/modules/import_registers_csv/controllers/import_register_csv_controller.dart';
 import 'package:keezy/src/modules/import_registers_csv/controllers/import_registers_csv_state.dart';
 import 'package:provider/provider.dart';
@@ -14,75 +16,85 @@ class ImportRegisterCsvPage extends StatefulWidget {
 }
 
 class _ImportRegisterCsvPageState extends State<ImportRegisterCsvPage> {
+  bool _isLoading = false;
+
   @override
   Widget build(BuildContext context) {
-    final controller =
-        Provider.of<ImportRegisterCsvController>(context, listen: false);
+    final controller = Provider.of<ImportRegisterCsvController>(
+      context,
+      listen: false,
+    );
 
     return BlocConsumer<ImportRegisterCsvController, ImportRegistersCsvState>(
-      listener: (context, state) {
+      listener: (context, state) async {
         if (state is ImportCsvLoading) {
-          _showLoadingDialog(context);
+          setState(() => _isLoading = true);
         } else {
-          Navigator.of(context, rootNavigator: true).pop();
+          setState(() => _isLoading = false);
         }
 
         if (state is ImportCsvLoaded) {
+          if (!mounted) return;
           ShowMessager.show(context, state.message);
-          Navigator.of(context).pop();
+
+          await Future.delayed(const Duration(seconds: 1));
+          if (mounted) {
+            context.go(RoutesPaths.home);
+          }
         }
+
         if (state is ImportCsvError) {
           ShowMessager.show(context, state.message);
-        } else {
-          SizedBox.shrink();
         }
       },
       builder: (context, state) {
-        return ItemCardWithIcon(
-          text: 'Importar Registros',
-          subtTitle:
-              'Selecione um arquivo ".csv" que contém suas senhas para importá-las.',
-          icon: Icons.upload_file,
-          onTap: () => _restoreBackup(controller),
+        return Stack(
+          children: [
+            Center(
+              child: ItemCardWithIcon(
+                text: 'Importar Registros',
+                subtTitle:
+                    'Selecione um arquivo ".csv" contendo seus registros exportados. ',
+                icon: Icons.upload_file_rounded,
+                onTap: _isLoading ? () {} : () => _restoreBackup(controller),
+              ),
+            ),
+            if (_isLoading) _buildLoadingOverlay(),
+          ],
         );
       },
     );
   }
 
-  void _restoreBackup(ImportRegisterCsvController controller) async {
-    await controller.restoreBackupFromFileCsv();
+  bool _isPickingFile = false;
+
+  Future<void> _restoreBackup(ImportRegisterCsvController controller) async {
+    if (_isPickingFile) return;
+    _isPickingFile = true;
+
+    try {
+      await controller.restoreBackupFromFileCsv();
+    } finally {
+      _isPickingFile = false;
+    }
   }
 
-  void _showLoadingDialog(BuildContext context,
-      {String message = 'Carregando...'}) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) => PopScope(
-        canPop: false,
-        child: AlertDialog(
-          content: Row(
-            children: [
-              const CircularProgressIndicator(),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Text(
-                  message,
-                  style: const TextStyle(fontSize: 16),
-                ),
-              ),
-            ],
-          ),
+  Widget _buildLoadingOverlay() {
+    return Container(
+      color: Colors.black.withValues(green: 0, red: 0),
+      child: const Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CircularProgressIndicator(),
+            SizedBox(height: 16),
+            Text(
+              'Importando registros...',
+              style: TextStyle(color: Colors.white, fontSize: 16),
+            ),
+          ],
         ),
       ),
     );
   }
-
 }
-
-
-
-
-
-
-

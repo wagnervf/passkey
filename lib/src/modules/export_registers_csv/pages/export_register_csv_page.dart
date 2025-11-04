@@ -18,8 +18,10 @@ class ExportRegisterCsvPage extends StatefulWidget {
 class _ExportRegisterCsvPageState extends State<ExportRegisterCsvPage> {
   @override
   Widget build(BuildContext context) {
-    final controller =
-        Provider.of<ExportRegisterCsvController>(context, listen: false);
+    final controller = Provider.of<ExportRegisterCsvController>(
+      context,
+      listen: false,
+    );
 
     return BlocConsumer<ExportRegisterCsvController, ExportRegistersCsvState>(
       listener: (context, state) {
@@ -34,7 +36,10 @@ class _ExportRegisterCsvPageState extends State<ExportRegisterCsvPage> {
           ShowMessager.show(context, '✅ Registros compartilhados com sucesso!');
           Navigator.of(context).pop();
         } else if (state is ExportCsvNull) {
-          ShowMessager.show(context, '⚠️ Nenhum registro encontrado para exportar.');
+          ShowMessager.show(
+            context,
+            '⚠️ Nenhum registro encontrado para exportar.',
+          );
         } else if (state is ExportCsvError) {
           ShowMessager.show(context, '❌ ${state.message}');
         }
@@ -49,14 +54,36 @@ class _ExportRegisterCsvPageState extends State<ExportRegisterCsvPage> {
               icon: Icons.share,
               onTap: () => _showExportDialog(controller),
             ),
+
+            ListTile(
+              dense: true,
+              title: Text(
+                'Exportar Modelo CSV',
+                style: Theme.of(context).textTheme.labelMedium),
+              
+              subtitle: Text(
+                'Gere um arquivo CSV vazio para preencher manualmente e importar depois.',
+              ),
+              leading: Icon(
+                Icons.download,
+              ),
+              onTap: () => _exportarModelo(controller),
+            ),
           ],
         );
       },
     );
   }
 
-  void _showLoadingDialog(BuildContext context,
-      {String message = 'Carregando...'}) {
+  // Exporta apenas o modelo CSV vazio
+  Future<void> _exportarModelo(ExportRegisterCsvController controller) async {
+    await controller.exportEmptyTemplate();
+  }
+
+  void _showLoadingDialog(
+    BuildContext context, {
+    String message = 'Carregando...',
+  }) {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -68,10 +95,7 @@ class _ExportRegisterCsvPageState extends State<ExportRegisterCsvPage> {
               const CircularProgressIndicator(),
               const SizedBox(width: 16),
               Expanded(
-                child: Text(
-                  message,
-                  style: const TextStyle(fontSize: 16),
-                ),
+                child: Text(message, style: const TextStyle(fontSize: 16)),
               ),
             ],
           ),
@@ -100,7 +124,7 @@ class _ExportRegisterCsvPageState extends State<ExportRegisterCsvPage> {
             ),
             TextButton(
               onPressed: () async {
-                Navigator.of(context).pop(); 
+                Navigator.of(context).pop();
                 await _exportarRegistros(controller);
               },
               child: const Text('Exportar'),
@@ -111,7 +135,9 @@ class _ExportRegisterCsvPageState extends State<ExportRegisterCsvPage> {
     );
   }
 
-  Future<void> _exportarRegistros(ExportRegisterCsvController controller) async {
+  Future<void> _exportarRegistros(
+    ExportRegisterCsvController controller,
+  ) async {
     try {
       await context.read<ExportRegisterCsvController>().exportFileCsv();
     } catch (e, s) {

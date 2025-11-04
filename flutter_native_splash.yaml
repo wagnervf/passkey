@@ -1,12 +1,12 @@
-
 flutter_native_splash:
-  color: "#FFFFFF"
-  image: assets/images/logo.png
-  android: true
-  ios: true
-  web: false
-
+  color: "#ffffff"
+  image: assets/images/splash2.png
 
   android_12:
-    color: "#FFFFFF"
-    image: assets/images/logo.png
+    image: assets/images/splash2.png
+    color: "#ffffff"
+
+  # 🔧 Configurações extras para controle do tamanho
+  android_gravity: center
+  ios_content_mode: scaleAspectFit
+  web_image_mode: contain

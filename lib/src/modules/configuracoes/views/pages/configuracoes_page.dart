@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:keezy/src/core/components/biometric_switch_widget.dart';
 import 'package:keezy/src/core/components/item_card_with_icon.dart';
 import 'package:keezy/src/core/components/show_messeger.dart';
 import 'package:keezy/src/core/router/routes.dart';
@@ -32,6 +33,7 @@ class _ConfiguracoesPageState extends State<ConfiguracoesPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.onPrimary,
       appBar: AppBar(
         title: const Text('Configurações'),
       ),
@@ -61,7 +63,7 @@ class _ConfiguracoesPageState extends State<ConfiguracoesPage> {
     );
   }
 
-  _body(BuildContext context, int currentYear, userLoged) {
+  LayoutBuilder _body(BuildContext context, int currentYear, userLoged) {
     return LayoutBuilder(builder: (context, constraint) {
       return SingleChildScrollView(
         child: ConstrainedBox(
@@ -84,14 +86,21 @@ class _ConfiguracoesPageState extends State<ConfiguracoesPage> {
 
                           const IconChangeTheme(),
                           const SizedBox(height: 20),
+
+                            BiometricSwitchWidget(),
+                         
+                          const SizedBox(height: 20),
                           Utils.titleCard(context, 'Gerenciar Registros'),
 
                           //    BackupRestorePage(),
+                          ExportRegisterCsvPage(),
+                           const SizedBox(height: 20),
 
                           ImportRegisterCsvPage(),
                           const SizedBox(height: 20),
-                          ExportRegisterCsvPage(),
-                          const SizedBox(height: 20),
+
+
+                        
 
                           ItemCardWithIcon(
                             text: 'Excluir todos os dados',
@@ -127,29 +136,7 @@ class _ConfiguracoesPageState extends State<ConfiguracoesPage> {
     });
   }
 
-  // InkWell buttonRemoverUser(BuildContext context) {
-  //   return InkWell(
-  //     onTap: () => _confirmarExclusao(context),
-  //     child: Card(
-  //       child: ListTile(
-  //         minTileHeight: 60,
-  //         dense: true,
-  //         contentPadding: const EdgeInsets.only(right: 8, left: 8),
-  //         leading: const Icon(
-  //           Icons.delete,
-  //           color: Colors.red,
-  //         ),
-  //         title: Text(
-  //           'Excluir o usuário e apagar os registros',
-  //           style: Theme.of(context)
-  //               .textTheme
-  //               .titleMedium!
-  //               .copyWith(color: Colors.red),
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  // }
+
 
   // Modal de confirmação antes de excluir a conta
   void _confirmarExclusao(BuildContext context) {
@@ -207,7 +194,7 @@ class _ConfiguracoesPageState extends State<ConfiguracoesPage> {
     );
   }
 
-  profile(BuildContext context, AuthUserModel? userLoged) {
+  ColoredBox profile(BuildContext context, AuthUserModel? userLoged) {
     return ColoredBox(
       color: Theme.of(context).colorScheme.onSecondary,
       child: ListTile(
@@ -230,11 +217,5 @@ class _ConfiguracoesPageState extends State<ConfiguracoesPage> {
     );
   }
 
-  // _auth() {
-  //   return GoRouter.of(context).pushReplacement(RoutesPaths.auth);
-  // }
 
-  // _goToEdit(AuthUserModel userLoged) async {
-  //   await GoRouter.of(context).push(RoutesPaths.authRegister, extra: userLoged);
-  // }
 }

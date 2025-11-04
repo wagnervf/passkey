@@ -13,4 +13,15 @@ class ExportRegistersCsvServicesImpl implements ExportRegistersCsvServices {
   Future<File?> exportRegistersCsvServices(List<RegisterModel> registros) {
     return repository.exportToCsv(registros);
   }
+  
+  @override
+  Future<void> exportEmptyCsvTemplate() {
+    return repository.exportEmptyCsvTemplate();
+     
+  }
+  
+  @override
+  Future exportSingleRegisterCsv(RegisterModel register) {
+    return repository.exportSingleRegisterCsv(register);
+  }
 }

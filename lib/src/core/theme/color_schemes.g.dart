@@ -37,7 +37,7 @@ const darkColorScheme = ColorScheme(
   brightness: Brightness.dark,
   primary: Color(0xFF1F2C34),
   secondary: Color(0xFFFAFAFA),
-  surface: Color(0xFF1F2C34),
+  surface: Color.fromARGB(255, 20, 28, 33),
   onPrimary: Color(0xFF1F2C34),
   onSecondary: Colors.white,
   onSurface: Colors.white,

@@ -29,7 +29,7 @@ class _HomePageState extends State<HomePage> {
     final tema = Theme.of(context).textTheme;
 
     return Scaffold(
-        backgroundColor: Theme.of(context).colorScheme.onPrimary,
+      backgroundColor: Theme.of(context).colorScheme.onPrimary,
       floatingActionButton: buttonAdd(context),
       drawer: Drawer(),
       appBar: AppBar(
@@ -40,20 +40,23 @@ class _HomePageState extends State<HomePage> {
         elevation: 0,
         leadingWidth: 20,
         title: Consumer<AuthUserProvider>(
-        builder: (context, authUserProvider, child) {
-          final user = authUserProvider.user;
-          if (user == null) {
-            return Center(child: Text('No user logged in.'));
-          }
-          return Text(user.name, style: tema.displayMedium,);
-        },
-      ),
-      
+          builder: (context, authUserProvider, child) {
+            final user = authUserProvider.user;
+            if (user == null) {
+              return Center(child: Text('No user logged in.'));
+            }
+            return Text(user.name, style: tema.displayMedium);
+          },
+        ),
+
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 12.0),
-            child: IconButton(onPressed: () => _sair(), icon: const Icon(Icons.logout_outlined)),
-          )
+            child: IconButton(
+              onPressed: () => _sair(),
+              icon: const Icon(Icons.logout_outlined),
+            ),
+          ),
         ],
       ),
       body: SafeArea(
@@ -61,15 +64,9 @@ class _HomePageState extends State<HomePage> {
           builder: (context, state) {
             if (state is AuthLoadingState) {
               return const CircularProgressIndicator();
-            } else if (state is AuthSuccessState) {
-              //  WidgetsBinding.instance.addPostFrameCallback((_) {
-              //    setState(() {
-              //       user = state.user;
-              //    });
-              //  });
-        
-              return ListRegisters(
-              );
+            } else if (state is AuthSuccessState) {         
+
+              return ListRegisters();
             } else if (state is AuthErrorState) {
               return Text('Erro: ${state.message}');
             }
@@ -84,18 +81,11 @@ class _HomePageState extends State<HomePage> {
     return GoRouter.of(context).pushReplacement(RoutesPaths.auth);
   }
 
- FloatingActionButton buttonAdd(BuildContext context) {
+  FloatingActionButton buttonAdd(BuildContext context) {
     return FloatingActionButton(
       onPressed: () => GoRouter.of(context).push(RoutesPaths.register),
       tooltip: 'Novo Registro',
       child: const Icon(Icons.add),
     );
   }
-  // _auth() {
-  //   return GoRouter.of(context).pushReplacement(RoutesPaths.auth);
-  // }
-
-  // _goToConfig() async {
-  //   await GoRouter.of(context).push(RoutesPaths.config);
-  // }
 }

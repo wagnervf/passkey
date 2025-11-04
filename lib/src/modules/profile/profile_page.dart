@@ -27,7 +27,6 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: Theme.of(context).colorScheme.onPrimary,
-
       appBar: AppBar(
         toolbarHeight: 10,
         excludeHeaderSemantics: true,
@@ -113,7 +112,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   ColoredBox profile(BuildContext context, AuthUserModel? userLoged) {
     return ColoredBox(
-      color: Theme.of(context).colorScheme.onTertiary,
+      color: Theme.of(context).colorScheme.surface,
       child: ListTile(
         contentPadding:
             const EdgeInsets.symmetric(horizontal: 15, vertical: 15),

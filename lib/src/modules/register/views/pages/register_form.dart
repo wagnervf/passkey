@@ -3,9 +3,12 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:installed_apps/app_info.dart';
+import 'package:keezy/src/core/components/button_copiar.dart';
 import 'package:keezy/src/core/components/show_messeger.dart';
 import 'package:keezy/src/core/installed_apps/installed_app_model.dart';
 import 'package:keezy/src/core/installed_apps/installed_apps_page.dart';
+import 'package:keezy/src/core/utils/utils.dart';
+import 'package:keezy/src/modules/export_registers_csv/controllers/export_register_csv_controller.dart';
 import 'package:keezy/src/modules/register/controller/register_controller.dart';
 import 'package:keezy/src/modules/register/model/register_model.dart';
 import 'package:provider/provider.dart';
@@ -32,7 +35,6 @@ class _RegisterFormState extends State<RegisterForm> {
   bool buscandoApps = false;
 
   RegisterModel? register;
-  // InstalledAppModel? _selectedApp;
   InstalledAppModel? selectedApp;
 
   @override
@@ -70,7 +72,13 @@ class _RegisterFormState extends State<RegisterForm> {
 
   @override
   Widget build(BuildContext context) {
+    final controller = Provider.of<ExportRegisterCsvController>(
+      context,
+      listen: false,
+    );
+
     return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.onPrimary,
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.close),
@@ -79,19 +87,25 @@ class _RegisterFormState extends State<RegisterForm> {
           },
         ),
         actions: [
-         edit ?
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: IconButton(
-              onPressed: () => _excluirRegistro(),
-              icon: Icon(Icons.delete, color: Colors.red),
-            ),
-          ) : const SizedBox.shrink(),
+          IconButton(
+            onPressed: () => _confirmarExportacao(context, controller),
+            tooltip: 'Compartilhar Registro',
+            icon: Icon(Icons.share_outlined, fontWeight: FontWeight.bold),
+          ),
+          edit
+              ? Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: IconButton(
+                    onPressed: () => _excluirRegistro(),
+                    icon: Icon(Icons.delete, color: Colors.red),
+                  ),
+                )
+              : const SizedBox.shrink(),
         ],
         title: Text(edit ? 'Editar Registro' : 'Adicionar Registro'),
         elevation: 0,
-        backgroundColor: Colors.transparent,
-       // foregroundColor: Colors.black,
+        // backgroundColor: Colors.transparent,
+        // foregroundColor: Colors.black,
       ),
       body: SafeArea(
         child: LayoutBuilder(
@@ -108,7 +122,6 @@ class _RegisterFormState extends State<RegisterForm> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
-                              Divider(thickness: 4, color: Colors.grey[200]),
                               const SizedBox(height: 15),
 
                               (selectedApp == null)
@@ -126,10 +139,8 @@ class _RegisterFormState extends State<RegisterForm> {
                               const SizedBox(height: 24),
                               const Text("Usuário e senha"),
                               const SizedBox(height: 8),
-                              _buildTextField(
-                                _loginController,
-                                "Usuário/Login",
-                              ),
+
+                              _buildLoginField(),
                               const SizedBox(height: 12),
                               _buildPasswordField(),
                               const SizedBox(height: 24),
@@ -140,27 +151,8 @@ class _RegisterFormState extends State<RegisterForm> {
                               ),
                               const Spacer(),
 
-                              // ActionButton(
-                              //   actionType: edit
-                              //       ? ActionType.editar
-                              //       : ActionType.salvar,
-                              //   title: edit ? 'Atualizar' : 'Salvar',
-                              //   onPressed: () => acaoSalvarRegistro(context),
-                              // ),
-                              Padding(
-                                padding: const EdgeInsets.only(
-                                  top: 32,
-                                  bottom: 24,
-                                ),
-                                child: SizedBox(
-                                  height: 50,
-                                  child: ElevatedButton(
-                                    onPressed: () =>
-                                        acaoSalvarRegistro(context),
-                                    child: const Text("Salvar"),
-                                  ),
-                                ),
-                              ),
+
+                              _buttonSalvar(context),
                             ],
                           ),
                         ),
@@ -173,40 +165,94 @@ class _RegisterFormState extends State<RegisterForm> {
     );
   }
 
+  Padding _buttonSalvar(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 32, bottom: 24),
+      child: SizedBox(
+        height: 50,
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Utils.isDarkMode(context)
+                ? Theme.of(context).colorScheme.surface
+                : Theme.of(context).colorScheme.primary,
+          ),
+          onPressed: () => acaoSalvarRegistro(context),
+          child:  Text("Salvar",style: TextStyle(fontSize: 18,fontWeight: FontWeight.bold)),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _confirmarExportacao(
+    BuildContext context,
+    ExportRegisterCsvController controller,
+  ) async {
+    final confirmar = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Compartilhar Registro'),
+        content: const Text(
+          'Deseja exportar e compartilhar este registro em formato CSV? '
+          'O arquivo poderá ser importado por outro usuário posteriormente.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancelar'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Compartilhar'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmar == true) {
+      await controller.exportSingleRegister(register!);
+    }
+  }
+
   Column selecionarApp() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text("Selecionar um App do celular"),
         const SizedBox(height: 8),
-        SizedBox(
-          width: double.maxFinite,
-          child: OutlinedButton.icon(
-            icon: const Icon(Icons.apps),
-            onPressed: () async {
-              setState(() {
-                buscandoApps = true;
-              });
-              await _showAppDialog(context);
-            },
-            label: const Text("Buscar app"),
+        ColoredBox(
+          color: Theme.of(context).colorScheme.onPrimary,
+          child: SizedBox(
+            width: double.maxFinite,
+            child: OutlinedButton.icon(
+              icon: const Icon(Icons.apps),
+              onPressed: () async {
+                setState(() {
+                  buscandoApps = true;
+                });
+                await _showAppDialog(context);
+              },
+              label: const Text("Buscar app"),
+            ),
           ),
         ),
       ],
     );
   }
 
-  ListTile appSelecionado() {
-    return ListTile(
-      contentPadding: EdgeInsets.zero,
-      leading: selectedApp!.iconBytes != null
-          ? Image.memory((selectedApp!.iconBytes!), width: 40, height: 40)
-          : const Icon(Icons.apps),
-      title: Text(selectedApp!.name),
-      subtitle: const Text("App selecionado"),
-      trailing: IconButton(
-        icon: const Icon(Icons.close),
-        onPressed: () => setState(() => selectedApp = null),
+  ColoredBox appSelecionado() {
+    return ColoredBox(
+      color: Theme.of(context).colorScheme.surface,
+      child: ListTile(
+        contentPadding: EdgeInsets.symmetric(horizontal: 4),
+        leading: selectedApp!.iconBytes != null
+            ? Image.memory((selectedApp!.iconBytes!), width: 40, height: 40)
+            : const Icon(Icons.apps),
+        title: Text(selectedApp!.name),
+        subtitle: const Text("App selecionado"),
+        trailing: IconButton(
+          icon: const Icon(Icons.close),
+          onPressed: () => setState(() => selectedApp = null),
+        ),
       ),
     );
   }
@@ -218,27 +264,51 @@ class _RegisterFormState extends State<RegisterForm> {
     );
   }
 
+  Widget _buildLoginField() {
+    return TextField(
+      controller: _loginController,
+      decoration: InputDecoration(
+        hintText: "Usuário/Login",
+        suffixIcon: ButtonCopiar(
+          controller: _loginController,
+          context: context,
+          message: 'Usuário copiada para a área de transferência',
+        ),
+      ),
+    );
+  }
+
   Widget _buildPasswordField() {
     return TextField(
       controller: _passwordController,
       obscureText: _obscureText,
       decoration: InputDecoration(
         hintText: "Senha",
-        suffixIcon: IconButton(
-          icon: Icon(_obscureText ? Icons.visibility : Icons.visibility_off),
-          onPressed: () => setState(() => _obscureText = !_obscureText),
+        suffixIcon: SizedBox(
+          width: 96,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ButtonCopiar(
+                controller: _passwordController,
+                context: context,
+                message: 'Senha copiada para a área de transferência',
+              ),
+              IconButton(
+                icon: Icon(
+                  _obscureText ? Icons.visibility : Icons.visibility_off,
+                ),
+                tooltip: _obscureText ? 'Mostrar senha' : 'Ocultar senha',
+                onPressed: () => setState(() {
+                  _obscureText = !_obscureText;
+                }),
+              ),
+            ],
+          ),
         ),
       ),
     );
-  }
-
-  void _clearInputs() {
-    _titleController.clear();
-    _loginController.clear();
-    _passwordController.clear();
-    _descriptionController.clear();
-    _siteController.clear();
-    Navigator.of(context).pop();
   }
 
   Future<void> _showAppDialog(BuildContext context) async {
@@ -344,5 +414,14 @@ class _RegisterFormState extends State<RegisterForm> {
         );
       },
     );
+  }
+
+  void _clearInputs() {
+    _titleController.clear();
+    _loginController.clear();
+    _passwordController.clear();
+    _descriptionController.clear();
+    _siteController.clear();
+    Navigator.of(context).pop();
   }
 }

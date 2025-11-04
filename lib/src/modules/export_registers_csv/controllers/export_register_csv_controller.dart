@@ -43,4 +43,28 @@ class ExportRegisterCsvController extends Cubit<ExportRegistersCsvState> {
       return null;
     }
   }
+
+
+  Future<void> exportSingleRegister(RegisterModel register) async {
+    try {
+      emit(ExportCsvLoading());
+      await exportRegistersCsvServices.exportSingleRegisterCsv(register);
+      emit(ExportCsvLoaded('Registro exportado com sucesso!'));
+    } catch (e) {
+      emit(ExportCsvError('Erro ao exportar o registro: $e'));
+    }
+  }
+
+Future<void> exportEmptyTemplate() async {
+  emit(ExportCsvLoading());
+  try {
+    await exportRegistersCsvServices.exportEmptyCsvTemplate();
+    emit(ExportCsvLoaded('Modelo CSV compartilhado com sucesso.'));
+  } catch (e) {
+    emit(ExportCsvError('Erro ao gerar modelo CSV: $e'));
+  }
+}
+
+
+
 }

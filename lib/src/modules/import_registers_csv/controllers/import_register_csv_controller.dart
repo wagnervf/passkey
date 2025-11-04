@@ -7,7 +7,6 @@ import 'package:keezy/src/modules/register/controller/register_controller.dart';
 import 'package:keezy/src/modules/register/model/register_model.dart';
 
 
-
 class ImportRegisterCsvController extends Cubit<ImportRegistersCsvState> {
   final ImportRegistersCsvServices importRegistersCsvServices;
   final RegisterController registerController;
@@ -18,32 +17,34 @@ class ImportRegisterCsvController extends Cubit<ImportRegistersCsvState> {
   }) : super(ImportCsvInitial());
 
   Future<List<RegisterModel>?> importFromCsv() async {
-    emit(ImportCsvLoading());
+  emit(ImportCsvLoading());
+
     try {
       final registers = await importRegistersCsvServices.importFromCsv();
 
-        if (registers.isEmpty) {
-        const msg = 'Nenhum registro selecionado!';
+      if (registers.isEmpty) {
+        const msg = 'Nenhum registro válido encontrado no arquivo!';
         emit(ImportCsvNull(msg));
         return null;
-     }
+      }
 
       log('Registros importados: ${registers.length}');
       emit(ImportCsvLoaded('Registros importados: ${registers.length}'));
+
       return registers;
-    } catch (e) {
-     // final errorMsg = 'Erro ao importar CSV: $e';
-      log(e.toString());
-      emit(ImportCsvError(e.toString()));
+    } catch (e, s) {
+      log('Erro ao importar CSV: $e', stackTrace: s);
+      emit(ImportCsvError('Erro ao importar CSV: $e'));
       return null;
     }
   }
 
+  /// Importa e restaura os registros diretamente no Hive (backup completo)
   Future<String?> restoreBackupFromFileCsv() async {
     emit(ImportCsvLoading());
 
     try {
-      final List<RegisterModel>? registers = await importFromCsv();
+      final registers = await importFromCsv();
 
       if (registers == null || registers.isEmpty) {
         const msg = 'Nenhum registro encontrado!';
@@ -58,15 +59,11 @@ class ImportRegisterCsvController extends Cubit<ImportRegistersCsvState> {
 
       emit(ImportCsvLoaded('Dados importados com sucesso!'));
       return 'Dados importados com sucesso!';
-    } catch (e) {
-      final errorMsg = 'Erro ao importar backup: $e';
+    } catch (e, s) {
+      log('Erro ao restaurar backup: $e', stackTrace: s);
+      final errorMsg = 'Erro ao restaurar backup: $e';
       emit(ImportCsvError(errorMsg));
       return errorMsg;
     }
   }
-
-
-
- 
 }
-

@@ -46,33 +46,14 @@ class SplashPageState extends State<SplashPage> {
       }
     } catch (e) {
       log('Error during authentication: $e');
+      GoRouter.of(context).pushReplacement(RoutesPaths.auth);
       return;
-     // GoRouter.of(context).pushReplacement(RoutesPaths.auth);
+
     }
   }
 
  
-// BlocConsumer<AuthController, AuthState> _blocCosumer() {
-//     return BlocConsumer<AuthController, AuthState>(
-//       listener: (context, state) {
-//         // if (state is AuthSuccessState) {
-//         //  _authSucess(context);
-//         //   return;
-//         // }
-//       },
-//       builder: (context, state) {
-//          if (state is AuthLoadingState) {
-//           return loading();
-//         }  else if (state is AuthUnauthenticatedState) {
-//           unautheticated(context);
-//           return const SizedBox.shrink();
-//         } else {
-//           _noAuthenticated(context);
-//           return loading();
-//         }
-//       },
-//     );
-//   }
+
 
   void _hasNotUser(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
