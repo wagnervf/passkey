@@ -5,11 +5,85 @@ import 'package:csv/csv.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:keezy/src/modules/import_registers_csv/repositories/import_registers_csv_repository.dart';
 import 'package:keezy/src/modules/register/model/register_model.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:uuid/uuid.dart';
 
+// class ImportRegistersCsvRepositoryImpl implements ImportRegistersCsvRepository {
+//   @override
+//   Future<List<RegisterModel>> importFromCsv() async {
+//     // Abre o seletor de arquivo CSV
+//     final result = await FilePicker.platform.pickFiles(
+//       type: FileType.custom,
+//       allowedExtensions: ['csv'],
+//     );
+
+//     if (result == null || result.files.single.path == null) {
+//       throw Exception('Nenhum arquivo selecionado.');
+//     }
+
+//     final file = File(result.files.single.path!);
+
+//     if (!await file.exists()) {
+//       throw Exception('Arquivo CSV não encontrado.');
+//     }
+
+//     final csvString = await file.readAsString();
+
+//     final csvTable = const CsvToListConverter(
+//       fieldDelimiter: ',',
+//       eol: '\n',
+//       shouldParseNumbers: false,
+//     ).convert(csvString);
+
+//     if (csvTable.isEmpty) {
+//       throw Exception('Arquivo CSV vazio.');
+//     }
+
+//     // Validação do cabeçalho
+//     final header = csvTable.first
+//         .map((e) => e.toString().trim().toLowerCase())
+//         .toList();
+
+//     const requiredHeaders = [
+//       'id',
+//       'name',
+//       'url',
+//       'username',
+//       'password',
+//       'note',
+//     ];
+
+//     final missingColumns = requiredHeaders
+//         .where((h) => !header.contains(h.toLowerCase()))
+//         .toList();
+
+//     if (missingColumns.isNotEmpty) {
+//       throw Exception(
+//         'O arquivo CSV não está no formato esperado. '
+//         'Verifique se as colunas são: ${requiredHeaders.join(', ')}.',
+//       );
+//     }
+
+//     // Validação de linhas de dados
+//     final dataRows = csvTable.skip(1).toList();
+//     if (dataRows.isEmpty) {
+//       throw Exception('Nenhum dado encontrado no arquivo CSV.');
+//     }
+
+//     // Converte cada linha em RegisterModel
+//     final entries = dataRows.map((row) {
+//       final map = <String, dynamic>{};
+//       for (int i = 0; i < header.length && i < row.length; i++) {
+//         map[header[i]] = row[i];
+//       }
+//       return RegisterModel.fromMap(map);
+//     }).toList();
+
+//     return entries;
+//   }
+// }
 class ImportRegistersCsvRepositoryImpl implements ImportRegistersCsvRepository {
   @override
- Future<List<RegisterModel>> importFromCsv() async {
+  Future<List<RegisterModel>> importFromCsv() async {
     // Abre o seletor de arquivo CSV
     final result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
@@ -26,11 +100,12 @@ class ImportRegistersCsvRepositoryImpl implements ImportRegistersCsvRepository {
       throw Exception('Arquivo CSV não encontrado.');
     }
 
-    final csvString = await file.readAsString();
+    // Lê o conteúdo e remove espaços/linhas extras
+    final csvString = (await file.readAsString()).trim();
 
+    // Faz o parsing automático de quebras de linha (\n ou \r\n)
     final csvTable = const CsvToListConverter(
       fieldDelimiter: ',',
-      eol: '\n',
       shouldParseNumbers: false,
     ).convert(csvString);
 
@@ -38,25 +113,36 @@ class ImportRegistersCsvRepositoryImpl implements ImportRegistersCsvRepository {
       throw Exception('Arquivo CSV vazio.');
     }
 
-    // Validação do cabeçalho
-    final header =
-        csvTable.first.map((e) => e.toString().trim().toLowerCase()).toList();
+    // Cabeçalhos
+    final header = csvTable.first
+        .map((e) => e.toString().trim().toLowerCase())
+        .toList();
 
-    const requiredHeaders = ['id', 'name', 'url', 'username', 'password', 'note'];
+   
 
 
-    final missingColumns =
-        requiredHeaders.where((h) => !header.contains(h.toLowerCase())).toList();
+    const requiredHeaders = [
+      'id',
+      'name',
+      'url',
+      'username',
+      'password',
+      'note',
+    ];
+
+    final missingColumns = requiredHeaders
+        .where((h) => !header.contains(h.toLowerCase()))
+        .toList();
 
     if (missingColumns.isNotEmpty) {
       throw Exception(
         'O arquivo CSV não está no formato esperado. '
-        'Verifique se as colunas são: ${requiredHeaders.join(', ')}.',
+        'Colunas obrigatórias: ${requiredHeaders.join(', ')}.',
       );
     }
 
-    // Validação de linhas de dados
-    final dataRows = csvTable.skip(1).toList();
+    // Linhas de dados
+    final dataRows = csvTable.skip(1).where((row) => row.isNotEmpty).toList();
     if (dataRows.isEmpty) {
       throw Exception('Nenhum dado encontrado no arquivo CSV.');
     }
@@ -64,100 +150,26 @@ class ImportRegistersCsvRepositoryImpl implements ImportRegistersCsvRepository {
     // Converte cada linha em RegisterModel
     final entries = dataRows.map((row) {
       final map = <String, dynamic>{};
+
+       if (!header.contains('id')) {
+        header.insert(0, 'id');
+        for (final row in dataRows) {
+          row.insert(0, Uuid().v4());
+        }
+      }
+
+      
       for (int i = 0; i < header.length && i < row.length; i++) {
-        map[header[i]] = row[i];
+        map[header[i]] = row[i]?.toString().trim();
       }
       return RegisterModel.fromMap(map);
     }).toList();
 
-    return entries;
-  }
-
-
-  
-
-  // Future<List<RegisterModel>> importFromCsv(File file) async {
-  //   try {
-  //     if (!await file.exists()) {
-  //       throw Exception('Arquivo CSV não encontrado');
-  //     }
-
-  //     final csvString = await file.readAsString();
-
-  //     final csvTable = const CsvToListConverter(
-  //       fieldDelimiter: ',',
-  //       eol: '\n',
-  //       shouldParseNumbers: false,
-  //     ).convert(csvString);
-
-  //     if (csvTable.isEmpty) {
-  //       throw Exception('Arquivo CSV vazio.');
-  //     }
-
-  //     final header =
-  //         csvTable.first.map((e) => e.toString().trim().toLowerCase()).toList();
-
-  //     const requiredHeaders = ['name', 'url', 'username', 'password', 'note'];
-
-  //     final missingColumns =
-  //         requiredHeaders.where((h) => !header.contains(h)).toList();
-  //     if (missingColumns.isNotEmpty) {
-  //       // throw Exception('Colunas ausentes no CSV: ${missingColumns.join(', ')}');
-  //       throw Exception(
-  //           'Verifique se o arquivo CSV possui as coluns corretas e tente novamente');
-  //     }
-
-  //     final dataRows = csvTable.skip(1).toList();
-  //     if (dataRows.isEmpty) {
-  //       throw Exception(
-  //           'Verifique se o arquivo CSV possui dados e tente novamente');
-  //     }
-
-  //     final entries =
-  //         dataRows.map((row) => RegisterModel.fromCsv(row)).toList();
-
-  //     return entries;
-  //   } catch (e) {
-      
-  //     log(e.toString());
-  //     return [];
-  //   }
-  // }
-
-
- 
-@override
-  Future<File> exportToCsv(List<RegisterModel> registros) async {
-  try {
-    if (registros.isEmpty) {
-      throw Exception('Nenhum dado disponível para exportar.');
+    // Log de verificação
+    for (final e in entries) {
+      log('Registro CSV importado: ${e.name}');
     }
 
-    // Cabeçalho
-    const headers = ['id', 'name', 'url', 'username', 'password', 'note'];
-
-    // Conteúdo dos registros
-    final rows = registros.map((e) => [
-          e.name,
-          e.url,
-          e.username,
-          e.password,
-          e.note,
-        ]).toList();
-
-    final csvData = const ListToCsvConverter().convert([headers, ...rows]);
-
-    // Diretório para salvar (temporário ou externo)
-    final dir = await getTemporaryDirectory(); // você pode trocar por outro
-    final file = File('${dir.path}/exported_registers.csv');
-
-    await file.writeAsString(csvData);
-
-    return file;
-  } catch (e) {
-    log('Erro ao exportar CSV: $e');
-    rethrow;
+    return entries;
   }
-}
-
 }

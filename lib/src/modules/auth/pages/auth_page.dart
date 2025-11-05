@@ -220,7 +220,7 @@ class _AuthPageState extends State<AuthPage> {
       body: Center(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center ,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text('Verificando autenticação...'),
 

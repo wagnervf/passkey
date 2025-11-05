@@ -43,7 +43,7 @@ class _BiometricSwitchWidgetState extends State<BiometricSwitchWidget> {
 
       final isAuthenticated = await _auth.authenticate(
         localizedReason: 'Use sua biometria para ativar o acesso seguro.',
-          biometricOnly: true,
+        biometricOnly: true,
       );
 
       if (!isAuthenticated) {
@@ -65,10 +65,9 @@ class _BiometricSwitchWidgetState extends State<BiometricSwitchWidget> {
     if (!mounted) return;
     ScaffoldMessenger.of(context)
       ..clearSnackBars()
-      ..showSnackBar(SnackBar(
-        content: Text(message),
-        behavior: SnackBarBehavior.floating,
-      ));
+      ..showSnackBar(
+        SnackBar(content: Text(message), behavior: SnackBarBehavior.floating),
+      );
   }
 
   @override
@@ -77,27 +76,22 @@ class _BiometricSwitchWidgetState extends State<BiometricSwitchWidget> {
       return const Center(child: CircularProgressIndicator());
     }
 
-    return Card(
-      child: SwitchListTile(
-  
-        title: const Text(
-          'Acesso por Biometria',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-        ),
-        subtitle: const Text(
-          'Permitir login com impressão digital ou reconhecimento facial.',
-          style: TextStyle(fontSize: 14, color: Colors.grey),
-        ),
-        value: _biometricEnabled,
-        onChanged: (value) => _toggleBiometric(value),
-        activeColor: Theme.of(context).colorScheme.primary,
-
-         secondary: Icon(
-          _biometricEnabled
-              ? Icons.fingerprint
-              : Icons.do_disturb,
-          color: Theme.of(context).colorScheme.primary,
-        ),
+    return SwitchListTile(
+      title: Text(
+        'Acesso por Biometria',
+        style: Theme.of(context).textTheme.titleMedium,
+      ),
+      subtitle: Text(
+        'Permitir login com a digital.',
+        style: Theme.of(context).textTheme.bodySmall,
+      ),
+      value: _biometricEnabled,
+      onChanged: (value) => _toggleBiometric(value),
+      activeThumbColor: Theme.of(context).colorScheme.primary,
+    
+      secondary: Icon(
+        _biometricEnabled ? Icons.fingerprint : Icons.do_disturb,
+        color: Theme.of(context).colorScheme.primary,
       ),
     );
   }

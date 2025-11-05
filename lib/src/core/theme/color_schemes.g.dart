@@ -4,7 +4,7 @@ const lightColorScheme = ColorScheme(
 
   primary: Colors.teal, // Dark Green
   surface: Color(0xFFFFFFFF),
-  onPrimary: Color.fromRGBO(238, 238, 238, 0.945), // Soft White
+  onPrimary: Color(0xFFF0F1F5),//Color.fromRGBO(238, 238, 238, 0.945), // Soft White
   error: Color(0xFFD32F2F), // Rustic Red
   brightness: Brightness.light,
   primaryContainer: Color(0xFFC3E8FF),

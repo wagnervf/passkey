@@ -16,19 +16,16 @@ class ItemCardWithIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: ListTile(
-        onTap: onTap,
-        contentPadding: const EdgeInsets.only(right: 8, left: 8),
-        leading: Icon(icon),
-        title: Text(
-          text,
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
-        subtitle: Text(
-          subtTitle,
-          style: Theme.of(context).textTheme.bodySmall,
-        ),
+    return ListTile(
+      onTap: onTap,
+      leading: Icon(icon),
+      title: Text(
+        text,
+        style: Theme.of(context).textTheme.titleMedium,
+      ),
+      subtitle: Text(
+        subtTitle,
+        style: Theme.of(context).textTheme.bodySmall,
       ),
     );
 

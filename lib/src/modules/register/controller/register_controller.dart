@@ -71,27 +71,27 @@ class RegisterController extends Cubit<RegisterState> {
     }
   }
 
-  Future<bool> saveListRegisterController(List<RegisterModel> registers) async {
-    emit(RegisterLoading());
-    try {
-      final register =
-          await registerRepository.saveListRegisterRepository(registers);
+  // Future<bool> saveListRegisterController(List<RegisterModel> registers) async {
+  //   emit(RegisterLoading());
+  //   try {
+  //     final register =
+  //         await registerRepository.saveListRegisterRepository(registers);
 
-      switch (register) {
-        case Left():
-          return false;
+  //     switch (register) {
+  //       case Left():
+  //         return false;
 
-        case Right<RepositoryException, bool>():
-          getRegisterController();
-          return true;
-      }
-    } on Exception catch (e) {
-      log(e.toString());
-      const message = 'Erro ao buscar Register';
-      emit(RegisterError(message));
-      return false;
-    }
-  }
+  //       case Right<RepositoryException, bool>():
+  //         getRegisterController();
+  //         return true;
+  //     }
+  //   } on Exception catch (e) {
+  //     log(e.toString());
+  //     const message = 'Erro ao buscar Register';
+  //     emit(RegisterError(message));
+  //     return false;
+  //   }
+  // }
 
   Future<bool> deleteRegisterController(RegisterModel updatedRegistro) async {
     emit(RegisterLoading());

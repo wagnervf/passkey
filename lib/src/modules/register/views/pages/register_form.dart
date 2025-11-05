@@ -7,6 +7,7 @@ import 'package:keezy/src/core/components/button_copiar.dart';
 import 'package:keezy/src/core/components/show_messeger.dart';
 import 'package:keezy/src/core/installed_apps/installed_app_model.dart';
 import 'package:keezy/src/core/installed_apps/installed_apps_page.dart';
+import 'package:keezy/src/core/utils/password_field_with_generator.dart';
 import 'package:keezy/src/core/utils/utils.dart';
 import 'package:keezy/src/modules/export_registers_csv/controllers/export_register_csv_controller.dart';
 import 'package:keezy/src/modules/register/controller/register_controller.dart';
@@ -29,7 +30,6 @@ class _RegisterFormState extends State<RegisterForm> {
   final _descriptionController = TextEditingController();
   final _siteController = TextEditingController();
 
-  bool _obscureText = true;
   bool edit = false;
   bool carregando = false;
   bool buscandoApps = false;
@@ -142,7 +142,13 @@ class _RegisterFormState extends State<RegisterForm> {
 
                               _buildLoginField(),
                               const SizedBox(height: 12),
-                              _buildPasswordField(),
+                              PasswordFieldWithGenerator(
+                                controller: _passwordController,
+                                labelText: "Senha do Cofre",
+                                maxLength: 16,
+                                onChanged: (value) {
+                                },
+                              ),
                               const SizedBox(height: 24),
                               const Text("Observação"),
                               _buildTextField(
@@ -150,7 +156,6 @@ class _RegisterFormState extends State<RegisterForm> {
                                 "Observação",
                               ),
                               const Spacer(),
-
 
                               _buttonSalvar(context),
                             ],
@@ -177,7 +182,10 @@ class _RegisterFormState extends State<RegisterForm> {
                 : Theme.of(context).colorScheme.primary,
           ),
           onPressed: () => acaoSalvarRegistro(context),
-          child:  Text("Salvar",style: TextStyle(fontSize: 18,fontWeight: FontWeight.bold)),
+          child: Text(
+            "Salvar",
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
         ),
       ),
     );
@@ -219,20 +227,20 @@ class _RegisterFormState extends State<RegisterForm> {
       children: [
         const Text("Selecionar um App do celular"),
         const SizedBox(height: 8),
-        ColoredBox(
-          color: Theme.of(context).colorScheme.onPrimary,
-          child: SizedBox(
-            width: double.maxFinite,
-            child: OutlinedButton.icon(
-              icon: const Icon(Icons.apps),
-              onPressed: () async {
-                setState(() {
-                  buscandoApps = true;
-                });
-                await _showAppDialog(context);
-              },
-              label: const Text("Buscar app"),
+        SizedBox(
+          width: double.maxFinite,
+          child: OutlinedButton.icon(
+            style: OutlinedButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.surface,
             ),
+            icon: const Icon(Icons.apps),
+            onPressed: () async {
+              setState(() {
+                buscandoApps = true;
+              });
+              await _showAppDialog(context);
+            },
+            label: const Text("Buscar app"),
           ),
         ),
       ],
@@ -278,38 +286,41 @@ class _RegisterFormState extends State<RegisterForm> {
     );
   }
 
-  Widget _buildPasswordField() {
-    return TextField(
-      controller: _passwordController,
-      obscureText: _obscureText,
-      decoration: InputDecoration(
-        hintText: "Senha",
-        suffixIcon: SizedBox(
-          width: 96,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ButtonCopiar(
-                controller: _passwordController,
-                context: context,
-                message: 'Senha copiada para a área de transferência',
-              ),
-              IconButton(
-                icon: Icon(
-                  _obscureText ? Icons.visibility : Icons.visibility_off,
-                ),
-                tooltip: _obscureText ? 'Mostrar senha' : 'Ocultar senha',
-                onPressed: () => setState(() {
-                  _obscureText = !_obscureText;
-                }),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+  // Widget _buildPasswordField() {
+
+  //
+
+  // return TextField(
+  //   controller: _passwordController,
+  //   obscureText: _obscureText,
+  //   decoration: InputDecoration(
+  //     hintText: "Senha",
+  //     suffixIcon: SizedBox(
+  //       width: 96,
+  //       child: Row(
+  //         mainAxisAlignment: MainAxisAlignment.end,
+  //         mainAxisSize: MainAxisSize.min,
+  //         children: [
+  //           ButtonCopiar(
+  //             controller: _passwordController,
+  //             context: context,
+  //             message: 'Senha copiada para a área de transferência',
+  //           ),
+  //           IconButton(
+  //             icon: Icon(
+  //               _obscureText ? Icons.visibility : Icons.visibility_off,
+  //             ),
+  //             tooltip: _obscureText ? 'Mostrar senha' : 'Ocultar senha',
+  //             onPressed: () => setState(() {
+  //               _obscureText = !_obscureText;
+  //             }),
+  //           ),
+  //         ],
+  //       ),
+  //     ),
+  //   ),
+  // );
+  // }
 
   Future<void> _showAppDialog(BuildContext context) async {
     final AppInfo? selected = await showDialog<AppInfo>(

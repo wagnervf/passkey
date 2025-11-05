@@ -2,10 +2,9 @@
 import 'dart:convert';
 
 import 'package:hive/hive.dart';
-import 'package:uuid/uuid.dart';
-
 import 'package:keezy/src/core/installed_apps/installed_app_model.dart';
 import 'package:keezy/src/modules/type_register/type_register_model.dart';
+import 'package:uuid/uuid.dart';
 
 part 'register_model.g.dart';
 
@@ -36,7 +35,9 @@ class RegisterModel extends HiveObject {
   final InstalledAppModel? selectedApp;
 
   RegisterModel(
-      {required this.id,
+      {
+        required 
+      this.id,
       this.name,
       this.username,
       this.password,
@@ -90,23 +91,45 @@ class RegisterModel extends HiveObject {
     };
   }
 
+  // factory RegisterModel.fromMap(Map<String, dynamic> map) {
+  //   return RegisterModel(
+  //     id: map['id'] as String,
+  //     name: map['name'] != null ? map['name'] as String : null,
+  //     username: map['username'] != null ? map['username'] as String : null,
+  //     password: map['password'] != null ? map['password'] as String : null,
+  //     url: map['url'] != null ? map['url'] as String : null,
+  //     note: map['note'] != null ? map['note'] as String : null,
+  //     type: map['type'] != null
+  //         ? TypeRegiterModel.fromMap(map['type'] as Map<String, dynamic>)
+  //         : null,
+  //     selectedApp: map['selectedApp'] != null
+  //         ? InstalledAppModel.fromMap(
+  //             map['selectedApp'] as Map<String, dynamic>)
+  //         : null,
+  //   );
+  // }
+
   factory RegisterModel.fromMap(Map<String, dynamic> map) {
-    return RegisterModel(
-      id: map['id'] as String,
-      name: map['name'] != null ? map['name'] as String : null,
-      username: map['username'] != null ? map['username'] as String : null,
-      password: map['password'] != null ? map['password'] as String : null,
-      url: map['url'] != null ? map['url'] as String : null,
-      note: map['note'] != null ? map['note'] as String : null,
-      type: map['type'] != null
-          ? TypeRegiterModel.fromMap(map['type'] as Map<String, dynamic>)
-          : null,
-      selectedApp: map['selectedApp'] != null
-          ? InstalledAppModel.fromMap(
-              map['selectedApp'] as Map<String, dynamic>)
-          : null,
-    );
-  }
+  final rawId = (map['id'] ?? '').toString().trim();
+
+  return RegisterModel(
+    id: rawId.isNotEmpty ? rawId : const Uuid().v4(),
+    name: map['name']?.toString(),
+    username: map['username']?.toString(),
+    password: map['password']?.toString(),
+    url: map['url']?.toString(),
+    note: map['note']?.toString(),
+    type: map['type'] != null
+        ? TypeRegiterModel.fromMap(map['type'] as Map<String, dynamic>)
+        : null,
+    selectedApp: map['selectedApp'] != null
+        ? InstalledAppModel.fromMap(
+            map['selectedApp'] as Map<String, dynamic>,
+          )
+        : null,
+  );
+}
+
 
   factory RegisterModel.fromJson(String source) =>
       RegisterModel.fromMap(json.decode(source) as Map<String, dynamic>);

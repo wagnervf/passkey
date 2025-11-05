@@ -45,39 +45,15 @@ class _ExportRegisterCsvPageState extends State<ExportRegisterCsvPage> {
         }
       },
       builder: (context, state) {
-        return Column(
-          children: [
-            ItemCardWithIcon(
-              text: 'Exportar Registros',
-              subtTitle:
-                  'Exportará seus registros para um arquivo ".csv". Você poderá compartilhá-los diretamente.',
-              icon: Icons.share,
-              onTap: () => _showExportDialog(controller),
-            ),
-
-            ListTile(
-              dense: true,
-              title: Text(
-                'Exportar Modelo CSV',
-                style: Theme.of(context).textTheme.labelMedium),
-              
-              subtitle: Text(
-                'Gere um arquivo CSV vazio para preencher manualmente e importar depois.',
-              ),
-              leading: Icon(
-                Icons.download,
-              ),
-              onTap: () => _exportarModelo(controller),
-            ),
-          ],
+        return ItemCardWithIcon(
+          text: 'Exportar Registros',
+          subtTitle:
+              'Exportará seus registros para um arquivo ".csv".',
+          icon: Icons.share,
+          onTap: () => _showExportDialog(controller),
         );
       },
     );
-  }
-
-  // Exporta apenas o modelo CSV vazio
-  Future<void> _exportarModelo(ExportRegisterCsvController controller) async {
-    await controller.exportEmptyTemplate();
   }
 
   void _showLoadingDialog(

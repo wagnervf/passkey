@@ -12,6 +12,7 @@ import 'package:keezy/src/modules/auth/controllers/auth_controller.dart';
 import 'package:keezy/src/modules/auth/controllers/auth_state.dart';
 import 'package:keezy/src/modules/auth/model/auth_user_model.dart';
 import 'package:keezy/src/modules/configuracoes/views/widgets/icon_change_theme.dart';
+import 'package:keezy/src/modules/export_registers_csv/pages/export_exemple_register_widget.dart';
 import 'package:keezy/src/modules/export_registers_csv/pages/export_register_csv_page.dart';
 import 'package:keezy/src/modules/import_registers_csv/pages/import_register_csv_page.dart';
 
@@ -34,9 +35,7 @@ class _ConfiguracoesPageState extends State<ConfiguracoesPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.onPrimary,
-      appBar: AppBar(
-        title: const Text('Configurações'),
-      ),
+      appBar: AppBar(title: const Text('Configurações')),
       body: SafeArea(child: body(context)),
     );
   }
@@ -64,9 +63,10 @@ class _ConfiguracoesPageState extends State<ConfiguracoesPage> {
   }
 
   LayoutBuilder _body(BuildContext context, int currentYear, userLoged) {
-    return LayoutBuilder(builder: (context, constraint) {
-      return SingleChildScrollView(
-        child: ConstrainedBox(
+    return LayoutBuilder(
+      builder: (context, constraint) {
+        return SingleChildScrollView(
+          child: ConstrainedBox(
             constraints: BoxConstraints(minHeight: constraint.maxHeight),
             child: IntrinsicHeight(
               child: Column(
@@ -79,64 +79,83 @@ class _ConfiguracoesPageState extends State<ConfiguracoesPage> {
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const SizedBox(
-                            height: 20,
+                          Utils.titleCard(context, 'Opções'),
+                          const SizedBox(height: 10),
+                          Card(
+                            elevation: 0,
+                            margin: EdgeInsets.zero,
+                            child: Column(
+                              children: [
+                                BiometricSwitchWidget(),
+                                _divider(),
+                                const IconChangeTheme(),
+                              ],
+                            ),
                           ),
-                          Utils.titleCard(context, 'Gerenciar Tema'),
 
-                          const IconChangeTheme(),
-                          const SizedBox(height: 20),
-
-                            BiometricSwitchWidget(),
-                         
-                          const SizedBox(height: 20),
+                          const SizedBox(height: 30),
                           Utils.titleCard(context, 'Gerenciar Registros'),
+                          const SizedBox(height: 10),
 
-                          //    BackupRestorePage(),
-                          ExportRegisterCsvPage(),
-                           const SizedBox(height: 20),
+                          Card(
+                            elevation: 0,
+                            margin: EdgeInsets.zero,
+                            child: Column(
+                              children: [
+                                ExportRegisterCsvPage(),
+                                _divider(),
 
-                          ImportRegisterCsvPage(),
-                          const SizedBox(height: 20),
+                                ImportRegisterCsvPage(),
 
+                                _divider(),
 
-                        
-
-                          ItemCardWithIcon(
-                            text: 'Excluir todos os dados',
-                            subtTitle:
-                                'Apagar do celular todos os dados do aplicativo.',
-                            icon: Icons.delete,
-                            onTap: () => _confirmarExclusao(context),
+                                ExportExempleRegisterWidget(),
+                              ],
+                            ),
                           ),
 
                           //  buttonRemoverUser(context),
                           const Spacer(),
 
+                          Card(
+                            elevation: 0,
+                            margin: EdgeInsets.zero,
+                            child: ItemCardWithIcon(
+                              text: 'Excluir todos os dados',
+                              subtTitle:
+                                  'Apagar do celular todos os dados do aplicativo.',
+                              icon: Icons.dangerous_outlined,
+                              onTap: () => _confirmarExclusao(context),
+                            ),
+                          ),
+                          const SizedBox(height: 10),
                           Center(
                             child: Text(
                               '© $currentYear keezy seu gerenciador de senhas particular e privativo. Todos os direitos reservados.',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodySmall
-                                  ?.copyWith(
-                                    color: Colors.grey,
-                                  ),
+                              style: Theme.of(context).textTheme.bodySmall
+                                  ?.copyWith(color: Colors.grey),
                               textAlign: TextAlign.center,
                             ),
                           ),
                         ],
                       ),
                     ),
-                  )
+                  ),
                 ],
               ),
-            )),
-      );
-    });
+            ),
+          ),
+        );
+      },
+    );
   }
 
-
+  Padding _divider() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+      child: Divider(thickness: 1),
+    );
+  }
 
   // Modal de confirmação antes de excluir a conta
   void _confirmarExclusao(BuildContext context) {
@@ -150,13 +169,13 @@ class _ConfiguracoesPageState extends State<ConfiguracoesPage> {
             child: Column(
               children: [
                 const Text(
-                    'Tem certeza que deseja excluir sua conta? Esta ação não pode ser desfeita.'),
+                  'Tem certeza que deseja excluir sua conta? Esta ação não pode ser desfeita.',
+                ),
                 Text(
                   'Importante! Realize a exportação dos registros antes de resetar o aplicativo.',
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodyMedium!
-                      .copyWith(color: Colors.red),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodyMedium!.copyWith(color: Colors.red),
                 ),
               ],
             ),
@@ -168,14 +187,12 @@ class _ConfiguracoesPageState extends State<ConfiguracoesPage> {
             ),
             TextButton(
               onPressed: () async {
-                bool result =
-                    await context.read<AuthController>().logoutAndRemoveUser();
+                bool result = await context
+                    .read<AuthController>()
+                    .logoutAndRemoveUser();
 
                 if (result) {
-                  ShowMessager.show(
-                    context,
-                    'Usuário removido com sucesso.',
-                  );
+                  ShowMessager.show(context, 'Usuário removido com sucesso.');
                 } else {
                   ShowMessager.show(
                     context,
@@ -198,16 +215,14 @@ class _ConfiguracoesPageState extends State<ConfiguracoesPage> {
     return ColoredBox(
       color: Theme.of(context).colorScheme.onSecondary,
       child: ListTile(
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 15,
+          vertical: 15,
+        ),
         leading: CircleAvatar(
           radius: 40,
           backgroundColor: Theme.of(context).colorScheme.primary,
-          child: const Icon(
-            Icons.person,
-            size: 40,
-            color: Colors.white,
-          ),
+          child: const Icon(Icons.person, size: 40, color: Colors.white),
         ),
         title: Text(
           userLoged?.name ?? '',
@@ -216,6 +231,4 @@ class _ConfiguracoesPageState extends State<ConfiguracoesPage> {
       ),
     );
   }
-
-
 }

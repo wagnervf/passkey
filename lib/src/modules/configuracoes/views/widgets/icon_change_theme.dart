@@ -10,27 +10,24 @@ class IconChangeTheme extends StatelessWidget {
   Widget build(BuildContext context) {
     final themeConfig = context.watch<ThemeController>();
 
-    return Card(
-      child: SwitchListTile(
-        title: const Text(
-          'Tema Escuro',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-        ),
-        subtitle: const Text(
-          'Ative o modo escuro para uma melhor experiência visual.',
-          style: TextStyle(fontSize: 14, color: Colors.grey),
-        ),
-        secondary: Icon(
-          themeConfig.isDark
-              ? Icons.dark_mode_outlined
-              : Icons.light_mode_outlined,
-          color: Theme.of(context).colorScheme.primary,
-        ),
-        value: themeConfig.isDark,
-        onChanged: (_) => themeConfig.toggleTheme(),
-        activeColor: Theme.of(context).colorScheme.primary,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16.0),
+    return SwitchListTile(
+      title: Text(
+        'Tema Escuro',
+        style: Theme.of(context).textTheme.titleMedium,
       ),
+      subtitle: Text(
+        'Ative o modo escuro',
+        style: Theme.of(context).textTheme.bodyMedium,
+      ),
+      secondary: Icon(
+        themeConfig.isDark
+            ? Icons.dark_mode_outlined
+            : Icons.light_mode_outlined,
+        color: Theme.of(context).colorScheme.primary,
+      ),
+      value: themeConfig.isDark,
+      onChanged: (_) => themeConfig.toggleTheme(),
+      activeThumbColor: Theme.of(context).colorScheme.primary,
     );
   }
 }

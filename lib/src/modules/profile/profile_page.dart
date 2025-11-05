@@ -26,7 +26,7 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Theme.of(context).colorScheme.onPrimary,
+      backgroundColor: Theme.of(context).colorScheme.onPrimary,
       appBar: AppBar(
         toolbarHeight: 10,
         excludeHeaderSemantics: true,
@@ -58,9 +58,10 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   LayoutBuilder _body(BuildContext context, int currentYear, userLoged) {
-    return LayoutBuilder(builder: (context, constraint) {
-      return SingleChildScrollView(
-        child: ConstrainedBox(
+    return LayoutBuilder(
+      builder: (context, constraint) {
+        return SingleChildScrollView(
+          child: ConstrainedBox(
             constraints: BoxConstraints(minHeight: constraint.maxHeight),
             child: IntrinsicHeight(
               child: Column(
@@ -75,55 +76,69 @@ class _ProfilePageState extends State<ProfilePage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Utils.titleCard(context, 'Usuário'),
-                          ItemCardWithIcon(
-                            text: 'Editar Perfil',
-                            subtTitle: 'Altere os dados do seu perfil',
-                            icon: Icons.edit,
-                            onTap: () => _goToEdit(userLoged!),
-                          ),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          Utils.titleCard(context, 'Sistema'),
-                          ItemCardWithIcon(
-                            text: 'Configurações',
-                            subtTitle: 'Altere as configurações do app',
-                            icon: Icons.settings,
-                            onTap: () => _goToConfig(userLoged!),
-                          ),
-                        
-                          ItemCardWithIcon(
-                            text: 'Sair',
 
-                            subtTitle: 'Sair do aplicativo',
-                            icon: Icons.logout_outlined,
-                            onTap: () => _auth(),
+                          Card(
+                            elevation: 0,
+                            margin: EdgeInsets.zero,
+
+                            child: Column(
+                              children: [
+                                ItemCardWithIcon(
+                                  text: 'Editar Perfil',
+                                  subtTitle: 'Altere os dados do seu perfil',
+                                  icon: Icons.edit,
+                                  onTap: () => _goToEdit(userLoged!),
+                                ),
+                                 _divider(),
+                                ItemCardWithIcon(
+                                  text: 'Configurações',
+                                  subtTitle: 'Altere as configurações do app',
+                                  icon: Icons.settings,
+                                  onTap: () => _goToConfig(userLoged!),
+                                ),
+                                _divider(),
+                                ItemCardWithIcon(
+                                  text: 'Sair',
+                                  subtTitle: 'Sair do aplicativo',
+                                  icon: Icons.logout_outlined,
+                                  onTap: () => _auth(),
+                                ),
+                              ],
+                            ),
                           ),
                         ],
                       ),
                     ),
-                  )
+                  ),
                 ],
               ),
-            )),
-      );
-    });
+            ),
+          ),
+        );
+      },
+    );
   }
+
+  Padding _divider() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 30.0),
+      child: Divider(thickness: 1),
+    );
+  }
+
 
   ColoredBox profile(BuildContext context, AuthUserModel? userLoged) {
     return ColoredBox(
       color: Theme.of(context).colorScheme.surface,
       child: ListTile(
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 15,
+          vertical: 15,
+        ),
         leading: CircleAvatar(
           radius: 40,
           backgroundColor: Theme.of(context).colorScheme.primary,
-          child: const Icon(
-            Icons.person,
-            size: 40,
-            color: Colors.white,
-          ),
+          child: const Icon(Icons.person, size: 40, color: Colors.white),
         ),
         title: Text(
           userLoged?.name ?? '',
