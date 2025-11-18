@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:keezy/src/core/components/item_card_with_icon.dart';
 import 'package:keezy/src/core/router/routes.dart';
-import 'package:keezy/src/core/utils/utils.dart';
 import 'package:keezy/src/modules/auth/controllers/auth_controller.dart';
 import 'package:keezy/src/modules/auth/controllers/auth_state.dart';
 import 'package:keezy/src/modules/auth/model/auth_user_model.dart';
@@ -75,21 +74,20 @@ class _ProfilePageState extends State<ProfilePage> {
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Utils.titleCard(context, 'Usuário'),
-
                           Card(
                             elevation: 0,
                             margin: EdgeInsets.zero,
 
                             child: Column(
                               children: [
+                                SizedBox(height: 20,),
                                 ItemCardWithIcon(
                                   text: 'Editar Perfil',
                                   subtTitle: 'Altere os dados do seu perfil',
                                   icon: Icons.edit,
                                   onTap: () => _goToEdit(userLoged!),
                                 ),
-                                 _divider(),
+                                _divider(),
                                 ItemCardWithIcon(
                                   text: 'Configurações',
                                   subtTitle: 'Altere as configurações do app',
@@ -122,10 +120,12 @@ class _ProfilePageState extends State<ProfilePage> {
   Padding _divider() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 30.0),
-      child: Divider(thickness: 1),
+      child: Divider(
+        thickness: 1,
+        color: Theme.of(context).colorScheme.primary,
+      ),
     );
   }
-
 
   ColoredBox profile(BuildContext context, AuthUserModel? userLoged) {
     return ColoredBox(

@@ -8,8 +8,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
 class ExportRegistersCsvRepositoryImpl implements ExportRegistersCsvRepository {
-
-   final headers = ['id', 'name', 'url', 'username', 'password', 'note'];
+  final headers = ['name', 'url', 'username', 'password', 'note'];
 
   @override
   Future<File?> exportToCsv(List<RegisterModel> registros) async {
@@ -24,7 +23,6 @@ class ExportRegistersCsvRepositoryImpl implements ExportRegistersCsvRepository {
       final rows = registros
           .map(
             (e) => [
-              e.id ?? '',
               e.name ?? '',
               e.url ?? '',
               e.username ?? '',
@@ -53,8 +51,8 @@ class ExportRegistersCsvRepositoryImpl implements ExportRegistersCsvRepository {
       // Compartilha diretamente com o SharePlus
       final shareParams = ShareParams(
         text: 'Aqui está o backup dos seus registros.',
-        subject: 'Backup de Registros CSV',
-        
+        subject: fileName,
+
         files: [XFile(file.path)],
       );
 
@@ -62,10 +60,10 @@ class ExportRegistersCsvRepositoryImpl implements ExportRegistersCsvRepository {
 
       // Se o usuário cancelar, exclui o arquivo imediatamente
       if (result.status != ShareResultStatus.success) {
-        if (await file.exists()) {
-          await file.delete();
+        Future.delayed(const Duration(seconds: 3), () async {
+          if (await file.exists()) await file.delete();
           log('🗑️ Arquivo removido — o usuário cancelou o compartilhamento.');
-        }
+        });
         return null;
       }
 
@@ -81,8 +79,8 @@ class ExportRegistersCsvRepositoryImpl implements ExportRegistersCsvRepository {
   /// Cria um CSV modelo vazio (apenas cabeçalhos)
   Future<void> exportEmptyCsvTemplate() async {
     try {
-     //  const headers = ['name', 'url', 'username', 'password', 'note'];
-      final csvData = const ListToCsvConverter().convert([headers]);
+      const headersExemple = ['name', 'url', 'username', 'password', 'note'];
+      final csvData = const ListToCsvConverter().convert([headersExemple]);
 
       final now = DateTime.now();
       final formattedDate =
@@ -142,29 +140,23 @@ class ExportRegistersCsvRepositoryImpl implements ExportRegistersCsvRepository {
     }
   }
 
- String _buildCsvFromRegister(RegisterModel register) {
-  // Cabeçalho
-  const header = 'id,name,url,username,password,note\n';
+  String _buildCsvFromRegister(RegisterModel register) {
+    // Cabeçalho
+    const header = 'name,url,username,password,note\n';
 
-  // Trata valores nulos e caracteres problemáticos (como vírgula ou quebra de linha)
-  String sanitize(String? value) {
-    if (value == null || value.isEmpty) return '';
-    final clean = value.replaceAll('\n', ' ').replaceAll(',', ';');
-    return '"$clean"'; // garante que campos com espaços sejam bem interpretados
+    // Trata valores nulos e caracteres problemáticos (como vírgula ou quebra de linha)
+    String sanitize(String? value) {
+      if (value == null || value.isEmpty) return '';
+      final clean = value.replaceAll('\n', ' ').replaceAll(',', ';');
+      return '"$clean"'; // garante que campos com espaços sejam bem interpretados
+    }
+
+    // Linha única do registro
+    final line =
+        '${[sanitize(register.name), sanitize(register.url), sanitize(register.username), sanitize(register.password), sanitize(register.note)].join(',')}\n';
+
+    return header + line;
   }
-
-  // Linha única do registro
-  final line = '${[
-    sanitize(register.id),
-    sanitize(register.name),
-    sanitize(register.url),
-    sanitize(register.username),
-    sanitize(register.password),
-    sanitize(register.note),
-  ].join(',')}\n';
-
-  return header + line;
-}
 
   String _twoDigits(int n) => n.toString().padLeft(2, '0');
 }

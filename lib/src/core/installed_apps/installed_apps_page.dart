@@ -38,8 +38,19 @@ class _InstalledAppsPageState extends State<InstalledAppsPage> {
     if (_isLoading) {
       return Padding(
         padding: const EdgeInsets.all(4.0),
-        child: LinearProgressIndicator(
-          color: Theme.of(context).colorScheme.primary,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(22.0),
+              child: Text( 'Buscando os seus aplicativos, por favor aguarde!', textAlign: TextAlign.center,),
+            ),
+            SizedBox(height: 20,),
+            LinearProgressIndicator(
+              color: Theme.of(context).colorScheme.primary,
+            ),
+          ],
         ),
       );
     }

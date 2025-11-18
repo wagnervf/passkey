@@ -34,6 +34,9 @@ class RegisterModel extends HiveObject {
   @HiveField(7)
   final InstalledAppModel? selectedApp;
 
+   @HiveField(8)
+  final bool isFavorite;
+
   RegisterModel(
       {
         required 
@@ -44,16 +47,28 @@ class RegisterModel extends HiveObject {
       this.url,
       this.note,
       this.type,
-      this.selectedApp});
+      this.selectedApp, 
+      this.isFavorite = false,});
 
   factory RegisterModel.fromCsv(List<dynamic> row) {
     return RegisterModel(
-        name: row[0] ?? '',
-        url: row[1] ?? '',
-        username: row[2] ?? '',
-        password: row[3] ?? '',
-        note: row[4] ?? '',
-        id: Uuid().v4());
+        // name: row[0] ?? '',
+        // url: row[1] ?? '',
+        // username: row[2] ?? '',
+        // password: row[3] ?? '',
+        // note: row[4] ?? '',
+        // id: Uuid().v4(), 
+        // isFavorite: row[5] == 'true' ? true : false
+
+         id: Uuid().v4(),
+    name: row[0] ?? '',
+    url: row[1] ?? '',
+    username: row[2] ?? '',
+    password: row[3] ?? '',
+    note: row.length > 4 ? row[4] : '',
+    isFavorite: false,
+        
+        );
   }
 
   RegisterModel copyWith({
@@ -65,6 +80,7 @@ class RegisterModel extends HiveObject {
     String? note,
     TypeRegiterModel? type,
     InstalledAppModel? selectedApp,
+    bool? isFavorite,
   }) {
     return RegisterModel(
       id: id ?? this.id,
@@ -75,6 +91,7 @@ class RegisterModel extends HiveObject {
       note: note ?? this.note,
       type: type ?? this.type,
       selectedApp: selectedApp ?? this.selectedApp,
+      isFavorite: isFavorite ?? this.isFavorite,
     );
   }
 
@@ -88,26 +105,10 @@ class RegisterModel extends HiveObject {
       'note': note,
       'type': type?.toMap(),
       'selectedApp': selectedApp?.toMap(),
+      'isFavorite': isFavorite,
     };
   }
 
-  // factory RegisterModel.fromMap(Map<String, dynamic> map) {
-  //   return RegisterModel(
-  //     id: map['id'] as String,
-  //     name: map['name'] != null ? map['name'] as String : null,
-  //     username: map['username'] != null ? map['username'] as String : null,
-  //     password: map['password'] != null ? map['password'] as String : null,
-  //     url: map['url'] != null ? map['url'] as String : null,
-  //     note: map['note'] != null ? map['note'] as String : null,
-  //     type: map['type'] != null
-  //         ? TypeRegiterModel.fromMap(map['type'] as Map<String, dynamic>)
-  //         : null,
-  //     selectedApp: map['selectedApp'] != null
-  //         ? InstalledAppModel.fromMap(
-  //             map['selectedApp'] as Map<String, dynamic>)
-  //         : null,
-  //   );
-  // }
 
   factory RegisterModel.fromMap(Map<String, dynamic> map) {
   final rawId = (map['id'] ?? '').toString().trim();
@@ -127,16 +128,20 @@ class RegisterModel extends HiveObject {
             map['selectedApp'] as Map<String, dynamic>,
           )
         : null,
+        isFavorite: map['isFavorite'] ?? false,
+        
   );
 }
 
+factory RegisterModel.fromJson(Map<String, dynamic> map) {
+  return RegisterModel.fromMap(map);
+}
 
-  factory RegisterModel.fromJson(String source) =>
-      RegisterModel.fromMap(json.decode(source) as Map<String, dynamic>);
+
 
   @override
   String toString() {
-    return 'RegisterModel(id: $id, name: $name, username: $username, password: $password, url: $url, note: $note, type: $type, selectedApp: $selectedApp)';
+    return 'RegisterModel(id: $id, name: $name, username: $username, password: $password, url: $url, note: $note, type: $type, selectedApp: $selectedApp, isFavorite: $isFavorite )';
   }
 
   @override
@@ -150,7 +155,8 @@ class RegisterModel extends HiveObject {
         other.url == url &&
         other.note == note &&
         other.type == type &&
-        other.selectedApp == selectedApp;
+        other.selectedApp == selectedApp &&
+        other.isFavorite == isFavorite;
   }
 
   @override
@@ -162,12 +168,26 @@ class RegisterModel extends HiveObject {
         url.hashCode ^
         note.hashCode ^
         type.hashCode ^
-        selectedApp.hashCode;
+        selectedApp.hashCode ^
+        isFavorite.hashCode;
+        
   }
 
   @override
   List<Object?> get props =>
-      [id, name, username, password, url, note, type, selectedApp];
+      [id, name, username, password, url, note, type, selectedApp, isFavorite];
 
-  String toJson() => json.encode(toMap());
+  //String toJson() => json.encode(toMap());
+
+  String toJson() {
+  return json.encode({
+    'id': id,
+    'name': name,
+    'username': username,
+    'password': password,
+    'url': url,
+    'note': note,
+    'isFavorite': isFavorite,
+  });
+}
 }

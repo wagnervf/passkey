@@ -28,7 +28,7 @@ abstract class RoutesPaths {
   static const authFormSenha = '/authFormSenha';
 
   static const exportRegistersCsv = '/exportRegistersCsv';
-
+  static const masterPasswordWarning = '/masterPasswordWarning';
 
 
 }

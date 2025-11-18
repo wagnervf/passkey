@@ -43,7 +43,7 @@ class AuthPageState extends State<AuthFormSenhaPage> {
         body: SafeArea(child: _body(context)));
   }
 
-  _body(BuildContext context) {
+  SingleChildScrollView _body(BuildContext context) {
     Size size = MediaQuery.of(context).size;
 
     return SingleChildScrollView(
@@ -88,7 +88,7 @@ class AuthPageState extends State<AuthFormSenhaPage> {
     );
   }
 
-  buttonEsqueciSenha(Size size, BuildContext context) {
+  Align buttonEsqueciSenha(Size size, BuildContext context) {
     return Align(
       alignment: Alignment.bottomRight,
       child: SizedBox(

@@ -1,10 +1,12 @@
 import 'dart:async';
 import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:keezy/src/app_widget.dart';
 import 'package:keezy/src/application_binding.dart';
 import 'package:keezy/src/core/data/services/secure_storage_service.dart';
 import 'package:keezy/src/core/hive/hive_config.dart';
+import 'package:keezy/src/core/session/session_manager.dart';
 import 'package:keezy/src/core/shared_preferences/shared_preferences_service.dart';
 
 Future<void> main() async {
@@ -28,5 +30,11 @@ Future<void> main() async {
   );
 }
 
+// Tempo de Sessão
+class ActivityObserver extends NavigatorObserver {
+  @override
+  void didPop(Route route, Route? previousRoute) => SessionManager.updateActivity();
+  @override
+  void didPush(Route route, Route? previousRoute) => SessionManager.updateActivity();
+}
 
-//https://www.youtube.com/watch?v=a8MNW97GuiI&t=1037s&ab_channel=Prof.DiegoAntunes

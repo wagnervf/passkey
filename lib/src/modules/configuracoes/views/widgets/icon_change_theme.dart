@@ -23,11 +23,14 @@ class IconChangeTheme extends StatelessWidget {
         themeConfig.isDark
             ? Icons.dark_mode_outlined
             : Icons.light_mode_outlined,
-        color: Theme.of(context).colorScheme.primary,
       ),
       value: themeConfig.isDark,
       onChanged: (_) => themeConfig.toggleTheme(),
-      activeThumbColor: Theme.of(context).colorScheme.primary,
+      activeThumbColor: themeConfig.isDark
+            ? Theme.of(context).colorScheme.secondary
+
+            : Theme.of(context).colorScheme.primary,
+      
     );
   }
 }

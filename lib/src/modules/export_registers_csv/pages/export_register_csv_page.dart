@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:keezy/src/core/components/auth_dialog_service.dart';
 import 'package:keezy/src/core/components/item_card_with_icon.dart';
 import 'package:keezy/src/core/components/show_messeger.dart';
 import 'package:keezy/src/modules/export_registers_csv/controllers/export_register_csv_controller.dart';
@@ -50,7 +51,7 @@ class _ExportRegisterCsvPageState extends State<ExportRegisterCsvPage> {
           subtTitle:
               'Exportará seus registros para um arquivo ".csv".',
           icon: Icons.share,
-          onTap: () => _showExportDialog(controller),
+          onTap: () => _confirmarExportacao(context, controller),
         );
       },
     );
@@ -80,36 +81,24 @@ class _ExportRegisterCsvPageState extends State<ExportRegisterCsvPage> {
     );
   }
 
-  Future<void> _showExportDialog(ExportRegisterCsvController controller) {
-    return showDialog(
-      barrierDismissible: true,
-      useSafeArea: true,
-      useRootNavigator: true,
+    Future<void> _confirmarExportacao(BuildContext context, ExportRegisterCsvController controller) async {
+    if (controller == null ) return;
+
+    final confirmou = await AuthDialogService.confirmarAcao(
       context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Exportar Registros'),
-          content: const Text(
-            'Os dados exportados poderão ser visualizados por qualquer pessoa que tenha acesso ao arquivo. '
-            'Deseja realmente continuar com a exportação?',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Cancelar'),
-            ),
-            TextButton(
-              onPressed: () async {
-                Navigator.of(context).pop();
-                await _exportarRegistros(controller);
-              },
-              child: const Text('Exportar'),
-            ),
-          ],
-        );
-      },
+      titulo: 'Compartilhar Registro',
+      mensagem: '''⚠ ATENÇÃO!\n\nAo exportar, suas senhas ficarão visíveis em um arquivo externo.\nRecomendamos guardar esse arquivo com extremo cuidado.
+        ''',
+      textoConfirmar: 'Compartilhar',
     );
+
+    if (confirmou) {
+     await _exportarRegistros(controller);
+    }
   }
+
+
+ 
 
   Future<void> _exportarRegistros(
     ExportRegisterCsvController controller,
@@ -120,7 +109,6 @@ class _ExportRegisterCsvPageState extends State<ExportRegisterCsvPage> {
       log('Erro ao exportar registros: $e', stackTrace: s);
       if (!context.mounted) return;
       ShowMessager.show(
-        // ignore: use_build_context_synchronously
         context,
         '❌ Ocorreu um erro durante a exportação.',
       );

@@ -14,7 +14,7 @@ class ShowLoading extends StatelessWidget {
         ));
   }
 
-  _showLoading(BuildContext context) async {
+  AlertDialog _showLoading(BuildContext context) {
     return AlertDialog(
       title: const Text('Carregando'),
       content: Column(

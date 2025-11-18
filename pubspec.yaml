@@ -22,7 +22,7 @@ dependencies:
   local_auth: ^3.0.0
   encrypt: ^5.0.3
   form_field_validator: ^1.1.0
-  flutter_native_splash: ^2.4.6
+  flutter_native_splash: ^2.4.4
   uuid: ^4.5.1
   flutter_launcher_icons: ^0.14.4
   path_provider: ^2.1.5
@@ -36,6 +36,8 @@ dependencies:
   introduction_screen: ^4.0.0
   hive: ^2.2.3
   hive_flutter: ^1.1.0
+  qr_flutter: ^4.1.0
+
   
 
 dev_dependencies:

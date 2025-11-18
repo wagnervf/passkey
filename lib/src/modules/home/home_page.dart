@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:keezy/src/core/router/routes.dart';
+import 'package:keezy/src/core/session/session_manager.dart';
 import 'package:keezy/src/modules/auth/controllers/auth_controller.dart';
 import 'package:keezy/src/modules/auth/controllers/auth_state.dart';
 import 'package:keezy/src/modules/auth/model/auth_user_model.dart';
@@ -22,6 +23,15 @@ class _HomePageState extends State<HomePage> {
     super.initState();
   }
 
+  @override
+void didChangeDependencies() {
+  super.didChangeDependencies();
+  if (SessionManager.isExpired()) {
+    GoRouter.of(context).go('/login');
+  }
+}
+
+
   AuthUserModel? user;
 
   @override
@@ -31,7 +41,10 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.onPrimary,
       floatingActionButton: buttonAdd(context),
-      drawer: Drawer(),
+      drawer: const AppDrawer(
+      appName: 'Proteja Seus Dados',
+      logoPath: 'assets/images/passkey.png',
+    ),
       appBar: AppBar(
         excludeHeaderSemantics: true,
         leading: SizedBox.shrink(),
@@ -89,3 +102,118 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
+
+
+
+
+class AppDrawer extends StatelessWidget {
+  final String appName;
+  final String logoPath;
+
+  const AppDrawer({
+    super.key,
+    required this.appName,
+    required this.logoPath,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Drawer(
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topRight: Radius.circular(24),
+          bottomRight: Radius.circular(24),
+        ),
+      ),
+      child: SafeArea(
+        child: Column(
+          children: [
+            // Cabeçalho com logo e nome
+            DrawerHeader(
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.primaryContainer,
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Image.asset(
+                    logoPath,
+                    width: 56,
+                    height: 56,
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Text(
+                      appName,
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).colorScheme.onPrimaryContainer,
+                          ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // Opções do menu
+            ListTile(
+              leading: const Icon(Icons.settings_outlined),
+              title: const Text('Configurações'),
+              onTap: () {
+                GoRouter.of(context).push('/configuracoes');
+              },
+            ),
+
+            const Divider(),
+
+            // Você pode adicionar mais itens aqui
+            ListTile(
+              leading: const Icon(Icons.help_outline),
+              title: const Text('Ajuda'),
+              onTap: () {
+                GoRouter.of(context).push('/ajuda');
+              },
+            ),
+
+            const Spacer(),
+
+            // Botão de sair
+            ListTile(
+              leading: const Icon(Icons.logout_outlined, color: Colors.redAccent),
+              title: const Text(
+                'Sair',
+                style: TextStyle(color: Colors.redAccent),
+              ),
+              onTap: () {
+                _confirmLogout(context);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _confirmLogout(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Deseja sair do aplicativo?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancelar'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              GoRouter.of(context).go('/login');
+            },
+            child: const Text('Sair'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+

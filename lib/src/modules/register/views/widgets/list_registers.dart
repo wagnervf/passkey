@@ -20,9 +20,12 @@ class _ListRegistersState extends State<ListRegisters> {
   List<RegisterModel> todosRegistros = [];
   List<RegisterModel> registrosFiltrados = [];
 
-  OrdemRegistros _ordemAtual = OrdemRegistros.data;
+  // OrdemRegistros _ordemAtual = OrdemRegistros.data;
+  TodosRegistros _ordemAtual = TodosRegistros.all;
 
-    final List<Color> cores = [
+  bool _mostrandoFavoritos = false;
+
+  final List<Color> cores = [
     Colors.blue,
     Colors.green,
     Colors.red,
@@ -33,13 +36,13 @@ class _ListRegistersState extends State<ListRegisters> {
     Colors.brown,
   ];
 
-
   @override
   void initState() {
     super.initState();
     getAllRegister();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _ordenarRegistros(OrdemRegistros.data);
+      _mostrandoFavoritos = false;
+      //_ordenarRegistros(OrdemRegistros.data);
     });
   }
 
@@ -72,7 +75,11 @@ class _ListRegistersState extends State<ListRegisters> {
             return emptyRegisters(context);
           }
 
-          if (_searchController.text.isEmpty) {
+          if (_mostrandoFavoritos) {
+            registrosFiltrados = todosRegistros
+                .where((registro) => registro.isFavorite == true)
+                .toList();
+          } else if (_searchController.text.isEmpty) {
             registrosFiltrados = todosRegistros;
           } else {
             WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -83,10 +90,11 @@ class _ListRegistersState extends State<ListRegisters> {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              const SizedBox(height: 2),
               fieldPesquisar(),
-              const SizedBox(height: 12),
+              const SizedBox(height: 6),
               _barraDeAcoes(),
-              const SizedBox(height: 8),
+              const SizedBox(height: 12),
               Expanded(child: listRegistros(registrosFiltrados)),
               const SizedBox(height: 10),
             ],
@@ -110,14 +118,14 @@ class _ListRegistersState extends State<ListRegisters> {
         final isLast = index == registers.length - 1;
 
         return Container(
-          margin: const EdgeInsets.only(bottom:2, top: 2),
+          margin: const EdgeInsets.only(bottom: 2, top: 2),
           decoration: BoxDecoration(
             color: Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.vertical(
               top: isFirst ? const Radius.circular(16) : Radius.zero,
               bottom: isLast ? const Radius.circular(16) : Radius.zero,
             ),
-           // border: Border.all(color: Colors.grey[300]!),
+            // border: Border.all(color: Colors.grey[300]!),
           ),
           child: ListTile(
             contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 0),
@@ -158,57 +166,55 @@ class _ListRegistersState extends State<ListRegisters> {
         mainAxisAlignment: MainAxisAlignment.start,
         spacing: 8.0,
         children: [
-          SizedBox(
-            height: 30,
-            child: OutlinedButton.icon(
-              style: OutlinedButton.styleFrom(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                backgroundColor: _ordemAtual == OrdemRegistros.nome
-                    ? Theme.of(context).colorScheme.tertiary
-                    : Colors.transparent,
-                foregroundColor: _ordemAtual == OrdemRegistros.nome
-                    ? Colors.black
-                    : Colors.grey.shade800,
-                side: BorderSide(color: Theme.of(context).colorScheme.tertiary),
-              ),
-              onPressed: () => _ordenarRegistros(OrdemRegistros.nome),
-              label: Text('Nome', style: Theme.of(context).textTheme.bodySmall),
-              icon: Icon(
-                _ordemAtual == OrdemRegistros.nome ? Icons.arrow_circle_up_sharp : Icons.arrow_circle_down_sharp,
-                color: Theme.of(context).colorScheme.secondary,
-              ),
-            ),
-          ),
-          SizedBox(
-            height: 30,
-            child: OutlinedButton.icon(
-              style: OutlinedButton.styleFrom(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                backgroundColor: _ordemAtual == OrdemRegistros.data
-                    ? Theme.of(context).colorScheme.tertiary
-                    : Colors.transparent,
-                foregroundColor: _ordemAtual == OrdemRegistros.data
-                    ? Colors.black
-                    : Colors.grey.shade800,
-                side: BorderSide(color: Theme.of(context).colorScheme.tertiary),
-              ),
-              onPressed: () => _ordenarRegistros(OrdemRegistros.data),
-              label: Text(
-                'Criação',
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
-              icon: Icon(
-_ordemAtual == OrdemRegistros.data ? Icons.arrow_circle_up_sharp : Icons.arrow_circle_down_sharp,                color: Theme.of(context).colorScheme.secondary,
-              ),
-            ),
+          _buttonFiltro(ordem: TodosRegistros.all, title: 'Todos'),
+          _buttonFiltro(
+            ordem: TodosRegistros.isFavorite,
+            title: 'Favoritos',
           ),
         ],
       ),
     );
+  }
+
+  SizedBox _buttonFiltro({required TodosRegistros ordem, required title}) {
+    return SizedBox(
+      height: 30,
+      child: OutlinedButton.icon(
+        style: OutlinedButton.styleFrom(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+          backgroundColor: corBackFiltro(ordem),
+          foregroundColor: _ordemAtual == ordem
+              ? Colors.black
+              : Colors.grey.shade800,
+          side: BorderSide(color: Theme.of(context).colorScheme.tertiary),
+        ),
+        onPressed: () {
+          setState(() {
+            _ordemAtual = ordem;
+            if  ( TodosRegistros.isFavorite == ordem) {
+             _mostrandoFavoritos = !_mostrandoFavoritos;
+            } else {
+              _mostrandoFavoritos = false;
+            }
+
+            
+          });
+        },
+        label: Text(title, style: Theme.of(context).textTheme.bodySmall),
+        icon: Icon(
+          _ordemAtual == ordem
+              ? Icons.arrow_circle_up_sharp
+              : Icons.arrow_circle_down_sharp,
+          color: Theme.of(context).colorScheme.secondary,
+        ),
+      ),
+    );
+  }
+
+  Color corBackFiltro(TodosRegistros ordem) {
+    return _ordemAtual == ordem
+        ? Theme.of(context).colorScheme.tertiary
+        : Colors.transparent;
   }
 
   Center emptyRegisters(BuildContext context) {
@@ -223,9 +229,11 @@ _ordemAtual == OrdemRegistros.data ? Icons.arrow_circle_up_sharp : Icons.arrow_c
             Text('Você ainda não possui nenhum Registro!'),
             const SizedBox(height: 10),
             FilledButton.icon(
-              onPressed: () =>
-                  GoRouter.of(context).push(RoutesPaths.register),
-              label: const Text('Clique aqui para adicionar um Registro', style: const TextStyle(fontWeight: FontWeight.bold),),
+              onPressed: () => GoRouter.of(context).push(RoutesPaths.register),
+              label: const Text(
+                'Clique aqui para adicionar um Registro',
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
               icon: const Icon(Icons.add),
             ),
             const SizedBox(height: 10),
@@ -234,9 +242,11 @@ _ordemAtual == OrdemRegistros.data ? Icons.arrow_circle_up_sharp : Icons.arrow_c
             const SizedBox(height: 10),
 
             OutlinedButton.icon(
-              onPressed: () =>
-                  GoRouter.of(context).push(RoutesPaths.config),
-              label: const Text('Clique aqui para importar Registros', style: TextStyle(fontWeight: FontWeight.bold),),
+              onPressed: () => GoRouter.of(context).push(RoutesPaths.config),
+              label: const Text(
+                'Clique aqui para importar Registros',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
               icon: const Icon(Icons.upload_file_rounded),
             ),
           ],
@@ -244,7 +254,6 @@ _ordemAtual == OrdemRegistros.data ? Icons.arrow_circle_up_sharp : Icons.arrow_c
       ),
     );
   }
-
 
   Future<void> _goToView(RegisterModel register) async {
     await GoRouter.of(context).push(RoutesPaths.register, extra: register);
@@ -274,7 +283,7 @@ _ordemAtual == OrdemRegistros.data ? Icons.arrow_circle_up_sharp : Icons.arrow_c
     var borderRadius = const BorderRadius.all(Radius.circular(16.0));
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+      padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6.0),
       child: TextField(
         controller: _searchController,
         onChanged: _filtrarRegistros,
@@ -307,7 +316,7 @@ _ordemAtual == OrdemRegistros.data ? Icons.arrow_circle_up_sharp : Icons.arrow_c
           fillColor: Theme.of(context).colorScheme.surface,
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 8,
-            vertical: 14,
+            vertical: 10,
           ), // 👈 controla espaço do texto
           hintStyle: const TextStyle(fontWeight: FontWeight.normal),
         ),
@@ -334,23 +343,23 @@ _ordemAtual == OrdemRegistros.data ? Icons.arrow_circle_up_sharp : Icons.arrow_c
     });
   }
 
-  void _ordenarRegistros(OrdemRegistros ordem) {
-    setState(() {
-      _ordemAtual = ordem;
+  // void _ordenarRegistros(OrdemRegistros ordem) {
+  //   setState(() {
+  //     _ordemAtual = ordem;
 
-      registrosFiltrados.sort((a, b) {
-        if (ordem == OrdemRegistros.nome) {
-          final nomeA = a.name?.toLowerCase() ?? '';
-          final nomeB = b.name?.toLowerCase() ?? '';
-          return nomeA.compareTo(nomeB);
-        } else {
-          return b.id.compareTo(
-            a.id,
-          ); 
-        }
-      });
-    });
-  }
+  //     registrosFiltrados.sort((a, b) {
+  //       if (ordem == OrdemRegistros.nome) {
+  //         final nomeA = a.name?.toLowerCase() ?? '';
+  //         final nomeB = b.name?.toLowerCase() ?? '';
+  //         return nomeA.compareTo(nomeB);
+  //       } else {
+  //         return b.id.compareTo(a.id);
+  //       }
+  //     });
+  //   });
+  // }
 }
 
-enum OrdemRegistros { nome, data }
+enum TodosRegistros { all, isFavorite }
+
+//enum OrdemRegistros { nome, data, isFavorite }

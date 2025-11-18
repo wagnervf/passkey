@@ -185,7 +185,7 @@ class BackupRestoreController extends Cubit<BackupRestoreState> {
 
         // Salvar usuário corretamente via AuthController
         await authController.registerUser(user);
-        await registerController.saveListRegisterController(registros);
+        //await registerController.saveListRegisterController(registros);
 
         emit(BackupRestoreStateSuccessState());
 
@@ -323,7 +323,7 @@ class BackupRestoreController extends Cubit<BackupRestoreState> {
       }
 
       // Decodificar o registro
-      final RegisterModel registro = RegisterModel.fromJson(dataMap as String);
+      final RegisterModel registro = RegisterModel.fromJson(dataMap);
 
       // Salvar o registro importado
       final sucesso = await _saveOneRegisterImported(registro);

@@ -8,29 +8,6 @@ class TokenStorage implements TokenStorageInterface {
   // ignore: constant_identifier_names
   static const String TOKEN_KEY = 'googleAuthUser';
 
-  // @override
-  // Future<String?> getToken() async {
-  //   final prefs = await SharedPreferences.getInstance();
-  //   return prefs.getString(TOKEN_KEY);
-  // }
-
-  // @override
-  // Future<bool> saveToken(String token) async {
-  //   final prefs = await SharedPreferences.getInstance();
-  //    String userJson = jsonEncode(user.toJson());
-  // await prefs.setString('googleAuthUser', userJson);
-  //   return await prefs.setString(TOKEN_KEY, token);
-  // }
-
-  // @override
-  // Future<GoogleAuthUserModel?> getUser() async {
-  //   final prefs = await SharedPreferences.getInstance();
-  //   final String? userJson = prefs.getString(TOKEN_KEY);
-  //   if (userJson != null) {
-  //     return GoogleAuthUserModel.fromJson(jsonDecode(userJson));
-  //   }
-  //   return null;
-  // }
 
   @override
   Future<void> saveUser(GoogleAuthUserModel user) async {

@@ -23,26 +23,39 @@ class _ExportExempleRegisterWidgetState
     );
 
     return BlocConsumer<ExportRegisterCsvController, ExportRegistersCsvState>(
-      listener: (context, state) {
-        if (state is ExportCsvLoading) {
-          CircularProgressIndicator();
-          return;
-        } else {
-          Navigator.of(context, rootNavigator: true).pop();
-        }
+     listener: (context, state) {
+    if (state is ExportCsvLoading) {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) => const Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+      return;
+    }
 
-        if (state is ExportCsvLoaded) {
-          ShowMessager.show(
-            context,
-            '✅ Exemplo de Registros compartilhados com sucesso!',
-          );
-          Navigator.of(context).pop();
-        } else if (state is ExportCsvNull) {
-          ShowMessager.show(context, '⚠️ Erro ao exportar exemplo');
-        } else if (state is ExportCsvError) {
-          ShowMessager.show(context, '❌ ${state.message}');
-        }
-      },
+    if (state is ExportCsvLoaded) {
+      Navigator.of(context, rootNavigator: true).pop(); // fecha o loading
+      ShowMessager.show(
+        context,
+        '✅ Exemplo de Registros compartilhados com sucesso!',
+      );
+      return;
+    }
+
+    if (state is ExportCsvNull) {
+      Navigator.of(context, rootNavigator: true).pop(); // fecha o loading
+      ShowMessager.show(context, '⚠️ Erro ao exportar exemplo');
+      return;
+    }
+
+    if (state is ExportCsvError) {
+      Navigator.of(context, rootNavigator: true).pop(); // fecha o loading
+      ShowMessager.show(context, '❌ ${state.message}');
+      return;
+    }
+  },
       builder: (context, state) {
         return ListTile(
           dense: true,

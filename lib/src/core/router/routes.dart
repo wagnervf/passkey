@@ -10,16 +10,18 @@ import 'package:keezy/src/modules/configuracoes/views/pages/configuracoes_page.d
 import 'package:keezy/src/modules/export_registers_csv/pages/export_register_csv_page.dart';
 import 'package:keezy/src/modules/home/home_navigation_page.dart';
 import 'package:keezy/src/modules/profile/profile_page.dart';
-import 'package:keezy/src/modules/register/views/pages/register_form.dart';
-import 'package:keezy/src/modules/register/views/pages/register_view.dart';
+import 'package:keezy/src/modules/register/views/pages/register_form_page.dart';
 import 'package:keezy/src/modules/register/views/widgets/list_registers.dart';
 import 'package:keezy/src/modules/splash/initial_screen.dart';
 import 'package:keezy/src/modules/splash/splash_page.dart';
 import 'package:keezy/src/modules/welcome/biometric_setup_screen_four.dart';
 import 'package:keezy/src/modules/welcome/finalization_screen_five.dart';
 import 'package:keezy/src/modules/welcome/master_password_creation_screen.dart';
+import 'package:keezy/src/modules/welcome/master_password_warning_screen.dart';
 import 'package:keezy/src/modules/welcome/mode_selection_screen_two.dart';
 import 'package:keezy/src/modules/welcome/welcome_screen_one.dart';
+
+import '../../../main.dart';
 
 part 'routes_pages.dart';
 
@@ -30,6 +32,9 @@ const String initial =  RoutesPaths.splash;
 final routes = GoRouter(
   initialLocation: initial,
   navigatorKey: navigatorKey,
+  observers: [
+  ActivityObserver(),
+],
   routes: <RouteBase>[
     // GoRoute(
     //   path: RoutesPaths.initial,
@@ -100,6 +105,16 @@ final routes = GoRouter(
     ),
 
     GoRoute(
+      path: RoutesPaths.masterPasswordWarning,
+      name: 'Atenção',    
+      parentNavigatorKey: navigatorKey,
+      builder: (context, state) {
+        final masterPassword = state.extra as String;
+        return MasterPasswordWarningScreen(masterPassword: masterPassword,);
+      },
+    ),
+
+    GoRoute(
       path: RoutesPaths.authValidade,
       name: 'Validar a Senha',
       parentNavigatorKey: navigatorKey,
@@ -163,7 +178,7 @@ final routes = GoRouter(
       parentNavigatorKey: navigatorKey,
       pageBuilder: (context, state) => CustomTransitionPage(
         key: state.pageKey,
-        child: const RegisterForm(),
+        child: const RegisterFormPage(),
         transitionDuration: const Duration(milliseconds: 300),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           return FadeThroughTransition(
@@ -174,23 +189,7 @@ final routes = GoRouter(
         },
       ),
     ),
-    GoRoute(
-      path: RoutesPaths.registerView,
-      name: 'Register View',
-      parentNavigatorKey: navigatorKey,
-      pageBuilder: (context, state) => CustomTransitionPage(
-        key: state.pageKey,
-        child: const RegisterView(),
-        transitionDuration: const Duration(milliseconds: 300),
-        transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          return FadeThroughTransition(
-            animation: animation,
-            secondaryAnimation: secondaryAnimation,
-            child: child,
-          );
-        },
-      ),
-    ),
+   
 
     GoRoute(
       path: RoutesPaths.config,

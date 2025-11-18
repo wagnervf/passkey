@@ -1,9 +1,11 @@
 flutter_native_splash:
   color: "#ffffff"
-  image: assets/images/splash2.png
+  image: assets/images/splash4.png
+  branding: assets/images/title.png
+  branding_bottom_padding: 24
 
   android_12:
-    image: assets/images/splash2.png
+    image: assets/images/splash4.png
     color: "#ffffff"
 
   # 🔧 Configurações extras para controle do tamanho

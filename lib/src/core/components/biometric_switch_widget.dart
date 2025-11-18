@@ -91,7 +91,6 @@ class _BiometricSwitchWidgetState extends State<BiometricSwitchWidget> {
     
       secondary: Icon(
         _biometricEnabled ? Icons.fingerprint : Icons.do_disturb,
-        color: Theme.of(context).colorScheme.primary,
       ),
     );
   }

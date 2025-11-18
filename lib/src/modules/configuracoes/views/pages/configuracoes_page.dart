@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:keezy/src/core/components/biometric_switch_widget.dart';
-import 'package:keezy/src/core/components/item_card_with_icon.dart';
 import 'package:keezy/src/core/components/show_messeger.dart';
 import 'package:keezy/src/core/router/routes.dart';
 import 'package:keezy/src/core/utils/utils.dart';
@@ -15,6 +14,7 @@ import 'package:keezy/src/modules/configuracoes/views/widgets/icon_change_theme.
 import 'package:keezy/src/modules/export_registers_csv/pages/export_exemple_register_widget.dart';
 import 'package:keezy/src/modules/export_registers_csv/pages/export_register_csv_page.dart';
 import 'package:keezy/src/modules/import_registers_csv/pages/import_register_csv_page.dart';
+import 'package:keezy/src/modules/register/controller/register_controller.dart';
 
 class ConfiguracoesPage extends StatefulWidget {
   const ConfiguracoesPage({super.key});
@@ -104,28 +104,33 @@ class _ConfiguracoesPageState extends State<ConfiguracoesPage> {
                               children: [
                                 ExportRegisterCsvPage(),
                                 _divider(),
-
                                 ImportRegisterCsvPage(),
-
                                 _divider(),
-
                                 ExportExempleRegisterWidget(),
                               ],
                             ),
                           ),
 
-                          //  buttonRemoverUser(context),
                           const Spacer(),
 
                           Card(
                             elevation: 0,
                             margin: EdgeInsets.zero,
-                            child: ItemCardWithIcon(
-                              text: 'Excluir todos os dados',
-                              subtTitle:
-                                  'Apagar do celular todos os dados do aplicativo.',
-                              icon: Icons.dangerous_outlined,
+                            child: ListTile(
                               onTap: () => _confirmarExclusao(context),
+                              leading: Icon(
+                                Icons.dangerous_outlined,
+                                color: Colors.red[800],
+                              ),
+                              title: Text(
+                                'Excluir todos os dados',
+                                style: Theme.of(context).textTheme.titleMedium!
+                                    .copyWith(color: Colors.red[800]),
+                              ),
+                              subtitle: Text(
+                                'Apagar do celular todos os dados do aplicativo.',
+                                style: Theme.of(context).textTheme.bodySmall,
+                              ),
                             ),
                           ),
                           const SizedBox(height: 10),
@@ -190,6 +195,10 @@ class _ConfiguracoesPageState extends State<ConfiguracoesPage> {
                 bool result = await context
                     .read<AuthController>()
                     .logoutAndRemoveUser();
+
+                await context
+                    .read<RegisterController>()
+                    .deleteAllRegistersController();
 
                 if (result) {
                   ShowMessager.show(context, 'Usuário removido com sucesso.');

@@ -97,6 +97,11 @@ class _MasterPasswordCreationScreenState
         await controller.registerUser(user);
         if (mounted) {
           context.push(RoutesPaths.biometricSetup);
+
+           context.push(
+      RoutesPaths.masterPasswordWarning,
+      extra: masterPassword, // enviar senha para tela
+    );
         }
       } catch (e) {
         if (mounted) {
@@ -112,9 +117,7 @@ class _MasterPasswordCreationScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Crie sua Senha Mestra'),
-        centerTitle: true,),
+      appBar: AppBar(title: Text('Crie sua Senha Mestra'), centerTitle: true),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -135,25 +138,21 @@ class _MasterPasswordCreationScreenState
                       children: [
                         TextSpan(
                           text: 'Senha Mestra é a ',
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleMedium
+                          style: Theme.of(context).textTheme.titleMedium
                               ?.copyWith(fontStyle: FontStyle.italic),
                         ),
                         TextSpan(
                           text: 'chave para todos os seus dados',
-                          style:
-                              Theme.of(context).textTheme.titleMedium?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                    fontStyle: FontStyle.italic,
-                                  ),
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                fontStyle: FontStyle.italic,
+                              ),
                         ),
                         TextSpan(
                           text:
                               '. A única senha que você precisará lembrar.\nGuarde-a bem!',
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleMedium
+                          style: Theme.of(context).textTheme.titleMedium
                               ?.copyWith(fontStyle: FontStyle.italic),
                         ),
                       ],
@@ -166,7 +165,8 @@ class _MasterPasswordCreationScreenState
                     decoration: InputDecoration(
                       labelText: 'Nome',
                       border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10)),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                       prefixIcon: Icon(Icons.person),
                     ),
                     onChanged: (_) => setState(() => _nameError = null),
@@ -178,7 +178,8 @@ class _MasterPasswordCreationScreenState
                     decoration: InputDecoration(
                       labelText: 'Criar Senha',
                       border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10)),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                       prefixIcon: Icon(Icons.lock_outline),
                       suffixIcon: IconButton(
                         icon: Icon(
@@ -202,7 +203,8 @@ class _MasterPasswordCreationScreenState
                     decoration: InputDecoration(
                       labelText: 'Confirmar Senha',
                       border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10)),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                       prefixIcon: Icon(Icons.lock),
                       suffixIcon: IconButton(
                         icon: Icon(
@@ -225,40 +227,17 @@ class _MasterPasswordCreationScreenState
                       child: Text(
                         _passwordError!,
                         style: TextStyle(
-                            color: Theme.of(context).colorScheme.error,
-                            fontSize: 14),
+                          color: Theme.of(context).colorScheme.error,
+                          fontSize: 14,
+                        ),
                         textAlign: TextAlign.center,
                       ),
                     ),
                   SizedBox(height: 40),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () async {
-                        if (_validatePasswords()) {
-                          await _sendDataToController(
-                              _createPasswordController.text);
-                        }
-                      },
-                      style: ElevatedButton.styleFrom(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 50, vertical: 15),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                      ),
-                      child: Text(
-                        'Continuar',
-                        style: TextStyle(fontSize: 18),
-                      ),
-                    ),
-                  ),
+                  _buttonContinuar(),
                   SizedBox(height: 40),
                   TextButton.icon(
-                    icon: const Icon(
-                      Icons.help,
-                      size: 16,
-                    ),
+                    icon: const Icon(Icons.help, size: 16),
                     label: Text('Porque devo criar uma conta?'),
                     onPressed: () => HelpView.mostrarDialogCriarConta(context),
                   ),
@@ -267,6 +246,26 @@ class _MasterPasswordCreationScreenState
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  SizedBox _buttonContinuar() {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        onPressed: () async {
+          if (_validatePasswords()) {
+            await _sendDataToController(_createPasswordController.text);
+          }
+        },
+        style: ElevatedButton.styleFrom(
+          padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(30),
+          ),
+        ),
+        child: Text('Continuar', style: TextStyle(fontSize: 18)),
       ),
     );
   }

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 const lightColorScheme = ColorScheme(
 
-  primary: Colors.teal, // Dark Green
+  primary: Color(0xFF009688), // Dark Green
   surface: Color(0xFFFFFFFF),
   onPrimary: Color(0xFFF0F1F5),//Color.fromRGBO(238, 238, 238, 0.945), // Soft White
   error: Color(0xFFD32F2F), // Rustic Red
