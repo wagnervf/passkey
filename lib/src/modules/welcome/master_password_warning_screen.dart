@@ -21,7 +21,12 @@ class MasterPasswordWarningScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Atenção")),
+      appBar: AppBar(
+        title: const Text("Atenção"),
+        leading: SizedBox.shrink(),
+        excludeHeaderSemantics: true,
+        centerTitle: true,
+      ),
       body: Padding(
         padding: const EdgeInsets.all(24),
         child: Column(
@@ -41,13 +46,33 @@ class MasterPasswordWarningScreen extends StatelessWidget {
             const SizedBox(height: 24),
 
             RepaintBoundary(
-  key: qrKey, // ESTA KEY É A MESMA QUE VOCÊ VAI USAR NO EXPORT
-  child: QrImageView(
-    data: masterPassword ?? 'Sem senha',
-    version: QrVersions.auto,
-    size: 200,
-  ),
-),
+              key: qrKey,
+              child: Container(
+                color: Colors.white,
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    QrImageView(
+                      data: masterPassword ?? 'Sem senha',
+                      version: QrVersions.auto,
+
+                      size: 200,
+                    ),
+                    const SizedBox(height: 8),
+                    const Text(
+                      'NÃO COMPARTILHE ESTE QR CODE!',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.red,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
             const SizedBox(height: 12),
             SelectableText(
               masterPassword,
@@ -71,6 +96,7 @@ class MasterPasswordWarningScreen extends StatelessWidget {
                 context.push(RoutesPaths.biometricSetup);
               },
             ),
+            const SizedBox(height: 34),
           ],
         ),
       ),
@@ -78,71 +104,34 @@ class MasterPasswordWarningScreen extends StatelessWidget {
   }
 
   Future<void> exportQrCode() async {
-  try {
-    await Future.delayed(const Duration(milliseconds: 300));
+    try {
+      await Future.delayed(const Duration(milliseconds: 300));
 
-    RenderRepaintBoundary boundary =
-        qrKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
+      RenderRepaintBoundary boundary =
+          qrKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
 
-    final image = await boundary.toImage(pixelRatio: 3.0);
-    final byteData = await image.toByteData(format: ImageByteFormat.png);
+      final image = await boundary.toImage(pixelRatio: 3.0);
+      final byteData = await image.toByteData(format: ImageByteFormat.png);
 
-    if (byteData == null) return;
+      if (byteData == null) return;
 
-    final pngBytes = byteData.buffer.asUint8List();
-    
-    final directory = await getTemporaryDirectory();
-    final file = File('${directory.path}/senha_qrcode.png');
-    await file.writeAsBytes(pngBytes);
+      final pngBytes = byteData.buffer.asUint8List();
 
-    await Share.shareXFiles(
-      [XFile(file.path)],
-      text: 'QR Code contendo sua senha mestra.',
-      subject: 'Senha mestra Keezy',
-    );
-  } catch (e, s) {
-    log('Erro ao exportar QR: $e', stackTrace: s);
-   // ShowMessager.show(, 'Erro ao exportar QR Code');
+      final directory = await getTemporaryDirectory();
+      final file = File('${directory.path}/senha_qrcode.png');
+      await file.writeAsBytes(pngBytes);
+
+      final shareParams = ShareParams(
+        text: 'QR Code contendo sua senha mestra.',
+        subject: 'Senha mestra Keezy',
+
+        files: [XFile(file.path)],
+      );
+
+      await SharePlus.instance.share(shareParams);
+    } catch (e, s) {
+      log('Erro ao exportar QR: $e', stackTrace: s);
+      // ShowMessager.show(, 'Erro ao exportar QR Code');
+    }
   }
-}
-
-
-  // Future<void> exportQrCode() async {
-  //   try {
-  //     RenderRepaintBoundary boundary =
-  //         qrKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
-
-  //     final image = await boundary.toImage(pixelRatio: 3.0);
-  //     final byteData = await image.toByteData(format: ImageByteFormat.png);
-  //     final pngBytes = byteData!.buffer.asUint8List();
-
-  //     // Salva como arquivo temporário
-  //     final tempDir = await getTemporaryDirectory();
-  //     final file = File('${tempDir.path}/qr_senha.png');
-  //     await file.writeAsBytes(pngBytes);
-
-  //     final shareParams = ShareParams(
-  //       text: 'Aqui está o backup dos seus registros.',
-  //       subject: 'Senha Mestra',
-
-  //       files: [XFile(file.path)],
-  //     );
-
-  //     final result = await SharePlus.instance.share(shareParams);
-
-  //     // Se o usuário cancelar, exclui o arquivo imediatamente
-  //     if (result.status != ShareResultStatus.success) {
-  //       Future.delayed(const Duration(seconds: 3), () async {
-  //         if (await file.exists()) await file.delete();
-  //         log('🗑️ Arquivo removido — o usuário cancelou o compartilhamento.');
-  //       });
-  //       return null;
-  //     }
-
-  //     log('✅ Senha Mestra compartilhado com sucesso!');
-  //     return; // retorna o arquivo só se foi realmente compartilhad
-  //   } catch (e) {
-  //     debugPrint('Erro ao exportar QR: $e');
-  //   }
-  // }
 }

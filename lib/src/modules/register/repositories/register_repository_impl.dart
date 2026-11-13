@@ -80,133 +80,18 @@ class RegisterRepositoryImpl implements RegisterRepository {
     }
   }
 
-  // opcional: salvar lista (p.ex. import em massa)
+
   @override
-  Future<Either<RepositoryException, bool>> saveListRegisterRepository(List<RegisterModel> listRegisters) async {
-    try {
-      // substitui tudo por nova lista
-      await _registerHive.replaceAll(listRegisters);
-      return Right(true);
-    } catch (e, s) {
-      log('Erro em saveListRegisterRepository: $e', stackTrace: s);
-      return Left(RepositoryException(message: 'Erro ao salvar registros.'));
-    }
+Future<Either<RepositoryException, bool>> saveListRegisterRepository(
+  List<RegisterModel> listRegisters,
+) async {
+  try {
+    await _registerHive.replaceAll(listRegisters); 
+    return Right(true);
+  } catch (e, s) {
+    log('Erro em saveListRegisterRepository: $e', stackTrace: s);
+    return Left(RepositoryException(message: 'Erro ao salvar todos registros.'));
   }
 }
 
-
-// class RegisterRepositoryImpl implements RegisterRepository {
-//   RegisterRepositoryImpl();
-
-//   final SecureStorageService _secureStorageService = SecureStorageService();
-
-//   final RegisterHive _registerHive = RegisterHive();
-
-//   static const _keyRegistros = 'registers';
-
-//   Future<List<RegisterModel>> _getListRegister() async {
-//     try {
-//       final List<RegisterModel>? listRegisters = _registerHive
-//           .getAllRegisters();
-
-//       if (listRegisters == null || listRegisters.isEmpty) {
-//         return [];
-//       }
-
-//       return listRegisters;
-//     } catch (e, s) {
-//       log("Erro ao buscar registros: $e", error: e, stackTrace: s);
-//       return [];
-//     }
-//   }
-
-
-//   @override
-//   Future<Either<RepositoryException, List<RegisterModel>>>
-//   getAllRegisterRepository() async {
-//     try {
-//       final List<RegisterModel> listRegisters = await _getListRegister();
-//       return Right(listRegisters);
-//     } catch (e, s) {
-//       log("Erro ao obter registros: $e", error: e, stackTrace: s);
-//       return Left(RepositoryException(message: 'Erro ao buscar os registros.'));
-//     }
-//   }
-
-//   @override
-//   Future<Either<RepositoryException, bool>> saveRegisterRepository(
-//     RegisterModel register,
-//   ) async {
-//     try {
-//       await _registerHive.addRegister(register);
-
-//       return Right(true);
-//     } catch (e, s) {
-//       log("Erro ao salvar registro: $e", error: e, stackTrace: s);
-//       return Left(RepositoryException(message: 'Erro ao salvar o registro.'));
-//     }
-//   }
-
-//   @override
-//   Future<Either<RepositoryException, bool>> updateRegisterRepository(
-//     RegisterModel registro,
-//   ) async {
-//     try {
-//       final List<RegisterModel> listRegisters = await _getListRegister();
-//       final int index = listRegisters.indexWhere(
-//         (reg) => reg.id == registro.id,
-//       );
-
-//       if (index == -1) {
-//         return Left(RepositoryException(message: 'Registro não encontrado.'));
-//       }
-
-//       listRegisters[index] = registro;
-//       await _registerHive.updateRegister(registro);
-//       return Right(true);
-
-//     } catch (e, s) {
-//       log("Erro ao atualizar registro: $e", error: e, stackTrace: s);
-//       return Left(
-//         RepositoryException(message: 'Erro ao atualizar o registro.'),
-//       );
-//     }
-//   }
-
-//   @override
-//   Future<Either<RepositoryException, Unit>> deleteRegisterRepository(
-//     RegisterModel registro,
-//   ) async {
-//     try {
-//       final List<RegisterModel> listRegisters = await _getListRegister();
-
-//       final int beforeCount = listRegisters.length;
-//       listRegisters.removeWhere((reg) => reg.id == registro.id);
-
-//       if (beforeCount == listRegisters.length) {
-//         return Left(RepositoryException(message: 'Registro não encontrado.'));
-//       }
-
-//       _registerHive.deleteRegister(registro.id);
-//       // final bool result = await _salvarLocalmente(listRegisters);
-//       return Right(unit);
-//     } catch (e, s) {
-//       log("Erro ao remover registro: $e", error: e, stackTrace: s);
-//       return Left(RepositoryException(message: 'Erro ao remover o registro.'));
-//     }
-//   }
-
-//   @override
-//   Future<Either<RepositoryException, Unit>>
-//   deleteAllRegistersRepository() async {
-//     try {
-//       _registerHive.clearAll();
-//       return Right(unit);
-//     } catch (e, s) {
-//       log("Erro ao remover registro");
-//       return Left(RepositoryException(message: 'Erro ao remover o registro.'));
-//     }
-//   }
-
-
-// }
+}

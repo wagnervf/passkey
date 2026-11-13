@@ -41,10 +41,7 @@ void didChangeDependencies() {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.onPrimary,
       floatingActionButton: buttonAdd(context),
-      drawer: const AppDrawer(
-      appName: 'Proteja Seus Dados',
-      logoPath: 'assets/images/passkey.png',
-    ),
+      
       appBar: AppBar(
         excludeHeaderSemantics: true,
         leading: SizedBox.shrink(),

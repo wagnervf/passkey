@@ -20,7 +20,7 @@ class _ListRegistersState extends State<ListRegisters> {
   List<RegisterModel> todosRegistros = [];
   List<RegisterModel> registrosFiltrados = [];
 
-  // OrdemRegistros _ordemAtual = OrdemRegistros.data;
+  //OrdemRegistros _ordemAtual = OrdemRegistros.data;
   TodosRegistros _ordemAtual = TodosRegistros.all;
 
   bool _mostrandoFavoritos = false;
@@ -79,6 +79,8 @@ class _ListRegistersState extends State<ListRegisters> {
             registrosFiltrados = todosRegistros
                 .where((registro) => registro.isFavorite == true)
                 .toList();
+
+
           } else if (_searchController.text.isEmpty) {
             registrosFiltrados = todosRegistros;
           } else {
@@ -95,7 +97,7 @@ class _ListRegistersState extends State<ListRegisters> {
               const SizedBox(height: 6),
               _barraDeAcoes(),
               const SizedBox(height: 12),
-              Expanded(child: listRegistros(registrosFiltrados)),
+           registrosFiltrados.isEmpty ? Center(child: Text('Nenhum registro encontrado')) :  Expanded(child: listRegistros(registrosFiltrados)),
               const SizedBox(height: 10),
             ],
           );
@@ -107,6 +109,7 @@ class _ListRegistersState extends State<ListRegisters> {
   }
 
   Widget listRegistros(List<RegisterModel> registers) {
+    //   _ordenarRegistros(TodosRegistros.nome);
     return ListView.builder(
       itemCount: registers.length,
       padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -167,10 +170,9 @@ class _ListRegistersState extends State<ListRegisters> {
         spacing: 8.0,
         children: [
           _buttonFiltro(ordem: TodosRegistros.all, title: 'Todos'),
-          _buttonFiltro(
-            ordem: TodosRegistros.isFavorite,
-            title: 'Favoritos',
-          ),
+          _buttonFiltro(ordem: TodosRegistros.nome, title: 'Nome'),
+          //_buttonFiltro(ordem: TodosRegistros.isFavorite, title: 'Favoritos'),
+          _buttonFavoritos(),
         ],
       ),
     );
@@ -191,13 +193,17 @@ class _ListRegistersState extends State<ListRegisters> {
         onPressed: () {
           setState(() {
             _ordemAtual = ordem;
-            if  ( TodosRegistros.isFavorite == ordem) {
-             _mostrandoFavoritos = !_mostrandoFavoritos;
-            } else {
-              _mostrandoFavoritos = false;
-            }
+            // if (TodosRegistros.isFavorite == ordem) {
+            //   _mostrandoFavoritos = !_mostrandoFavoritos;
+            // } else
 
-            
+            if (ordem == TodosRegistros.nome || ordem == TodosRegistros.all) {
+              _mostrandoFavoritos = false;
+              _ordenarRegistros(ordem);
+            }
+            // else {
+            //   _mostrandoFavoritos = false;
+            // }
           });
         },
         label: Text(title, style: Theme.of(context).textTheme.bodySmall),
@@ -205,6 +211,33 @@ class _ListRegistersState extends State<ListRegisters> {
           _ordemAtual == ordem
               ? Icons.arrow_circle_up_sharp
               : Icons.arrow_circle_down_sharp,
+          color: Theme.of(context).colorScheme.secondary,
+        ),
+      ),
+    );
+  }
+
+  SizedBox _buttonFavoritos() {
+    return SizedBox(
+      height: 30,
+      child: OutlinedButton.icon(
+        style: OutlinedButton.styleFrom(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+          backgroundColor: corBackFiltro(TodosRegistros.isFavorite),
+          foregroundColor: _mostrandoFavoritos == false
+              ? Colors.black
+              : Colors.grey.shade800,
+          side: BorderSide(color: Theme.of(context).colorScheme.tertiary),
+        ),
+        onPressed: () {
+          setState(() {
+            _ordemAtual = TodosRegistros.isFavorite;
+            _mostrandoFavoritos = !_mostrandoFavoritos;
+          });
+        },
+        label: Text('Favoritos', style: Theme.of(context).textTheme.bodySmall),
+        icon: Icon(
+          _mostrandoFavoritos == false ? Icons.favorite_border : Icons.favorite,
           color: Theme.of(context).colorScheme.secondary,
         ),
       ),
@@ -268,7 +301,9 @@ class _ListRegistersState extends State<ListRegisters> {
       radius: 25,
       child: Center(
         child: Text(
-          name?[0].toUpperCase() ?? 'R',
+          name != null && name.isNotEmpty && name[0] != ""
+              ? name[0].toUpperCase()
+              : 'R',
           style: const TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
@@ -343,23 +378,23 @@ class _ListRegistersState extends State<ListRegisters> {
     });
   }
 
-  // void _ordenarRegistros(OrdemRegistros ordem) {
-  //   setState(() {
-  //     _ordemAtual = ordem;
+  void _ordenarRegistros(TodosRegistros ordem) {
+    setState(() {
+      // _ordemAtual = orde;
 
-  //     registrosFiltrados.sort((a, b) {
-  //       if (ordem == OrdemRegistros.nome) {
-  //         final nomeA = a.name?.toLowerCase() ?? '';
-  //         final nomeB = b.name?.toLowerCase() ?? '';
-  //         return nomeA.compareTo(nomeB);
-  //       } else {
-  //         return b.id.compareTo(a.id);
-  //       }
-  //     });
-  //   });
-  // }
+      registrosFiltrados.sort((a, b) {
+        if (ordem == TodosRegistros.nome) {
+          final nomeA = a.name?.toLowerCase() ?? '';
+          final nomeB = b.name?.toLowerCase() ?? '';
+          return nomeA.compareTo(nomeB);
+        } else {
+          return b.id.compareTo(a.id);
+        }
+      });
+    });
+  }
 }
 
-enum TodosRegistros { all, isFavorite }
+enum TodosRegistros { all, nome, isFavorite }
 
 //enum OrdemRegistros { nome, data, isFavorite }

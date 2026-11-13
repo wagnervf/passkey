@@ -27,11 +27,11 @@ class ImportRegistersCsvServicesImpl implements ImportRegistersCsvServices {
       final registers = await repository.importFromCsv();
 
     // Exemplo: remove registros com nome duplicado
-    final unique = {
-      for (var r in registers) r.name: r,
-    }.values.toList();
+    // final unique = {
+    //   for (var r in registers) r.name: r,
+    // }.values.toList();
 
-    return unique;
+    return registers;
   
   }
 }

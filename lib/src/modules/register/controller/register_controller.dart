@@ -154,156 +154,26 @@ class RegisterController extends Cubit<RegisterState> {
       return false;
     }
   }
+
+  Future<bool> saveListRegistersController(List<RegisterModel> list) async {
+  emit(RegisterLoading());
+  try {
+    final result = await registerRepository.saveListRegisterRepository(list);
+    switch (result) {
+      case Left(value: RepositoryException()):
+        emit(RegisterError('Erro ao salvar lista'));
+        return false;
+
+      case Right(value: bool()):
+        await getRegisterController(); // recarrega a lista
+        return true;
+    }
+  } catch (e, s) {
+    log('Erro ao salvar lista de registros: $e', stackTrace: s);
+    emit(RegisterError('Erro inesperado ao salvar lista.'));
+    return false;
+  }
 }
 
+}
 
-// class RegisterController extends Cubit<RegisterState> {
-//   final RegisterRepository registerRepository;
-
-//   RegisterController({required this.registerRepository})
-//       : super(RegisterInitial());
-
-//   List<RegisterModel> _listRegisters = [];
-//   List<RegisterModel> get listRegisters => _listRegisters;
-
-//   Future<Either<RepositoryException, Unit>> getRegisterController() async {
-//     try {
-//       emit(RegisterLoading());
-
-//       final register = await registerRepository.getAllRegisterRepository();
-
-//       log(register.toString());
-
-      // switch (register) {
-      //   case Left(value: RepositoryException(:final message)):
-      //     emit(RegisterError(message));
-      //     return Left(RepositoryException(message: message));
-
-      //   case Right<RepositoryException, List<RegisterModel>>(
-      //       value: final result
-      //     ):
-      //     _listRegisters = result;
-
-      //     _listRegisters.sort((a, b) => b.id.compareTo(a.id));
-
-      //     emit(RegisterLoaded(register: _listRegisters));
-      //     return Right(unit);
-      // }
-//     } on Exception catch (e) {
-//       log(e.toString());
-//       const message = 'Erro ao buscar Register';
-//       emit(RegisterError(message));
-//       return Left(RepositoryException(message: message));
-//     }
-//   }
-
-//   Future<bool> saveAndUpdateRegisterController(
-//       RegisterModel novoRegister) async {
-//     emit(RegisterLoading());
-//     try {
-//       final register =
-//           await registerRepository.saveRegisterRepository(novoRegister);
-
-//       switch (register) {
-//         case Left<RepositoryException, bool>():
-//           return false;
-
-//         case Right<RepositoryException, bool>():
-//           getRegisterController();
-//           return true;
-//       }
-//     } catch (e, s) {
-//       log('Exceção inesperada ao salvar registro: $e\n$s');
-//       emit(RegisterError('Erro inesperado ao salvar registro.'));
-//       return false;
-//     }
-//   }
-
-
-//   Future<bool> deleteRegisterController(RegisterModel registro) async {
-//     emit(RegisterLoading());
-//     try {
-//       final register =
-//           await registerRepository.deleteRegisterRepository(registro);
-
-//       switch (register) {
-//         case Left<RepositoryException, Unit>():
-//           return false;
-
-//         case Right<RepositoryException, Unit>():
-//           await getRegisterController();
-
-//           return true;
-//       }
-//     } on Exception catch (e) {
-//       log(e.toString());
-//       const message = 'Erro ao remover';
-//       emit(RegisterError(message));
-//       return false;
-//     }
-//   }
-
-//   Future<void> importarUmRegistro(String jsonContent) async {
-//     try {
-//       // Decodifica o texto JSON recebido
-//       var registroJson = jsonDecode(jsonContent);
-
-//       log(registroJson.toString());
-
-//       var registroFormatado = RegisterModel.fromMap(registroJson);
-
-//       await saveAndUpdateRegisterController(registroFormatado);
-//     } catch (e) {
-//       log('Erro ao importar registro: $e');
-//       //  return null;
-//     }
-//   }
-
-//   Future<List<RegisterModel>?>? getRegisterForExportCsv() async {
-//     try {
-//       final register = await registerRepository.getAllRegisterRepository();
-
-//       log(register.toString());
-
-//       switch (register) {
-//         case Left(value: RepositoryException()):
-//           return null;
-
-//         case Right<RepositoryException, List<RegisterModel>>(
-//             value: final result
-//           ):
-//           result.sort((a, b) => b.id.compareTo(a.id));
-
-//           return result;
-//       }
-//     } on Exception catch (e) {
-//       log(e.toString());
-//       return null;
-//     }
-//   }
-
-
-
-//  Future<bool> deleteAllRegistersController() async {
-//     emit(RegisterLoading());
-//     try {
-//       final register =
-//           await registerRepository.deleteAllRegistersRepository();
-
-//       switch (register) {
-//         case Left<RepositoryException, Unit>():
-//           return false;
-
-//         case Right<RepositoryException, Unit>():
-//           await getRegisterController();
-
-//           return true;
-//       }
-//     } on Exception catch (e) {
-//       log(e.toString());
-//       const message = 'Erro ao remover';
-//       emit(RegisterError(message));
-//       return false;
-//     }
-//   }
-// }

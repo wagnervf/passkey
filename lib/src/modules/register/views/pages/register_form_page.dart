@@ -136,8 +136,12 @@ class _RegisterFormPageState extends State<RegisterFormPage> {
           selectedApp == null ? selecionarApp() : appSelecionado(),
           const SizedBox(height: 24),
           const Text("Nome, app ou site"),
-          const SizedBox(height: 8),
           _buildTextFormField(_titleController, "Nome do app ou site"),
+          const SizedBox(height: 8),
+
+          const Text("URL"),
+          _buildTextFormField(_siteController, "Ulr do site"),
+
           const SizedBox(height: 24),
           const Text("Usuário e senha"),
           const SizedBox(height: 8),
@@ -148,13 +152,13 @@ class _RegisterFormPageState extends State<RegisterFormPage> {
             labelText: "Senha do Cofre",
             maxLength: 16,
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 18),
           const Text("Observação"),
           const SizedBox(height: 8),
           _buildTextFormField(
             _descriptionController,
             "Observação",
-            maxLines: 4,
+            maxLines: 2,
           ),
           const SizedBox(height: 20),
           _buttonSalvar(context),
@@ -175,9 +179,9 @@ class _RegisterFormPageState extends State<RegisterFormPage> {
         transitionBuilder: (child, anim) =>
             ScaleTransition(scale: anim, child: child),
         child: Icon(
-          _isFavorite ? Icons.star : Icons.star_border,
+          _isFavorite ? Icons.favorite : Icons.favorite_border,
           key: ValueKey(_isFavorite),
-          color: _isFavorite ? Colors.amber : null,
+          color: _isFavorite ? Colors.red : null,
         ),
       ),
     );
@@ -227,17 +231,16 @@ class _RegisterFormPageState extends State<RegisterFormPage> {
                   width: 24,
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
-              :  Text(
+              : Text(
                   "Salvar",
-                  style:Theme.of(context).textTheme.titleLarge!.copyWith(
-                    color: Colors.white,
-                  )
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleLarge!.copyWith(color: Colors.white),
                 ),
         ),
       ),
     );
   }
- 
 
   Future<void> _confirmarExportacao(BuildContext context) async {
     final controller = _exportController;
@@ -246,7 +249,8 @@ class _RegisterFormPageState extends State<RegisterFormPage> {
     final confirmou = await AuthDialogService.confirmarAcao(
       context: context,
       titulo: 'Compartilhar Registro',
-      mensagem: '''⚠ ATENÇÃO!\n\nAo exportar, suas senhas ficarão visíveis em um arquivo externo.\nRecomendamos guardar esse arquivo com extremo cuidado.
+      mensagem:
+          '''⚠ ATENÇÃO!\n\nAo exportar, suas senhas ficarão visíveis em um arquivo externo.\nRecomendamos guardar esse arquivo com extremo cuidado.
         ''',
       textoConfirmar: 'Compartilhar',
     );
@@ -456,7 +460,6 @@ class _RegisterFormPageState extends State<RegisterFormPage> {
     if (result) {
       ShowMessager.show(context, 'Registro removido');
       // pop duas vezes: fechar dialog e voltar para lista
-      Navigator.of(context).pop();
       Navigator.of(context).pop();
     } else {
       ShowMessager.show(context, 'Erro ao excluir registro');

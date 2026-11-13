@@ -5,7 +5,7 @@ import 'package:keezy/src/modules/import_registers_csv/controllers/import_regist
 import 'package:keezy/src/modules/import_registers_csv/services/import_registers_csv_services.dart';
 import 'package:keezy/src/modules/register/controller/register_controller.dart';
 import 'package:keezy/src/modules/register/model/register_model.dart';
-
+import 'package:uuid/uuid.dart';
 
 class ImportRegisterCsvController extends Cubit<ImportRegistersCsvState> {
   final ImportRegistersCsvServices importRegistersCsvServices;
@@ -17,7 +17,7 @@ class ImportRegisterCsvController extends Cubit<ImportRegistersCsvState> {
   }) : super(ImportCsvInitial());
 
   Future<List<RegisterModel>?> importFromCsv() async {
-  emit(ImportCsvLoading());
+    emit(ImportCsvLoading());
 
     try {
       final registers = await importRegistersCsvServices.importFromCsv();
@@ -38,27 +38,43 @@ class ImportRegisterCsvController extends Cubit<ImportRegistersCsvState> {
       return null;
     }
   }
-
-  /// Importa e restaura os registros diretamente no Hive (backup completo)
+  
   Future<String?> restoreBackupFromFileCsv() async {
     emit(ImportCsvLoading());
-
     try {
-      final registers = await importFromCsv();
+      // 1. Importa do CSV
+      final importedRegisters = await importFromCsv();
 
-      if (registers == null || registers.isEmpty) {
+      if (importedRegisters == null || importedRegisters.isEmpty) {
         const msg = 'Nenhum registro encontrado!';
         emit(ImportCsvNull(msg));
         return msg;
       }
 
-      for (final register in registers) {
-        log('Salvando registro: ${register.name}');
-        await registerController.saveAndUpdateRegisterController(register);
+      // 2. Busca registros já existentes
+      final currentRegisters =
+          await registerController.getRegisterForExportCsv() ?? [];
+
+      // 3. Garante ID ÚNICO para cada importado
+      final newRegisters = importedRegisters
+          .map((r) => r.copyWith(id: const Uuid().v4()))
+          .toList();
+
+      // 4. Junta tudo numa só lista
+      final allRegisters = [...currentRegisters, ...newRegisters];
+
+      // 5. Salva tudo de uma vez (mais seguro e rápido)
+      final success = await registerController.saveListRegistersController(
+        allRegisters,
+      );
+
+      if (!success) {
+        emit(ImportCsvError('Erro ao salvar registros!'));
+        return 'Erro ao salvar registros!';
       }
 
-      emit(ImportCsvLoaded('Dados importados com sucesso!'));
-      return 'Dados importados com sucesso!';
+      emit(ImportCsvLoaded('Importação concluída com sucesso!'));
+      return 'Importação concluída com sucesso!';
     } catch (e, s) {
       log('Erro ao restaurar backup: $e', stackTrace: s);
       final errorMsg = 'Erro ao restaurar backup: $e';
