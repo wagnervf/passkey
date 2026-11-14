@@ -43,8 +43,12 @@ class AuthController extends Cubit<AuthState> {
     if (isValid) {
       try {
         final user = await authRepository.getUser();
-
-        emit(AuthSuccessState(user!));
+        if (user == null) {
+          emit(AuthErrorState('Usuário não encontrado!'));
+          return false;
+        }
+        _user = user;
+        emit(AuthSuccessState(user));
         // Notify the provider about the new user
         AuthUserProvider.instance.setUser(user);
         return true;
@@ -58,24 +62,51 @@ class AuthController extends Cubit<AuthState> {
     }
   }
 
-  Future<void> registerUser(AuthUserModel user) async {
+  Future<bool> registerUser(AuthUserModel user) async {
     emit(AuthLoadingState());
     try {
       final result = await authRepository.saveUser(user);
       if (result) {
-        emit(AuthSuccessState(user));
+        final savedUser = await authRepository.getUser();
+        if (savedUser == null) {
+          emit(AuthErrorState('Erro ao cadastrar usuário'));
+          return false;
+        }
+        _user = savedUser;
+        emit(AuthSuccessState(savedUser));
 
-        //Para saber que já existe um usuário registrado
-        await tokenStorage.saveHasUser(true);
-        AuthUserProvider.instance.setUser(user);
+        // A credencial persistida é a fonte de verdade; a preferência é legado.
+        try {
+          await tokenStorage.saveHasUser(true);
+        } catch (_) {}
+        AuthUserProvider.instance.setUser(savedUser);
+        return true;
       } else {
-        await tokenStorage.saveHasUser(false);
         emit(AuthErrorState('Erro ao cadastrar usuário'));
+        return false;
       }
     } catch (e) {
-      await tokenStorage.saveHasUser(false);
       emit(AuthErrorState('Erro ao cadastrar usuário'));
+      return false;
     }
+  }
+
+  Future<bool> updateProfile({required String name, required String email}) async {
+    emit(AuthLoadingState());
+    final saved = await authRepository.updateProfile(name: name, email: email);
+    if (!saved) {
+      emit(AuthErrorState('Erro ao atualizar perfil'));
+      return false;
+    }
+    final user = await authRepository.getUser();
+    if (user == null) {
+      emit(AuthErrorState('Erro ao atualizar perfil'));
+      return false;
+    }
+    _user = user;
+    AuthUserProvider.instance.setUser(user);
+    emit(AuthSuccessState(user));
+    return true;
   }
 
   Future<bool> logoutAndRemoveUser() async {
@@ -84,16 +115,13 @@ class AuthController extends Cubit<AuthState> {
     await tokenStorage.saveHasUser(false);
 
     if (result) {
+      _user = null;
+      AuthUserProvider.instance.clearUser();
       emit(AuthUnauthenticatedState());
       return true;
     } else {
       return false;
     }
-  }
-
-  Future<void> limparContaAntesDeCriarUser() async {
-    await tokenStorage.saveHasUser(false);
-    await authRepository.logoutAndRemoveUser();
   }
 
   Future<bool> loginWithBiometrics() async {
@@ -165,6 +193,6 @@ class AuthController extends Cubit<AuthState> {
   }
 
   Future<bool> checkExistUserLocal() async {
-    return await tokenStorage.getHasUser();
+    return authRepository.hasUser();
   }
 }

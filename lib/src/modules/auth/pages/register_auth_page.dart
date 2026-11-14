@@ -47,21 +47,25 @@ class _RegisterAuthPageState extends State<RegisterAuthPage> {
       edit = true;
       _nameController.text = user.name;
       _emailController.text = user.email;
-      _passwordController.text = user.password;
     });
   }
 
   void _register(BuildContext context) async {
     if (_formKeyAuth.currentState!.validate()) {
-      final user = AuthUserModel(
-        name: _nameController.text,
-        email: _emailController.text,
-        password: _passwordController.text,
-      );
-
       try {
-        await context.read<AuthController>().limparContaAntesDeCriarUser();
-        await context.read<AuthController>().registerUser(user);
+        final controller = context.read<AuthController>();
+        if (edit) {
+          await controller.updateProfile(
+            name: _nameController.text,
+            email: _emailController.text,
+          );
+        } else {
+          await controller.registerUser(AuthUserModel(
+            name: _nameController.text,
+            email: _emailController.text,
+            password: _passwordController.text,
+          ));
+        }
       } catch (e) {
         DialogUtils.showSuccessDialog(
           context,
@@ -169,19 +173,21 @@ class _RegisterAuthPageState extends State<RegisterAuthPage> {
                             'E-mail', Icons.email_outlined,),
                       ),
                       SizedBox(height: size.height * 0.03),
-                      FormFieldInputPassword(
-                        passwordController: _passwordController,
-                        copy: true,
-                      ),
-                      const SizedBox(height: 5),
-                      Padding(
-                        padding: const EdgeInsets.all(4),
-                        child: Text(
-                          'Senha mestra, a única senha que você precisará lembrar.',
-                          textAlign: TextAlign.start,
-                          style: Theme.of(context).textTheme.labelSmall,
+                      if (!edit) ...[
+                        FormFieldInputPassword(
+                          passwordController: _passwordController,
+                          copy: false,
                         ),
-                      ),
+                        const SizedBox(height: 5),
+                        Padding(
+                          padding: const EdgeInsets.all(4),
+                          child: Text(
+                            'Senha mestra, a única senha que você precisará lembrar.',
+                            textAlign: TextAlign.start,
+                            style: Theme.of(context).textTheme.labelSmall,
+                          ),
+                        ),
+                      ],
                       const Spacer(),
                       SizedBox(
                         width: size.width * .9,

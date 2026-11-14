@@ -1,19 +1,9 @@
 import 'package:encrypt/encrypt.dart' as encrypt;
 
 class EncryptDecryptServices {
+  // Read-only compatibility with credentials written before version 2.
+  // Remove after all supported installations have migrated.
   static const _encryptionKey = 'my32lengthsupersecretnooneknows1';
-
-
-  String encryptPassword(String password) {
-    final key = encrypt.Key.fromUtf8(_encryptionKey);
-    final iv = encrypt.IV.fromLength(16);
-    final encrypter = encrypt.Encrypter(encrypt.AES(key));
-
-    final encrypted = encrypter.encrypt(password, iv: iv);
-
-    // Concatenar o IV com o texto criptografado
-    return '${iv.base64}:${encrypted.base64}';
-  }
 
   String decryptPassword(String encryptedPassword) {
     final key = encrypt.Key.fromUtf8(_encryptionKey);

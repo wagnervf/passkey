@@ -3,34 +3,61 @@ import 'dart:developer';
 import 'package:keezy/src/core/components/encrypt/encrypt_decrypt_services.dart';
 import 'package:keezy/src/core/data/services/secure_storage_service.dart';
 import 'package:keezy/src/modules/auth/model/auth_user_model.dart';
+import 'package:keezy/src/modules/auth/security/master_password_verifier.dart';
 
 class AuthRepository {
   static const _userKey = 'auth_user';
 
-  final secureStorageService = SecureStorageService();
-  final encrypt = EncryptDecryptServices();
+  final SecureStorageService secureStorageService;
+  final MasterPasswordVerifier verifier;
+  final EncryptDecryptServices _legacyCipher = EncryptDecryptServices();
+
+  AuthRepository({
+    SecureStorageService? secureStorageService,
+    MasterPasswordVerifier? verifier,
+  }) : secureStorageService = secureStorageService ?? SecureStorageService(),
+       verifier = verifier ?? MasterPasswordVerifier();
 
   Future<bool> saveUser(AuthUserModel user) async {
     try {
-      final encryptedPassword = encrypt.encryptPassword(user.password);
+      if (user.password.isEmpty ||
+          await secureStorageService.hasApiKey(_userKey)) {
+        return false;
+      }
+
       final userToSave = {
         'name': user.name,
         'email': user.email,
-        'password': encryptedPassword,
+        'passwordVerifier': await verifier.create(user.password),
       };
-      secureStorageService.setDataKey(_userKey, json.encode(userToSave));
+      await secureStorageService.setDataKey(_userKey, json.encode(userToSave));
       return true;
-    } catch (e) {
+    } catch (e, s) {
+      log('Erro ao cadastrar usuário', error: e, stackTrace: s);
       return false;
     }
   }
+
+  Future<bool> updateProfile({required String name, required String email}) async {
+    try {
+      final stored = await _readUser();
+      if (stored == null) return false;
+      stored['name'] = name;
+      stored['email'] = email;
+      await secureStorageService.setDataKey(_userKey, jsonEncode(stored));
+      return true;
+    } catch (e, s) {
+      log('Erro ao atualizar perfil', error: e, stackTrace: s);
+      return false;
+    }
+  }
+
+  Future<bool> hasUser() => secureStorageService.hasApiKey(_userKey);
 
   Future<bool> logoutAndRemoveUser() async {
     // Remove o usuário
     if (await secureStorageService.hasApiKey(_userKey)) {
       await secureStorageService.deleteApiKey(_userKey);
-      await secureStorageService.deleteAll();
-
       return true;
     } else {
       return false;
@@ -38,33 +65,86 @@ class AuthRepository {
   }
 
   Future<AuthUserModel?> getUser() async {
-    final userData = await secureStorageService.getDataKey(_userKey);
-    if (userData == '') return null;
-
     try {
-      final jsonUser = json.decode(userData);
+      final stored = await _readUser();
+      if (stored == null) return null;
 
-      final encryptedPassword = jsonUser['password']?.toString();
-      if (encryptedPassword == null) {
-        throw Exception('Senha ausente ou inválido no JSON');
+      if (stored['passwordVerifier'] == null) {
+        final legacyPassword = _decryptLegacy(stored);
+        if (legacyPassword == null) return null;
+        await _migrateLegacy(stored, legacyPassword);
       }
 
-      // Descriptografar a senha
-      final decryptedPassword = encrypt.decryptPassword(encryptedPassword);
-
       return AuthUserModel(
-        name: jsonUser['name']?.toString() ?? '',
-        email: jsonUser['email']?.toString() ?? '',
-        password: decryptedPassword,
+        name: stored['name']?.toString() ?? '',
+        email: stored['email']?.toString() ?? '',
       );
     } catch (e) {
-      log('Erro ao recuperar o usuário: $e');
+      log('Erro ao recuperar o usuário', error: e);
       return null;
     }
   }
 
   Future<bool> validatePassword(String inputPassword) async {
-    final user = await getUser();
-    return user?.password == inputPassword;
+    if (inputPassword.isEmpty) return false;
+    try {
+      final stored = await _readUser();
+      if (stored == null) return false;
+
+      final passwordVerifier = stored['passwordVerifier'];
+      if (passwordVerifier != null) {
+        return await verifier.verify(inputPassword, passwordVerifier);
+      }
+
+      final legacyPassword = _decryptLegacy(stored);
+      if (legacyPassword == null ||
+          !_equalLegacyPasswords(inputPassword, legacyPassword)) {
+        return false;
+      }
+      await _migrateLegacy(stored, inputPassword);
+      return true;
+    } catch (e) {
+      log('Erro ao validar senha mestra', error: e);
+      return false;
+    }
+  }
+
+  Future<Map<String, dynamic>?> _readUser() async {
+    final data = await secureStorageService.getDataKey(_userKey);
+    if (data.isEmpty) return null;
+    final decoded = jsonDecode(data);
+    if (decoded is! Map<String, dynamic>) return null;
+    return decoded;
+  }
+
+  String? _decryptLegacy(Map<String, dynamic> stored) {
+    final encrypted = stored['password'];
+    if (encrypted is! String) return null;
+    try {
+      return _legacyCipher.decryptPassword(encrypted);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<void> _migrateLegacy(
+    Map<String, dynamic> stored,
+    String password,
+  ) async {
+    final updated = Map<String, dynamic>.from(stored);
+    updated.remove('password');
+    updated['passwordVerifier'] = await verifier.create(password);
+    await secureStorageService.setDataKey(_userKey, jsonEncode(updated));
+  }
+
+  bool _equalLegacyPasswords(String input, String stored) {
+    final a = utf8.encode(input);
+    final b = utf8.encode(stored);
+    if (a.length != b.length) return false;
+    var difference = 0;
+    for (var i = 0; i < a.length; i++) {
+      difference |= a[i] ^ b[i];
+    }
+    return difference == 0;
   }
 }

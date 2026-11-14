@@ -9,12 +9,12 @@ import 'package:csv/csv.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:keezy/src/core/components/encrypt/encrypt_decrypt_services.dart';
 import 'package:keezy/src/core/data/services/secure_storage_service.dart';
 import 'package:keezy/src/core/either/either.dart';
 import 'package:keezy/src/core/exceptions/repository_exception.dart';
 import 'package:keezy/src/modules/auth/controllers/auth_controller.dart';
 import 'package:keezy/src/modules/auth/model/auth_user_model.dart';
+import 'package:keezy/src/modules/auth/repositories/auth_repository.dart';
 import 'package:keezy/src/modules/configuracoes/backup_restore/controllers/backup_restore_state.dart';
 import 'package:keezy/src/modules/register/controller/register_controller.dart';
 import 'package:keezy/src/modules/register/model/register_model.dart';
@@ -29,7 +29,6 @@ class BackupRestoreController extends Cubit<BackupRestoreState> {
   static const _userKey = 'auth_user';
 
   final secureStorageService = SecureStorageService();
-  final encryptP = EncryptDecryptServices();
   final RegisterController registerControllerX;
 
    /// 🔐 Função para criptografar os dados
@@ -84,32 +83,7 @@ class BackupRestoreController extends Cubit<BackupRestoreState> {
 
   // Buscar o usuário para exportá-lo
   Future<AuthUserModel?> getUser() async {
-    final userData = await secureStorageService.getDataKey(_userKey);
-
-    if (userData == '') return null;
-
-    try {
-      final jsonUser = json.decode(userData);
-
-      final encryptedPassword = jsonUser['password']?.toString();
-      if (encryptedPassword == null) {
-        throw Exception('Senha ausente ou inválido no JSON');
-      }
-
-      // Descriptografar a senha
-      final decryptedPassword = encryptP.decryptPassword(encryptedPassword);
-
-      final user = AuthUserModel(
-        name: jsonUser['name']?.toString() ?? '',
-        email: jsonUser['email']?.toString() ?? '',
-        password: decryptedPassword,
-      );
-
-      return user;
-    } catch (e) {
-      log('Erro ao recuperar o usuário: $e');
-      return null;
-    }
+    return AuthRepository().getUser();
   }
 
   Future<String> exportBackup() async {

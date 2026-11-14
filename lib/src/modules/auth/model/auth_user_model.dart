@@ -28,7 +28,6 @@ import 'dart:convert';
     return <String, dynamic>{
       'name': name,
       'email': email,
-      'password': password,
     };
   }
 
@@ -36,7 +35,7 @@ import 'dart:convert';
     return AuthUserModel(
       name: map['name'] as String,
       email: map['email'] as String,
-      password: map['password'] as String,
+      password: map['password']?.toString() ?? '',
     );
   }
 
@@ -45,7 +44,7 @@ import 'dart:convert';
   factory AuthUserModel.fromJson(String source) => AuthUserModel.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
-  String toString() => 'AuthUserModel(name: $name, email: $email, password: $password)';
+  String toString() => 'AuthUserModel(name: $name, email: $email)';
 
   @override
   bool operator ==(covariant AuthUserModel other) {

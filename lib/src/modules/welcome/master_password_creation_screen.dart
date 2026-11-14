@@ -93,9 +93,8 @@ class _MasterPasswordCreationScreenState
       if (!mounted) return;
 
       try {
-        await controller.limparContaAntesDeCriarUser();
-        await controller.registerUser(user);
-        if (mounted) {
+        final saved = await controller.registerUser(user);
+        if (saved && mounted) {
           context.push(RoutesPaths.biometricSetup);
 
            context.push(

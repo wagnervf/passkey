@@ -192,13 +192,19 @@ class _ConfiguracoesPageState extends State<ConfiguracoesPage> {
             ),
             TextButton(
               onPressed: () async {
-                bool result = await context
-                    .read<AuthController>()
-                    .logoutAndRemoveUser();
-
-                await context
+                final recordsRemoved = await context
                     .read<RegisterController>()
                     .deleteAllRegistersController();
+                if (!context.mounted) return;
+                if (!recordsRemoved) {
+                  ShowMessager.show(context, 'Não foi possível apagar os registros.');
+                  return;
+                }
+
+                final result = await context
+                    .read<AuthController>()
+                    .logoutAndRemoveUser();
+                if (!context.mounted) return;
 
                 if (result) {
                   ShowMessager.show(context, 'Usuário removido com sucesso.');
