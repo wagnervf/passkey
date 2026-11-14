@@ -4,21 +4,21 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: ^3.11.0
+  sdk: ^3.14.0
 
 dependencies:
   flutter:
     sdk: flutter
-  cupertino_icons: ^1.0.8
-  go_router: ^16.1.0
+  cupertino_icons: ^2.0.0
+  go_router: ^18.1.4
   shared_preferences: ^2.5.3
   provider: ^6.1.5
   bloc: ^9.0.0
   flutter_bloc: ^9.1.1
   intl: ^0.20.2
-  font_awesome_flutter: ^10.9.0
-  equatable: ^2.0.7
-  animations: ^2.0.11
+  font_awesome_flutter: ^11.0.0
+  equatable: ^3.0.0
+  animations: ^3.0.0
   local_auth: ^3.0.0
   encrypt: ^5.0.3
   form_field_validator: ^1.1.0
@@ -26,17 +26,19 @@ dependencies:
   uuid: ^4.5.1
   flutter_launcher_icons: ^0.14.4
   path_provider: ^2.1.5
-  share_plus: ^12.0.1
+  share_plus: ^13.3.1
   modal_bottom_sheet: ^3.0.0
-  flutter_secure_storage: ^9.2.4
+  flutter_secure_storage: ^11.2.0
   flutter_svg: ^2.2.0
-  file_picker: ^10.3.3
-  csv: ^6.0.0
+  file_picker: ^13.3.3
+  csv: ^8.0.0
   installed_apps: ^2.0.0
-  introduction_screen: ^4.0.0
+  introduction_screen: ^5.0.1
   hive: ^2.2.3
   hive_flutter: ^1.1.0
   qr_flutter: ^4.1.0
+  local_auth_android: ^2.3.0
+  local_auth_darwin: ^2.0.5
   cryptography: ^2.9.0
 
   

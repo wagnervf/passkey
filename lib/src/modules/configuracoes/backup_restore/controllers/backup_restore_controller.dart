@@ -183,17 +183,17 @@ class BackupRestoreController extends Cubit<BackupRestoreState> {
       //   allowedExtensions: ['enc'], // Arquivo encriptado
       // );
 
-      final FilePickerResult? result = await FilePicker.platform.pickFiles(
+      final PlatformFile? result = await FilePicker.pickFile(
         dialogTitle: 'Selecione um arquivo',
         type: FileType.any, // ✅ Permite qualquer arquivo
       );
 
-      if (result == null || result.files.single.path == null) {
+      if (result?.path == null) {
         log("Nenhum arquivo selecionado.");
         return null;
       }
 
-      final File file = File(result.files.single.path!);
+      final File file = File(result!.path!);
       final String encryptedContent = await file.readAsString();
 
       // 🔓 Descriptografar os dados
@@ -271,17 +271,17 @@ class BackupRestoreController extends Cubit<BackupRestoreState> {
   /// Importa um único registro a partir de um arquivo JSON
   Future<Either<RepositoryException, bool>> importarUmRegistro() async {
     try {
-      final FilePickerResult? result = await FilePicker.platform.pickFiles(
+      final PlatformFile? result = await FilePicker.pickFile(
         dialogTitle: 'Selecione um arquivo',
         type: FileType.any, // ✅ Permite qualquer arquivo
       );
 
-      if (result == null || result.files.single.path == null) {
+      if (result?.path == null) {
         log("Nenhum arquivo selecionado.");
         return Left(RepositoryException(message: 'Nenhum arquivo selecionado.'));
       }
 
-      final File file = File(result.files.single.path!);
+      final File file = File(result!.path!);
       final String encryptedContent = await file.readAsString();
 
       // 🔓 Descriptografar os dados
@@ -336,27 +336,25 @@ class BackupRestoreController extends Cubit<BackupRestoreState> {
 Future<List<Map<String, String>>> importCsv() async {
   try {
     // Permitir que o usuário selecione o arquivo CSV
-    final FilePickerResult? result = await FilePicker.platform.pickFiles(
+    final PlatformFile? result = await FilePicker.pickFile(
       dialogTitle: 'Selecione um arquivo CSV',
       type: FileType.custom,
       allowedExtensions: ['csv'], // Apenas arquivos CSV
     );
 
-    if (result == null || result.files.single.path == null) {
+    if (result?.path == null) {
       throw Exception('Nenhum arquivo selecionado.');
     }
 
-    final File file = File(result.files.single.path!);
+    final File file = File(result!.path!);
 
     if (!await file.exists()) {
       throw Exception('Arquivo CSV não encontrado: ${file.path}');
     }
 
     final csvContent = await file.readAsString();
-    final List<List<dynamic>> rows = const CsvToListConverter().convert(
-      csvContent,
-      eol: '\n', // Define o separador de linhas
-    );
+    final List<List<dynamic>> rows = const CsvDecoder(fieldDelimiter: ',')
+        .convert(csvContent);
 
     if (rows.isEmpty) {
       throw Exception('O arquivo CSV está vazio.');

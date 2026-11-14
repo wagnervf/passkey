@@ -11,16 +11,16 @@ class ImportRegistersCsvRepositoryImpl implements ImportRegistersCsvRepository {
   @override
   Future<List<RegisterModel>> importFromCsv() async {
     // 1. Abre o seletor de arquivo
-    final result = await FilePicker.platform.pickFiles(
+    final result = await FilePicker.pickFile(
       type: FileType.custom,
       allowedExtensions: ['csv'],
     );
 
-    if (result == null || result.files.single.path == null) {
+    if (result?.path == null) {
       throw Exception('Nenhum arquivo selecionado.');
     }
 
-    final file = File(result.files.single.path!);
+    final file = File(result!.path!);
 
     if (!await file.exists()) {
       throw Exception('Arquivo CSV não encontrado.');
@@ -29,11 +29,8 @@ class ImportRegistersCsvRepositoryImpl implements ImportRegistersCsvRepository {
     // 2. Leitura com trim para remover espaços/breaks extras
     final csvString = (await file.readAsString()).trim();
 
-    final csvTable = const CsvToListConverter(
-      fieldDelimiter: ',',
-      eol: '\n',
-      shouldParseNumbers: false,
-    ).convert(csvString);
+    final csvTable = const CsvDecoder(fieldDelimiter: ',', dynamicTyping: false)
+        .convert(csvString);
 
     if (csvTable.isEmpty) {
       throw Exception('Arquivo CSV vazio.');

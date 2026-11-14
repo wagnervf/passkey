@@ -21,13 +21,13 @@ class _ImportOneRegisterPageState extends State<ImportOneRegisterPage> {
   }
 
   Future<void> pickJsonFile() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
+    PlatformFile? result = await FilePicker.pickFile(
       type: FileType.custom,
       allowedExtensions: ['json'],
     );
 
-    if (result != null && result.files.single.path != null) {
-      final fileContent = await File(result.files.single.path!).readAsString();
+    if (result?.path != null) {
+      final fileContent = await File(result!.path!).readAsString();
       setState(() {
         jsonController.text = fileContent;
       });

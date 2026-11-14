@@ -109,7 +109,7 @@ class Utils {
     );
   }
 
-  static IconData getIcon(String iconName) {
+  static FaIconData getIcon(String iconName) {
     switch (iconName) {
       case 'google':
         return FontAwesomeIcons.google;
@@ -282,7 +282,7 @@ class Utils {
         return FontAwesomeIcons.microsoft;
 
       default:
-        return Icons.help_outline; // Ícone padrão para nomes desconhecidos
+        return FontAwesomeIcons.circleQuestion; // Ícone padrão para nomes desconhecidos
     }
   }
 }

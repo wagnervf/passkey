@@ -32,7 +32,7 @@ class ExportRegistersCsvRepositoryImpl implements ExportRegistersCsvRepository {
           )
           .toList();
 
-      final csvData = const ListToCsvConverter().convert([headers, ...rows]);
+      final csvData = const CsvEncoder().convert([headers, ...rows]);
 
       // Cria nome único do arquivo
       final now = DateTime.now();
@@ -80,7 +80,7 @@ class ExportRegistersCsvRepositoryImpl implements ExportRegistersCsvRepository {
   Future<void> exportEmptyCsvTemplate() async {
     try {
       const headersExemple = ['name', 'url', 'username', 'password', 'note'];
-      final csvData = const ListToCsvConverter().convert([headersExemple]);
+      final csvData = const CsvEncoder().convert([headersExemple]);
 
       final now = DateTime.now();
       final formattedDate =
