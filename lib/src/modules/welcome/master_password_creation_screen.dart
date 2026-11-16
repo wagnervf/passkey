@@ -237,7 +237,7 @@ class _MasterPasswordCreationScreenState
                   SizedBox(height: 40),
                   TextButton.icon(
                     icon: const Icon(Icons.help, size: 16),
-                    label: Text('Porque devo criar uma conta?'),
+                    label: Text('Por que criar uma senha mestra?'),
                     onPressed: () => HelpView.mostrarDialogCriarConta(context),
                   ),
                 ],

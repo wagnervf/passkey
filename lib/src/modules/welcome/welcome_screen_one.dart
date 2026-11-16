@@ -88,26 +88,26 @@ class _WelcomeScreenOneState extends State<WelcomeScreenOne> {
                     case 1:
                       return _buildCarouselPage(
                         context,
-                        icon: Icons.cloud_queue,
-                        title: 'Acesso Onde Estiver',
+                        icon: Icons.phone_android,
+                        title: 'Seus dados no seu aparelho',
                         description:
-                            'Seus dados sempre disponíveis, com ou sem conta na nuvem, como preferir.',
+                            'O cofre fica neste dispositivo. Exporte um CSV para transferir registros manualmente.',
                       );
                     case 2:
                       return _buildCarouselPage(
                         context,
                         icon: Icons.security,
-                        title: 'Sua Privacidade em Primeiro Lugar',
+                        title: 'Proteção local',
                         description:
-                            'Com criptografia de ponta a ponta, só você tem acesso ao seu cofre digital.',
+                            'Seus registros são criptografados no aparelho e protegidos pela senha mestra.',
                       );
                     case 3:
                       return _buildCarouselPage(
                         context,
-                        icon: Icons.wb_cloudy_outlined,
-                        title: 'Importe suas Senhas do Google Chrome',
+                        icon: Icons.upload_file_outlined,
+                        title: 'Importe arquivos CSV',
                         description:
-                            'Com criptografia de ponta a ponta, só você tem acesso ao seu cofre digital.',
+                            'Adicione registros ao cofre usando um arquivo CSV compatível.',
                       );
                     default:
                       return Container(); // Should not happen
