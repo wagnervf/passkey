@@ -102,11 +102,11 @@ class _MasterPasswordCreationScreenState
       extra: masterPassword, // enviar senha para tela
     );
         }
-      } catch (e) {
+      } catch (_) {
         if (mounted) {
           DialogUtils.showSuccessDialog(
             context,
-            'Erro ao realizar cadastro: ${e.toString()}',
+            'Erro ao realizar cadastro. Tente novamente.',
           );
         }
       }

@@ -183,8 +183,6 @@ class RegisterHive {
   int count() => _box.length;
 
   void debugPrintAll() {
-    for (var item in _box.values) {
-      l.log('REG: ${item.toString()}');
-    }
+    l.log('Total de registros: ${_box.length}');
   }
 }

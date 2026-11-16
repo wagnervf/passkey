@@ -141,7 +141,7 @@ factory RegisterModel.fromJson(Map<String, dynamic> map) {
 
   @override
   String toString() {
-    return 'RegisterModel(id: $id, name: $name, username: $username, password: $password, url: $url, note: $note, type: $type, selectedApp: $selectedApp, isFavorite: $isFavorite )';
+    return 'RegisterModel(id: $id)';
   }
 
   @override

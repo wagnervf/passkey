@@ -46,7 +46,7 @@ class ExportRegistersCsvRepositoryImpl implements ExportRegistersCsvRepository {
       final file = File('${dir.path}/$fileName');
       await file.writeAsString(csvData);
 
-      log('📁 Arquivo CSV gerado temporariamente: ${file.path}');
+      log('Arquivo CSV temporário gerado.');
 
       // Compartilha diretamente com o SharePlus
       final shareParams = ShareParams(
@@ -69,8 +69,8 @@ class ExportRegistersCsvRepositoryImpl implements ExportRegistersCsvRepository {
 
       log('✅ Registros compartilhados com sucesso!');
       return file; // retorna o arquivo só se foi realmente compartilhado
-    } catch (e, s) {
-      log('❌ Erro ao exportar CSV: $e', stackTrace: s);
+    } catch (_) {
+      log('Erro ao exportar CSV.');
       return null;
     }
   }
@@ -109,8 +109,8 @@ class ExportRegistersCsvRepositoryImpl implements ExportRegistersCsvRepository {
       if (await file.exists()) {
         await file.delete();
       }
-    } catch (e, s) {
-      log('Erro ao exportar modelo CSV: $e', stackTrace: s);
+    } catch (_) {
+      log('Erro ao exportar modelo CSV.');
       rethrow;
     }
   }

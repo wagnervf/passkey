@@ -105,8 +105,8 @@ class _ExportRegisterCsvPageState extends State<ExportRegisterCsvPage> {
   ) async {
     try {
       await context.read<ExportRegisterCsvController>().exportFileCsv();
-    } catch (e, s) {
-      log('Erro ao exportar registros: $e', stackTrace: s);
+    } catch (_) {
+      log('Erro ao exportar registros.');
       if (!context.mounted) return;
       ShowMessager.show(
         context,

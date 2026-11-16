@@ -22,7 +22,7 @@ Future<void> main() async {
       runApp(ApplicationBinding(child: AppWidget()));
     },
     (Object error, StackTrace stack) {
-      log('Erro não tratado!', error: error, stackTrace: stack);
+      log('Erro não tratado.');
     },
   );
 }

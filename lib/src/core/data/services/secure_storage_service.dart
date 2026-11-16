@@ -28,8 +28,8 @@ class SecureStorageService {
       String encodedList = jsonEncode(list);
       await _secureStorage.write(key: key, value: encodedList);
       return true;
-    } catch (e) {
-      log('Erro ao salvar a lista: $e');
+    } catch (_) {
+      log('Erro ao salvar a lista.');
       return false; 
     }
   }
@@ -42,8 +42,8 @@ class SecureStorageService {
         return decodedList.cast<String>();
       }
       return [];
-    } catch (e) {
-      log('Erro ao recuperar a lista: $e');
+    } catch (_) {
+      log('Erro ao recuperar a lista.');
       return [];
     }
   }

@@ -39,8 +39,8 @@ class RegisterController extends Cubit<RegisterState> {
           emit(RegisterLoaded(register: _listRegisters));
           return Right(unit);
       }
-    } catch (e, s) {
-      log("Erro inesperado ao buscar registros: $e", stackTrace: s);
+    } catch (_) {
+      log('Erro inesperado ao buscar registros.');
       const message = "Erro ao buscar Register";
       emit(RegisterError(message));
       return Left(RepositoryException(message: message));
@@ -64,8 +64,8 @@ class RegisterController extends Cubit<RegisterState> {
           await getRegisterController();
           return true;
       }
-    } catch (e, s) {
-      log("Erro inesperado ao salvar/atualizar registro: $e", stackTrace: s);
+    } catch (_) {
+      log('Erro inesperado ao salvar ou atualizar registro.');
       emit(RegisterError("Erro inesperado ao salvar registro."));
       return false;
     }
@@ -89,8 +89,8 @@ class RegisterController extends Cubit<RegisterState> {
           await getRegisterController();
           return true;
       }
-    } catch (e, s) {
-      log("Erro inesperado ao remover registro: $e", stackTrace: s);
+    } catch (_) {
+      log('Erro inesperado ao remover registro.');
       emit(RegisterError("Erro ao remover"));
       return false;
     }
@@ -105,8 +105,8 @@ class RegisterController extends Cubit<RegisterState> {
       final registro = RegisterModel.fromMap(data);
 
       await saveAndUpdateRegisterController(registro);
-    } catch (e) {
-      log("Erro ao importar registro: $e");
+    } catch (_) {
+      log('Erro ao importar registro.');
     }
   }
 
@@ -126,8 +126,8 @@ class RegisterController extends Cubit<RegisterState> {
           return List.from(result)
             ..sort((a, b) => b.id.compareTo(a.id));
       }
-    } catch (e) {
-      log("Erro ao buscar registros para exportação: $e");
+    } catch (_) {
+      log('Erro ao buscar registros para exportação.');
       return null;
     }
   }
@@ -149,8 +149,8 @@ class RegisterController extends Cubit<RegisterState> {
           await getRegisterController();
           return true;
       }
-    } catch (e) {
-      log("Erro ao remover todos os registros: $e");
+    } catch (_) {
+      log('Erro ao remover todos os registros.');
       return false;
     }
   }
@@ -168,8 +168,8 @@ class RegisterController extends Cubit<RegisterState> {
         await getRegisterController(); // recarrega a lista
         return true;
     }
-  } catch (e, s) {
-    log('Erro ao salvar lista de registros: $e', stackTrace: s);
+  } catch (_) {
+    log('Erro ao salvar lista de registros.');
     emit(RegisterError('Erro inesperado ao salvar lista.'));
     return false;
   }

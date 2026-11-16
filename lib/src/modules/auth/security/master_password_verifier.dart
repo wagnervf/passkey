@@ -19,7 +19,7 @@ class MasterPasswordVerifier {
 
   Future<Map<String, Object>> create(String password) async {
     if (password.isEmpty) {
-      throw ArgumentError.value(password, 'password', 'Must not be empty');
+      throw ArgumentError('A senha mestra não pode estar vazia');
     }
 
     final salt = List<int>.generate(saltLength, (_) => _random.nextInt(256));

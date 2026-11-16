@@ -75,8 +75,8 @@ class BackupRestoreController extends Cubit<BackupRestoreState> {
             (registro) => RegisterModel.fromMap(jsonDecode(registro)),
           )
           .toList();
-    } catch (e, s) {
-      log("Erro ao buscar registros: $e", error: e, stackTrace: s);
+    } catch (_) {
+      log('Erro ao buscar registros para backup.');
       return [];
     }
   }
@@ -123,7 +123,7 @@ class BackupRestoreController extends Cubit<BackupRestoreState> {
       await file.writeAsString(encryptedData);
 
       // Compartilhando o arquivo
-      final ShareResult result = await Share.shareXFiles(
+      await Share.shareXFiles(
         [XFile(file.path)],
         text: 'Segue o backup criptografado dos dados do meu aplicativo!',
       );
@@ -131,13 +131,13 @@ class BackupRestoreController extends Cubit<BackupRestoreState> {
       file.existsSync();
       emit(BackupRestoreStateSuccessState());
 
-      log('Compartilhamento: $result');
-      log('Backup exportado com sucesso! Arquivo salvo em: $filePath');
+      log('Backup exportado com sucesso.');
       return 'Backup exportado com sucesso!';
-    } catch (e, s) {
-      emit(BackupRestoreStateErrorState("Erro ao exportar backup: $e"));
-      log("Erro ao exportar backup: $e", error: e.toString(), stackTrace: s);
-      return "Erro ao exportar backup: $e";
+    } catch (_) {
+      const message = 'Erro ao exportar backup.';
+      emit(BackupRestoreStateErrorState(message));
+      log(message);
+      return message;
     }
   }
  
@@ -154,7 +154,6 @@ class BackupRestoreController extends Cubit<BackupRestoreState> {
         AuthUserModel user = resultado['user'];
         List<RegisterModel> registros = resultado['registros'];
 
-        log('Usuário importado: ${user.name}, ${user.email}');
         log('Registros importados: ${registros.length}');
 
         // Salvar usuário corretamente via AuthController
@@ -169,9 +168,10 @@ class BackupRestoreController extends Cubit<BackupRestoreState> {
         emit(BackupRestoreStateErrorState('Falha ao importar os dados.'));
         return 'Falha ao importar os dados.';
       }
-    } catch (e) {
-      emit(BackupRestoreStateErrorState("Erro ao importar backup: $e"));
-      return "Erro ao importar backup: $e";
+    } catch (_) {
+      const message = 'Erro ao importar backup.';
+      emit(BackupRestoreStateErrorState(message));
+      return message;
     }
   }
 
@@ -219,15 +219,14 @@ class BackupRestoreController extends Cubit<BackupRestoreState> {
           registrosJson.map((r) => RegisterModel.fromJson(r)).toList();
 
       log("Importação concluída com sucesso!");
-      log("Usuário: ${user.name}, ${user.email}");
       log("Registros: ${registros.length}");
 
       return {
         'user': user,
         'registros': registros,
       };
-    } catch (e, s) {
-      log("Erro ao importar arquivo: $e", error: e.toString(), stackTrace: s);
+    } catch (_) {
+      log('Erro ao importar arquivo de backup.');
       return null;
     }
   }
@@ -250,7 +249,7 @@ class BackupRestoreController extends Cubit<BackupRestoreState> {
       await file.writeAsString(encryptedData);
 
       // Compartilhando o arquivo
-      final ShareResult result = await Share.shareXFiles(
+      await Share.shareXFiles(
         [XFile(file.path)],
         text: 'Segue o backup criptografado do registro selecionado!',
       );
@@ -258,12 +257,11 @@ class BackupRestoreController extends Cubit<BackupRestoreState> {
       file.existsSync();
       emit(BackupRestoreStateSuccessState());
 
-      log('Compartilhamento: $result');
-      log('Registro exportado com sucesso! Arquivo salvo em: $filePath');
+      log('Registro exportado com sucesso.');
       return true;
-    } catch (e, s) {
-      log("Erro ao exportar registro: $e", error: e, stackTrace: s);
-      emit(BackupRestoreStateErrorState("Erro ao exportar registro: $e"));
+    } catch (_) {
+      log('Erro ao exportar registro.');
+      emit(BackupRestoreStateErrorState('Erro ao exportar registro.'));
       return false;
     }
   }
@@ -309,8 +307,8 @@ class BackupRestoreController extends Cubit<BackupRestoreState> {
         return Left(RepositoryException(
             message: 'Falha ao salvar o registro importado.'));
       }
-    } catch (e, s) {
-      log("Erro ao importar registro: $e", error: e, stackTrace: s);
+    } catch (_) {
+      log('Erro ao importar registro.');
       return Left(RepositoryException(message: 'Erro ao importar o registro.'));
     }
   }
@@ -326,8 +324,8 @@ class BackupRestoreController extends Cubit<BackupRestoreState> {
       await secureStorageService.saveStringList(_keyRegistros, registrosString);
 
       return true;
-    } catch (e, s) {
-      log("Erro ao salvar registro localmente: $e", error: e, stackTrace: s);
+    } catch (_) {
+      log('Erro ao salvar registro importado.');
       return false;
     }
   }
@@ -349,7 +347,7 @@ Future<List<Map<String, String>>> importCsv() async {
     final File file = File(result!.path!);
 
     if (!await file.exists()) {
-      throw Exception('Arquivo CSV não encontrado: ${file.path}');
+      throw Exception('Arquivo CSV não encontrado.');
     }
 
     final csvContent = await file.readAsString();
@@ -373,13 +371,9 @@ Future<List<Map<String, String>>> importCsv() async {
       return rowData;
     }).toList();
 
-    for (var row in data) {
-      print('Name: ${row['name']}, URL: ${row['url']}, Username: ${row['username']}, Password: ${row['password']}, Note: ${row['note']}');
-    }
-
     return data;
-  } catch (e) {
-    rethrow;
+  } catch (_) {
+    throw const FormatException('Não foi possível importar o CSV.');
   }
 }
 

@@ -32,9 +32,9 @@ class ImportRegisterCsvController extends Cubit<ImportRegistersCsvState> {
       emit(ImportCsvLoaded('Registros importados: ${registers.length}'));
 
       return registers;
-    } catch (e, s) {
-      log('Erro ao importar CSV: $e', stackTrace: s);
-      emit(ImportCsvError('Erro ao importar CSV: $e'));
+    } catch (_) {
+      log('Erro ao importar CSV.');
+      emit(ImportCsvError('Erro ao importar CSV. Verifique o arquivo.'));
       return null;
     }
   }
@@ -75,9 +75,9 @@ class ImportRegisterCsvController extends Cubit<ImportRegistersCsvState> {
 
       emit(ImportCsvLoaded('Importação concluída com sucesso!'));
       return 'Importação concluída com sucesso!';
-    } catch (e, s) {
-      log('Erro ao restaurar backup: $e', stackTrace: s);
-      final errorMsg = 'Erro ao restaurar backup: $e';
+    } catch (_) {
+      log('Erro ao restaurar registros do CSV.');
+      const errorMsg = 'Erro ao restaurar registros do CSV.';
       emit(ImportCsvError(errorMsg));
       return errorMsg;
     }

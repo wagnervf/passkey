@@ -32,8 +32,8 @@ class AuthRepository {
       };
       await secureStorageService.setDataKey(_userKey, json.encode(userToSave));
       return true;
-    } catch (e, s) {
-      log('Erro ao cadastrar usuário', error: e, stackTrace: s);
+    } catch (_) {
+      log('Erro ao cadastrar usuário.');
       return false;
     }
   }
@@ -46,8 +46,8 @@ class AuthRepository {
       stored['email'] = email;
       await secureStorageService.setDataKey(_userKey, jsonEncode(stored));
       return true;
-    } catch (e, s) {
-      log('Erro ao atualizar perfil', error: e, stackTrace: s);
+    } catch (_) {
+      log('Erro ao atualizar perfil.');
       return false;
     }
   }
@@ -79,8 +79,8 @@ class AuthRepository {
         name: stored['name']?.toString() ?? '',
         email: stored['email']?.toString() ?? '',
       );
-    } catch (e) {
-      log('Erro ao recuperar o usuário', error: e);
+    } catch (_) {
+      log('Erro ao recuperar o usuário.');
       return null;
     }
   }
@@ -103,8 +103,8 @@ class AuthRepository {
       }
       await _migrateLegacy(stored, inputPassword);
       return true;
-    } catch (e) {
-      log('Erro ao validar senha mestra', error: e);
+    } catch (_) {
+      log('Erro ao validar senha mestra.');
       return false;
     }
   }

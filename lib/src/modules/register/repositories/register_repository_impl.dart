@@ -22,8 +22,8 @@ class RegisterRepositoryImpl implements RegisterRepository {
       // garantir lista não nula
       final safeList = list ?? <RegisterModel>[];
       return Right(safeList);
-    } catch (e, s) {
-      log('Erro em getAllRegisterRepository: $e', stackTrace: s);
+    } catch (_) {
+      log('Erro ao buscar registros.');
       return Left(RepositoryException(message: 'Erro ao buscar os registros.'));
     }
   }
@@ -33,8 +33,8 @@ class RegisterRepositoryImpl implements RegisterRepository {
     try {
       await _registerHive.addRegister(register);
       return Right(true);
-    } catch (e, s) {
-      log('Erro em saveRegisterRepository: $e', stackTrace: s);
+    } catch (_) {
+      log('Erro ao salvar registro.');
       return Left(RepositoryException(message: 'Erro ao salvar o registro.'));
     }
   }
@@ -48,8 +48,8 @@ class RegisterRepositoryImpl implements RegisterRepository {
       }
       await _registerHive.updateRegister(register);
       return Right(true);
-    } catch (e, s) {
-      log('Erro em updateRegisterRepository: $e', stackTrace: s);
+    } catch (_) {
+      log('Erro ao atualizar registro.');
       return Left(RepositoryException(message: 'Erro ao atualizar o registro.'));
     }
   }
@@ -63,8 +63,8 @@ class RegisterRepositoryImpl implements RegisterRepository {
       }
       await _registerHive.deleteRegister(register.id);
       return Right(unit);
-    } catch (e, s) {
-      log('Erro em deleteRegisterRepository: $e', stackTrace: s);
+    } catch (_) {
+      log('Erro ao remover registro.');
       return Left(RepositoryException(message: 'Erro ao remover o registro.'));
     }
   }
@@ -74,8 +74,8 @@ class RegisterRepositoryImpl implements RegisterRepository {
     try {
       await _registerHive.clearAll();
       return Right(unit);
-    } catch (e, s) {
-      log('Erro em deleteAllRegistersRepository: $e', stackTrace: s);
+    } catch (_) {
+      log('Erro ao remover registros.');
       return Left(RepositoryException(message: 'Erro ao remover os registros.'));
     }
   }
@@ -88,8 +88,8 @@ Future<Either<RepositoryException, bool>> saveListRegisterRepository(
   try {
     await _registerHive.replaceAll(listRegisters); 
     return Right(true);
-  } catch (e, s) {
-    log('Erro em saveListRegisterRepository: $e', stackTrace: s);
+  } catch (_) {
+    log('Erro ao salvar lista de registros.');
     return Left(RepositoryException(message: 'Erro ao salvar todos registros.'));
   }
 }

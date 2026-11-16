@@ -129,8 +129,8 @@ class MasterPasswordWarningScreen extends StatelessWidget {
       );
 
       await SharePlus.instance.share(shareParams);
-    } catch (e, s) {
-      log('Erro ao exportar QR: $e', stackTrace: s);
+    } catch (_) {
+      log('Erro ao exportar QR.');
       // ShowMessager.show(, 'Erro ao exportar QR Code');
     }
   }

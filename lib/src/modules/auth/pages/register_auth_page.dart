@@ -66,10 +66,10 @@ class _RegisterAuthPageState extends State<RegisterAuthPage> {
             password: _passwordController.text,
           ));
         }
-      } catch (e) {
+      } catch (_) {
         DialogUtils.showSuccessDialog(
           context,
-          'Erro ao realizar cadastro: ${e.toString()}',
+          'Erro ao realizar cadastro. Tente novamente.',
         );
       }
     }
