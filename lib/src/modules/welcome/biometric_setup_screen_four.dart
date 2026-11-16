@@ -1,16 +1,17 @@
-
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:keezy/src/modules/register/data/register_hive.dart';
 
 class BiometricSetupScreenFour extends StatefulWidget {
   const BiometricSetupScreenFour({super.key});
 
   @override
-  State<BiometricSetupScreenFour> createState() => _BiometricSetupScreenFourState();
+  State<BiometricSetupScreenFour> createState() =>
+      _BiometricSetupScreenFourState();
 }
 
 class _BiometricSetupScreenFourState extends State<BiometricSetupScreenFour> {
@@ -45,11 +46,13 @@ class _BiometricSetupScreenFourState extends State<BiometricSetupScreenFour> {
     setState(() => _isProcessing = true);
     try {
       final isAuthenticated = await _auth.authenticate(
-        localizedReason: 'Use sua biometria para ativar o acesso rápido e seguro.',
-          biometricOnly: true,
+        localizedReason:
+            'Use sua biometria para ativar o acesso rápido e seguro.',
+        biometricOnly: true,
       );
 
       if (isAuthenticated) {
+        await RegisterHive.enableBiometrics();
         await _saveBiometricPreference(true);
         if (!mounted) return;
         _showSnackBar(context, 'Acesso biométrico ativado com sucesso!');
@@ -98,8 +101,11 @@ class _BiometricSetupScreenFourState extends State<BiometricSetupScreenFour> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.fingerprint,
-                    size: 120, color: theme.colorScheme.primary),
+                Icon(
+                  Icons.fingerprint,
+                  size: 120,
+                  color: theme.colorScheme.primary,
+                ),
                 const SizedBox(height: 32),
                 Text(
                   'Deseja ativar o acesso por biometria?',
@@ -132,15 +138,18 @@ class _BiometricSetupScreenFourState extends State<BiometricSetupScreenFour> {
                           width: 20,
                           height: 20,
                           child: CircularProgressIndicator(
-                              strokeWidth: 2, color: Colors.white),
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
                         )
                       : const Icon(Icons.check_circle_outline),
                   label: Text(
                     _isProcessing ? 'Ativando...' : 'Ativar Agora',
                     style: const TextStyle(fontSize: 18, color: Colors.white),
                   ),
-                  onPressed:
-                      _canCheckBiometrics && !_isProcessing ? _activateBiometrics : null,
+                  onPressed: _canCheckBiometrics && !_isProcessing
+                      ? _activateBiometrics
+                      : null,
                   style: ElevatedButton.styleFrom(
                     minimumSize: const Size.fromHeight(50),
                     shape: RoundedRectangleBorder(

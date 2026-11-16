@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:keezy/src/modules/register/data/register_hive.dart';
 
 class BiometricSwitchWidget extends StatefulWidget {
   const BiometricSwitchWidget({super.key});
@@ -51,9 +52,16 @@ class _BiometricSwitchWidgetState extends State<BiometricSwitchWidget> {
         return;
       }
 
-      await prefs.setBool('biometric_enabled', true);
+      try {
+        await RegisterHive.enableBiometrics();
+        await prefs.setBool('biometric_enabled', true);
+      } catch (_) {
+        _showSnackBar('Não foi possível vincular a biometria ao cofre.');
+        return;
+      }
       _showSnackBar('Acesso biométrico ativado.');
     } else {
+      await RegisterHive.disableBiometrics();
       await prefs.setBool('biometric_enabled', false);
       _showSnackBar('Acesso biométrico desativado.');
     }
@@ -88,10 +96,8 @@ class _BiometricSwitchWidgetState extends State<BiometricSwitchWidget> {
       value: _biometricEnabled,
       onChanged: (value) => _toggleBiometric(value),
       activeThumbColor: Theme.of(context).colorScheme.primary,
-    
-      secondary: Icon(
-        _biometricEnabled ? Icons.fingerprint : Icons.do_disturb,
-      ),
+
+      secondary: Icon(_biometricEnabled ? Icons.fingerprint : Icons.do_disturb),
     );
   }
 }

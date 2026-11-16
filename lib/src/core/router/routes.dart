@@ -12,6 +12,7 @@ import 'package:keezy/src/modules/home/home_navigation_page.dart';
 import 'package:keezy/src/modules/profile/profile_page.dart';
 import 'package:keezy/src/modules/register/views/pages/register_form_page.dart';
 import 'package:keezy/src/modules/register/views/widgets/list_registers.dart';
+import 'package:keezy/src/modules/register/data/register_hive.dart';
 import 'package:keezy/src/modules/splash/initial_screen.dart';
 import 'package:keezy/src/modules/splash/splash_page.dart';
 import 'package:keezy/src/modules/welcome/biometric_setup_screen_four.dart';
@@ -27,14 +28,30 @@ part 'routes_pages.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
-const String initial =  RoutesPaths.splash;
+const String initial = RoutesPaths.splash;
 
 final routes = GoRouter(
   initialLocation: initial,
   navigatorKey: navigatorKey,
-  observers: [
-  ActivityObserver(),
-],
+  redirect: (context, state) {
+    const protectedPaths = {
+      RoutesPaths.home,
+      RoutesPaths.profile,
+      RoutesPaths.register,
+      RoutesPaths.config,
+      RoutesPaths.importOneRegister,
+      RoutesPaths.exportRegistersCsv,
+      RoutesPaths.listRegisters,
+      RoutesPaths.biometricSetup,
+      RoutesPaths.finalization,
+    };
+    if (protectedPaths.contains(state.matchedLocation) &&
+        !RegisterHive.isUnlocked) {
+      return RoutesPaths.auth;
+    }
+    return null;
+  },
+  observers: [ActivityObserver()],
   routes: <RouteBase>[
     // GoRoute(
     //   path: RoutesPaths.initial,
@@ -45,20 +62,19 @@ final routes = GoRouter(
     //   },
     // ),
 
-     GoRoute(
+    GoRoute(
       path: RoutesPaths.initial,
       builder: (BuildContext context, GoRouterState state) {
         return WelcomeScreenOne();
       },
     ),
 
-     GoRoute(
+    GoRoute(
       path: '/mode-selection',
       builder: (BuildContext context, GoRouterState state) {
         return ModeSelectionScreenTwo();
       },
     ),
-
 
     GoRoute(
       path: '/create-master-password',
@@ -95,7 +111,7 @@ final routes = GoRouter(
       },
     ),
 
-     GoRoute(
+    GoRoute(
       path: RoutesPaths.digitarSenha,
       name: 'Digitar Senha',
       parentNavigatorKey: navigatorKey,
@@ -106,11 +122,11 @@ final routes = GoRouter(
 
     GoRoute(
       path: RoutesPaths.masterPasswordWarning,
-      name: 'Atenção',    
+      name: 'Atenção',
       parentNavigatorKey: navigatorKey,
       builder: (context, state) {
         final masterPassword = state.extra as String;
-        return MasterPasswordWarningScreen(masterPassword: masterPassword,);
+        return MasterPasswordWarningScreen(masterPassword: masterPassword);
       },
     ),
 
@@ -189,7 +205,6 @@ final routes = GoRouter(
         },
       ),
     ),
-   
 
     GoRoute(
       path: RoutesPaths.config,
@@ -217,8 +232,7 @@ final routes = GoRouter(
       ),
     ),
 
-
-     GoRoute(
+    GoRoute(
       path: RoutesPaths.exportRegistersCsv,
       name: 'Exportar Registros Csv',
       parentNavigatorKey: navigatorKey,
@@ -271,9 +285,5 @@ final routes = GoRouter(
         },
       ),
     ),
-
-   
-   
-    
   ],
 );

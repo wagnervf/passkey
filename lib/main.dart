@@ -8,21 +8,18 @@ import 'package:keezy/src/core/data/services/secure_storage_service.dart';
 import 'package:keezy/src/core/hive/hive_config.dart';
 import 'package:keezy/src/core/session/session_manager.dart';
 import 'package:keezy/src/core/shared_preferences/shared_preferences_service.dart';
+import 'package:keezy/src/modules/register/data/register_hive.dart';
 
 Future<void> main() async {
   await runZonedGuarded(
     () async {
       WidgetsFlutterBinding.ensureInitialized();
       await HiveConfig.start();
+      RegisterHive.init();
       await SharedPreferencesService.init();
       SecureStorageService.init();
-     
-    
-      runApp(
-         ApplicationBinding(
-          child: AppWidget(),
-        ),
-      );
+
+      runApp(ApplicationBinding(child: AppWidget()));
     },
     (Object error, StackTrace stack) {
       log('Erro não tratado!', error: error, stackTrace: stack);
@@ -33,8 +30,9 @@ Future<void> main() async {
 // Tempo de Sessão
 class ActivityObserver extends NavigatorObserver {
   @override
-  void didPop(Route route, Route? previousRoute) => SessionManager.updateActivity();
+  void didPop(Route route, Route? previousRoute) =>
+      SessionManager.updateActivity();
   @override
-  void didPush(Route route, Route? previousRoute) => SessionManager.updateActivity();
+  void didPush(Route route, Route? previousRoute) =>
+      SessionManager.updateActivity();
 }
-

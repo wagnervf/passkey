@@ -24,13 +24,16 @@ class _HomePageState extends State<HomePage> {
   }
 
   @override
-void didChangeDependencies() {
-  super.didChangeDependencies();
-  if (SessionManager.isExpired()) {
-    GoRouter.of(context).go('/login');
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (SessionManager.isExpired()) {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        if (!mounted) return;
+        await context.read<AuthController>().lockVault();
+        if (mounted) GoRouter.of(context).go(RoutesPaths.auth);
+      });
+    }
   }
-}
-
 
   AuthUserModel? user;
 
@@ -41,7 +44,7 @@ void didChangeDependencies() {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.onPrimary,
       floatingActionButton: buttonAdd(context),
-      
+
       appBar: AppBar(
         excludeHeaderSemantics: true,
         leading: SizedBox.shrink(),
@@ -74,8 +77,7 @@ void didChangeDependencies() {
           builder: (context, state) {
             if (state is AuthLoadingState) {
               return const CircularProgressIndicator();
-            } else if (state is AuthSuccessState) {         
-
+            } else if (state is AuthSuccessState) {
               return ListRegisters();
             } else if (state is AuthErrorState) {
               return Text('Erro: ${state.message}');
@@ -87,8 +89,9 @@ void didChangeDependencies() {
     );
   }
 
-  Future<Object?> _sair() {
-    return GoRouter.of(context).pushReplacement(RoutesPaths.auth);
+  Future<void> _sair() async {
+    await context.read<AuthController>().lockVault();
+    if (mounted) GoRouter.of(context).go(RoutesPaths.auth);
   }
 
   FloatingActionButton buttonAdd(BuildContext context) {
@@ -100,18 +103,11 @@ void didChangeDependencies() {
   }
 }
 
-
-
-
 class AppDrawer extends StatelessWidget {
   final String appName;
   final String logoPath;
 
-  const AppDrawer({
-    super.key,
-    required this.appName,
-    required this.logoPath,
-  });
+  const AppDrawer({super.key, required this.appName, required this.logoPath});
 
   @override
   Widget build(BuildContext context) {
@@ -133,19 +129,15 @@ class AppDrawer extends StatelessWidget {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Image.asset(
-                    logoPath,
-                    width: 56,
-                    height: 56,
-                  ),
+                  Image.asset(logoPath, width: 56, height: 56),
                   const SizedBox(width: 16),
                   Expanded(
                     child: Text(
                       appName,
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: Theme.of(context).colorScheme.onPrimaryContainer,
-                          ),
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.onPrimaryContainer,
+                      ),
                     ),
                   ),
                 ],
@@ -176,7 +168,10 @@ class AppDrawer extends StatelessWidget {
 
             // Botão de sair
             ListTile(
-              leading: const Icon(Icons.logout_outlined, color: Colors.redAccent),
+              leading: const Icon(
+                Icons.logout_outlined,
+                color: Colors.redAccent,
+              ),
               title: const Text(
                 'Sair',
                 style: TextStyle(color: Colors.redAccent),
@@ -213,4 +208,3 @@ class AppDrawer extends StatelessWidget {
     );
   }
 }
-
