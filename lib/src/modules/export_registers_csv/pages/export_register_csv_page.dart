@@ -35,11 +35,10 @@ class _ExportRegisterCsvPageState extends State<ExportRegisterCsvPage> {
 
         if (state is ExportCsvLoaded) {
           ShowMessager.show(context, '✅ Registros compartilhados com sucesso!');
-          Navigator.of(context).pop();
         } else if (state is ExportCsvNull) {
           ShowMessager.show(
             context,
-            '⚠️ Nenhum registro encontrado para exportar.',
+            '⚠️ ${state.message}',
           );
         } else if (state is ExportCsvError) {
           ShowMessager.show(context, '❌ ${state.message}');
@@ -82,16 +81,15 @@ class _ExportRegisterCsvPageState extends State<ExportRegisterCsvPage> {
   }
 
     Future<void> _confirmarExportacao(BuildContext context, ExportRegisterCsvController controller) async {
-    if (controller == null ) return;
-
     final confirmou = await AuthDialogService.confirmarAcao(
       context: context,
-      titulo: 'Compartilhar Registro',
-      mensagem: '''⚠ ATENÇÃO!\n\nAo exportar, suas senhas ficarão visíveis em um arquivo externo.\nRecomendamos guardar esse arquivo com extremo cuidado.
-        ''',
+      titulo: 'Compartilhar registros em CSV',
+      mensagem: 'O arquivo CSV contém todas as senhas em texto legível. '
+          'Quem tiver acesso a ele poderá lê-las. Guarde o arquivo com cuidado.',
       textoConfirmar: 'Compartilhar',
     );
 
+    if (!mounted) return;
     if (confirmou) {
      await _exportarRegistros(controller);
     }
@@ -104,10 +102,10 @@ class _ExportRegisterCsvPageState extends State<ExportRegisterCsvPage> {
     ExportRegisterCsvController controller,
   ) async {
     try {
-      await context.read<ExportRegisterCsvController>().exportFileCsv();
+      await controller.exportFileCsv();
     } catch (_) {
       log('Erro ao exportar registros.');
-      if (!context.mounted) return;
+      if (!mounted) return;
       ShowMessager.show(
         context,
         '❌ Ocorreu um erro durante a exportação.',

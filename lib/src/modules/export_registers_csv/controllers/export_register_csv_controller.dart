@@ -1,6 +1,4 @@
 import 'dart:developer';
-import 'dart:io';
-
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:keezy/src/modules/export_registers_csv/controllers/export_registers_csv_state.dart';
 import 'package:keezy/src/modules/export_registers_csv/services/export_registers_csv_services.dart';
@@ -16,7 +14,7 @@ class ExportRegisterCsvController extends Cubit<ExportRegistersCsvState> {
     required this.registerController,
   }) : super(ExportCsvInitial());
 
-  Future<File?> exportFileCsv() async {
+  Future<bool> exportFileCsv() async {
     emit(ExportCsvLoading());
 
     try {
@@ -26,21 +24,24 @@ class ExportRegisterCsvController extends Cubit<ExportRegistersCsvState> {
       if (registros == null || registros.isEmpty) {
         const msg = 'Nenhum registro para ser exportado!';
         emit(ExportCsvNull(msg));
-        return null;
+        return false;
       }
 
       log('Exportando ${registros.length} registros...');
 
-      final File file = await exportRegistersCsvServices
+      final shared = await exportRegistersCsvServices
           .exportRegistersCsvServices(registros);
 
-      emit(ExportCsvLoaded('Registros exportados para: ${file.path}'));
-
-      return file;
+      if (!shared) {
+        emit(ExportCsvNull('Compartilhamento cancelado ou não confirmado.'));
+        return false;
+      }
+      emit(ExportCsvLoaded('Registros compartilhados com sucesso.'));
+      return true;
     } catch (_) {
       log('Erro ao exportar CSV.');
       emit(ExportCsvError('Erro ao exportar CSV.'));
-      return null;
+      return false;
     }
   }
 

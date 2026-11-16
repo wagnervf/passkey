@@ -8,6 +8,7 @@ import 'package:keezy/src/core/data/services/secure_storage_service.dart';
 import 'package:keezy/src/core/hive/hive_config.dart';
 import 'package:keezy/src/core/session/session_manager.dart';
 import 'package:keezy/src/core/shared_preferences/shared_preferences_service.dart';
+import 'package:keezy/src/modules/export_registers_csv/repositories/export_registers_csv_repository_impl.dart';
 import 'package:keezy/src/modules/register/data/register_hive.dart';
 
 Future<void> main() async {
@@ -15,6 +16,7 @@ Future<void> main() async {
     () async {
       WidgetsFlutterBinding.ensureInitialized();
       await HiveConfig.start();
+      await ExportRegistersCsvRepositoryImpl.cleanupStaleExports();
       RegisterHive.init();
       await SharedPreferencesService.init();
       SecureStorageService.init();
