@@ -194,21 +194,16 @@ class ExportRegistersCsvRepositoryImpl implements ExportRegistersCsvRepository {
   }
 
   String _buildCsvFromRegister(RegisterModel register) {
-    // Cabeçalho
-    const header = 'name,url,username,password,note\n';
-
-    // Trata valores nulos e caracteres problemáticos (como vírgula ou quebra de linha)
-    String sanitize(String? value) {
-      if (value == null || value.isEmpty) return '';
-      final clean = value.replaceAll('\n', ' ').replaceAll(',', ';');
-      return '"$clean"'; // garante que campos com espaços sejam bem interpretados
-    }
-
-    // Linha única do registro
-    final line =
-        '${[sanitize(register.name), sanitize(register.url), sanitize(register.username), sanitize(register.password), sanitize(register.note)].join(',')}\n';
-
-    return header + line;
+    return const CsvEncoder().convert([
+      headers,
+      [
+        register.name ?? '',
+        register.url ?? '',
+        register.username ?? '',
+        register.password ?? '',
+        register.note ?? '',
+      ],
+    ]);
   }
 
   String _twoDigits(int n) => n.toString().padLeft(2, '0');

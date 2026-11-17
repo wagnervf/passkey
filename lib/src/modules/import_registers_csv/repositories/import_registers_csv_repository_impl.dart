@@ -26,9 +26,13 @@ class ImportRegistersCsvRepositoryImpl implements ImportRegistersCsvRepository {
       throw Exception('Arquivo CSV não encontrado.');
     }
 
-    // 2. Leitura com trim para remover espaços/breaks extras
-    final csvString = (await file.readAsString()).trim();
+    final csvString = await file.readAsString();
 
+    return parseCsv(csvString);
+  }
+
+  /// Parses CSV without changing whitespace inside record values.
+  static List<RegisterModel> parseCsv(String csvString) {
     final csvTable = const CsvDecoder(fieldDelimiter: ',', dynamicTyping: false)
         .convert(csvString);
 
@@ -57,7 +61,7 @@ class ImportRegistersCsvRepositoryImpl implements ImportRegistersCsvRepository {
     // 4. Linhas de dados (SEM linhas vazias)
     final dataRows = csvTable.skip(1).where((row) {
       // Remove linhas 100% vazias
-      final hasOnlyEmpty = row.every((cell) => cell.toString().trim().isEmpty);
+      final hasOnlyEmpty = row.every((cell) => cell == null || cell.toString().isEmpty);
       return !hasOnlyEmpty;
     }).toList();
 
@@ -72,7 +76,7 @@ class ImportRegistersCsvRepositoryImpl implements ImportRegistersCsvRepository {
       for (int i = 0; i < header.length; i++) {
         final field = header[i];
         if (field == 'id') continue;
-        final value = (i < row.length) ? row[i].toString().trim() : '';
+        final value = (i < row.length) ? row[i]?.toString() ?? '' : '';
         map[field] = value;
       }
 

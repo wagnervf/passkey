@@ -150,7 +150,7 @@ class _RegisterFormPageState extends State<RegisterFormPage> {
           PasswordFieldWithGenerator(
             controller: _passwordController,
             labelText: "Senha do Cofre",
-            maxLength: 16,
+            generatedLength: 16,
           ),
           const SizedBox(height: 18),
           const Text("Observação"),
@@ -405,7 +405,7 @@ class _RegisterFormPageState extends State<RegisterFormPage> {
       id: edit ? register!.id : const Uuid().v4(),
       name: _titleController.text.trim(),
       username: _loginController.text.trim(),
-      password: _passwordController.text.trim(),
+      password: _passwordController.text,
       note: _descriptionController.text.trim(),
       url: _siteController.text.trim(),
       selectedApp: selectedApp,

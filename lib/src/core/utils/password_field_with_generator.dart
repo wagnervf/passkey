@@ -7,8 +7,7 @@ class PasswordFieldWithGenerator extends StatefulWidget {
   final TextEditingController controller;
   final String? hintText;
   final String? labelText;
-  final int minLength;
-  final int maxLength;
+  final int generatedLength;
   final Function(String)? onChanged;
 
   const PasswordFieldWithGenerator({
@@ -16,8 +15,7 @@ class PasswordFieldWithGenerator extends StatefulWidget {
     required this.controller,
     this.hintText,
     this.labelText,
-    this.minLength = 6,
-    this.maxLength = 10,
+    this.generatedLength = 16,
     this.onChanged,
   });
 
@@ -45,7 +43,7 @@ class _PasswordFieldWithGeneratorState
   }
 
   void _generatePassword() {
-    final newPassword = _generateSecurePassword(length: widget.maxLength);
+    final newPassword = _generateSecurePassword(length: widget.generatedLength);
     widget.controller.text = newPassword;
     widget.onChanged?.call(newPassword);
   }
@@ -69,7 +67,6 @@ class _PasswordFieldWithGeneratorState
         TextField(
           controller: widget.controller,
           obscureText: _obscureText,
-          maxLength: widget.maxLength,
           onChanged: widget.onChanged,
           decoration: InputDecoration(
             hintText: widget.hintText ?? 'Digite sua senha',
