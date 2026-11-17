@@ -3,16 +3,14 @@ import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:keezy/src/core/router/routes.dart';
 import 'package:keezy/src/core/utils/utils.dart';
-import 'package:keezy/src/modules/auth/model/auth_user_model.dart';
 
 class InitialScreen extends StatelessWidget {
   const InitialScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
-      appBar: AppBar( toolbarHeight: 10,),
+      appBar: AppBar(toolbarHeight: 10),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -34,7 +32,7 @@ class InitialScreen extends StatelessWidget {
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.displayLarge,
               ),
-            
+
               const SizedBox(height: 10),
               Text(
                 "Armazenamento criptografado e acesso fácil quando precisar",
@@ -42,11 +40,10 @@ class InitialScreen extends StatelessWidget {
                 style: Theme.of(context).textTheme.titleSmall,
               ),
               const SizedBox(height: 80),
-            
+
               buttonCriarConta(context),
               const SizedBox(height: 20),
               buttonAcessar(context),
-            
             ],
           ),
         ),
@@ -89,8 +86,6 @@ class InitialScreen extends StatelessWidget {
   // }
 
   void _criarConta(BuildContext context) {
-    GoRouter.of(context)
-        .pushReplacement(RoutesPaths.authRegister, extra: AuthUserModel());
+    GoRouter.of(context).pushReplacement(RoutesPaths.createMasterPassword);
   }
-
 }

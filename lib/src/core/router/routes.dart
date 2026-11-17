@@ -13,6 +13,8 @@ import 'package:keezy/src/modules/profile/profile_page.dart';
 import 'package:keezy/src/modules/register/views/pages/register_form_page.dart';
 import 'package:keezy/src/modules/register/views/widgets/list_registers.dart';
 import 'package:keezy/src/modules/register/data/register_hive.dart';
+import 'package:keezy/src/core/session/session_manager.dart';
+import 'package:keezy/src/modules/auth/providers/auth_user_provider.dart';
 import 'package:keezy/src/modules/splash/initial_screen.dart';
 import 'package:keezy/src/modules/splash/splash_page.dart';
 import 'package:keezy/src/modules/welcome/biometric_setup_screen_four.dart';
@@ -33,23 +35,23 @@ const String initial = RoutesPaths.splash;
 final routes = GoRouter(
   initialLocation: initial,
   navigatorKey: navigatorKey,
+  refreshListenable: AuthUserProvider.instance,
   redirect: (context, state) {
-    const protectedPaths = {
-      RoutesPaths.home,
-      RoutesPaths.profile,
-      RoutesPaths.register,
-      RoutesPaths.config,
-      RoutesPaths.importOneRegister,
-      RoutesPaths.exportRegistersCsv,
-      RoutesPaths.listRegisters,
-      RoutesPaths.biometricSetup,
-      RoutesPaths.finalization,
-    };
-    if (protectedPaths.contains(state.matchedLocation) &&
-        !RegisterHive.isUnlocked) {
-      return RoutesPaths.auth;
+    final destination = vaultRedirect(
+      state.matchedLocation,
+      vaultUnlocked: RegisterHive.isUnlocked,
+      sessionActive: SessionManager.isActive && !SessionManager.isExpired(),
+      authenticated: AuthUserProvider.instance.user != null,
+    );
+    if (SessionManager.isExpired()) {
+      SessionManager.expire();
     }
-    return null;
+    if (destination == null &&
+        state.matchedLocation == RoutesPaths.masterPasswordWarning &&
+        state.extra is! String) {
+      return RoutesPaths.home;
+    }
+    return destination;
   },
   observers: [ActivityObserver()],
   routes: <RouteBase>[
@@ -287,3 +289,26 @@ final routes = GoRouter(
     ),
   ],
 );
+
+/// Keep the public entry points explicit so newly added vault routes are guarded.
+String? vaultRedirect(
+  String path, {
+  required bool vaultUnlocked,
+  required bool sessionActive,
+  required bool authenticated,
+}) {
+  const publicPaths = {
+    RoutesPaths.initial,
+    RoutesPaths.initialScreen,
+    RoutesPaths.splash,
+    RoutesPaths.modeSelection,
+    RoutesPaths.createMasterPassword,
+    RoutesPaths.auth,
+    RoutesPaths.digitarSenha,
+  };
+  if (publicPaths.contains(path)) return null;
+  if (!vaultUnlocked || !sessionActive || !authenticated) {
+    return RoutesPaths.digitarSenha;
+  }
+  return null;
+}

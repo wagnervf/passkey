@@ -80,7 +80,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
                             child: Column(
                               children: [
-                                SizedBox(height: 20,),
+                                SizedBox(height: 20),
                                 ItemCardWithIcon(
                                   text: 'Editar Perfil',
                                   subtTitle: 'Altere os dados do seu perfil',
@@ -152,8 +152,9 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Future<Object?> _auth() {
-    return GoRouter.of(context).pushReplacement(RoutesPaths.auth);
+  Future<void> _auth() async {
+    await context.read<AuthController>().lockVault();
+    if (mounted) GoRouter.of(context).go(RoutesPaths.digitarSenha);
   }
 
   Future<void> _goToEdit(AuthUserModel userLoged) async {

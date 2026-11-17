@@ -160,7 +160,6 @@ class AuthPage extends StatefulWidget {
 }
 
 class _AuthPageState extends State<AuthPage> {
-  bool _isBiometricEnabled = false;
   bool _isLoading = true;
 
   @override
@@ -173,27 +172,28 @@ class _AuthPageState extends State<AuthPage> {
   Future<void> _checkBiometricPreference() async {
     final prefs = await SharedPreferences.getInstance();
     final enabled = prefs.getBool('biometric_enabled') ?? false;
+    if (!mounted) return;
 
     setState(() {
-      _isBiometricEnabled = enabled;
       _isLoading = false;
     });
 
     // Se biometria estiver habilitada, tenta autenticar automaticamente
     if (enabled) {
-      _authenticateWithBiometrics(context);
+      _authenticateWithBiometrics();
     } else {
       GoRouter.of(context).pushReplacement(RoutesPaths.digitarSenha);
     }
   }
 
   /// Realiza autenticação biométrica
-  Future<void> _authenticateWithBiometrics(BuildContext context) async {
+  Future<void> _authenticateWithBiometrics() async {
     try {
       final result = await context.read<AuthController>().loginWithBiometrics();
+      if (!mounted) return;
 
       if (result) {
-        GoRouter.of(context).pushReplacement(RoutesPaths.authValidade);
+        GoRouter.of(context).go(RoutesPaths.home);
       } else {
         ShowMessager.show(
           context,
@@ -205,7 +205,7 @@ class _AuthPageState extends State<AuthPage> {
       log("Autenticando com biometria: $result");
     } catch (e) {
       log('Erro ao autenticar com biometria: $e');
-      GoRouter.of(context).pushReplacement(RoutesPaths.digitarSenha);
+      if (mounted) GoRouter.of(context).pushReplacement(RoutesPaths.digitarSenha);
     }
   }
 

@@ -22,8 +22,10 @@ class AuthPageState extends State<AuthFormSenhaPage> {
 
   final passwordValidator = MultiValidator([
     RequiredValidator(errorText: 'Senha obrigatória'),
-    MinLengthValidator(6,
-        errorText: 'Sua senha deve possuir pelo menos 6 dígitos'),
+    MinLengthValidator(
+      6,
+      errorText: 'Sua senha deve possuir pelo menos 6 dígitos',
+    ),
   ]);
 
   @override
@@ -32,15 +34,23 @@ class AuthPageState extends State<AuthFormSenhaPage> {
   }
 
   @override
+  void dispose() {
+    _passwordController.clear();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: const Text("Acesso com Senha"),
-          toolbarHeight: 60,
-          automaticallyImplyLeading: true,
-          centerTitle: true,
-        ),
-        body: SafeArea(child: _body(context)));
+      appBar: AppBar(
+        title: const Text("Acesso com Senha"),
+        toolbarHeight: 60,
+        automaticallyImplyLeading: true,
+        centerTitle: true,
+      ),
+      body: SafeArea(child: _body(context)),
+    );
   }
 
   SingleChildScrollView _body(BuildContext context) {
@@ -115,16 +125,10 @@ class AuthPageState extends State<AuthFormSenhaPage> {
         style: ButtonStyle(
           alignment: Alignment.center,
           shape: WidgetStateProperty.all<RoundedRectangleBorder>(
-            RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10.0),
-            ),
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
           ),
         ),
-        icon: const Icon(
-          Icons.login,
-          size: 30,
-          color: Colors.white,
-        ),
+        icon: const Icon(Icons.login, size: 30, color: Colors.white),
         onPressed: () => _login(context),
       ),
     );
@@ -134,11 +138,15 @@ class AuthPageState extends State<AuthFormSenhaPage> {
     final password = _passwordController.text;
     if (password.isEmpty) {
       ShowMessager.show(context, 'Por favor, insira sua senha');
+      return;
     }
-    await context.read<AuthController>().login(password);
-
-    GoRouter.of(context).push(RoutesPaths.authValidade);
-
-    return;
+    final loggedIn = await context.read<AuthController>().login(password);
+    if (!context.mounted) return;
+    if (loggedIn) {
+      _passwordController.clear();
+      GoRouter.of(context).go(RoutesPaths.home);
+    } else {
+      ShowMessager.show(context, 'Não foi possível entrar. Confira sua senha.');
+    }
   }
 }

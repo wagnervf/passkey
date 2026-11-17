@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:keezy/src/core/storage/i_token_storage.dart';
+import 'package:keezy/src/core/session/session_manager.dart';
 import 'package:keezy/src/modules/register/data/register_hive.dart';
 import 'package:keezy/src/modules/auth/controllers/auth_state.dart';
 import 'package:keezy/src/modules/auth/model/auth_user_model.dart';
@@ -32,6 +33,11 @@ class AuthController extends Cubit<AuthState> {
     _user = await authRepository.getUser();
 
     if (_user != null) {
+      if (!SessionManager.isForeground) {
+        await lockVault();
+        return;
+      }
+      SessionManager.start();
       emit(AuthSuccessState(_user));
       AuthUserProvider.instance.setUser(_user!);
       return;
@@ -66,12 +72,18 @@ class AuthController extends Cubit<AuthState> {
           emit(AuthErrorState('Usuário não encontrado!'));
           return false;
         }
+        if (!SessionManager.isForeground) {
+          await lockVault();
+          return false;
+        }
         _user = user;
+        SessionManager.start();
         emit(AuthSuccessState(user));
         // Notify the provider about the new user
         AuthUserProvider.instance.setUser(user);
         return true;
       } catch (_) {
+        await lockVault();
         emit(
           AuthErrorState('Não foi possível abrir o cofre. Tente novamente.'),
         );
@@ -101,15 +113,20 @@ class AuthController extends Cubit<AuthState> {
           emit(AuthErrorState('Erro ao cadastrar usuário'));
           return false;
         }
+        if (!SessionManager.isForeground) {
+          await lockVault();
+          return false;
+        }
         _user = savedUser;
+        SessionManager.start();
         emit(AuthSuccessState(savedUser));
+        AuthUserProvider.instance.setUser(savedUser);
 
         // A credencial persistida é a fonte de verdade; a preferência é legado.
         try {
           await tokenStorage.saveHasUser(true);
         } catch (_) {}
-        AuthUserProvider.instance.setUser(savedUser);
-        return true;
+        return SessionManager.isActive && SessionManager.isForeground;
       } else {
         emit(AuthErrorState('Erro ao cadastrar usuário'));
         return false;
@@ -139,6 +156,12 @@ class AuthController extends Cubit<AuthState> {
       emit(AuthErrorState('Erro ao atualizar perfil'));
       return false;
     }
+    if (!SessionManager.isActive ||
+        !SessionManager.isForeground ||
+        !RegisterHive.isUnlocked) {
+      await lockVault();
+      return false;
+    }
     _user = user;
     AuthUserProvider.instance.setUser(user);
     emit(AuthSuccessState(user));
@@ -159,6 +182,7 @@ class AuthController extends Cubit<AuthState> {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool('biometric_enabled', false);
       _user = null;
+      SessionManager.stop();
       AuthUserProvider.instance.clearUser();
       emit(AuthUnauthenticatedState());
       return true;
@@ -169,10 +193,11 @@ class AuthController extends Cubit<AuthState> {
   }
 
   Future<void> lockVault() async {
-    await RegisterHive.lock();
+    SessionManager.stop();
     _user = null;
     AuthUserProvider.instance.clearUser();
     emit(AuthUnauthenticatedState());
+    await RegisterHive.lock();
   }
 
   Future<bool> loginWithBiometrics() async {

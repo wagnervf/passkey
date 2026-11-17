@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:keezy/src/core/router/routes.dart';
-import 'package:keezy/src/core/session/session_manager.dart';
 import 'package:keezy/src/modules/auth/controllers/auth_controller.dart';
 import 'package:keezy/src/modules/auth/controllers/auth_state.dart';
 import 'package:keezy/src/modules/auth/model/auth_user_model.dart';
@@ -21,18 +20,6 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (SessionManager.isExpired()) {
-      WidgetsBinding.instance.addPostFrameCallback((_) async {
-        if (!mounted) return;
-        await context.read<AuthController>().lockVault();
-        if (mounted) GoRouter.of(context).go(RoutesPaths.auth);
-      });
-    }
   }
 
   AuthUserModel? user;
@@ -91,7 +78,7 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _sair() async {
     await context.read<AuthController>().lockVault();
-    if (mounted) GoRouter.of(context).go(RoutesPaths.auth);
+    if (mounted) GoRouter.of(context).go(RoutesPaths.digitarSenha);
   }
 
   FloatingActionButton buttonAdd(BuildContext context) {
@@ -149,7 +136,7 @@ class AppDrawer extends StatelessWidget {
               leading: const Icon(Icons.settings_outlined),
               title: const Text('Configurações'),
               onTap: () {
-                GoRouter.of(context).push('/configuracoes');
+                GoRouter.of(context).push(RoutesPaths.config);
               },
             ),
 
@@ -197,9 +184,12 @@ class AppDrawer extends StatelessWidget {
             child: const Text('Cancelar'),
           ),
           ElevatedButton(
-            onPressed: () {
+            onPressed: () async {
               Navigator.pop(context);
-              GoRouter.of(context).go('/login');
+              await context.read<AuthController>().lockVault();
+              if (context.mounted) {
+                GoRouter.of(context).go(RoutesPaths.digitarSenha);
+              }
             },
             child: const Text('Sair'),
           ),
