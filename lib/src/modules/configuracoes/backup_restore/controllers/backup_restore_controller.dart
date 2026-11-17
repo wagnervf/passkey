@@ -141,94 +141,15 @@ class BackupRestoreController extends Cubit<BackupRestoreState> {
     }
   }
  
-  Future<String?> restoreBackup(AuthController authController,
-      RegisterController registerController) async {
-    try {
-      emit(BackupRestoreStateLoadingState());
-     // name	url	username	password	note
-
-
-      final resultado = await _importarViaArquivo();
-
-      if (resultado != null) {
-        AuthUserModel user = resultado['user'];
-        List<RegisterModel> registros = resultado['registros'];
-
-        log('Registros importados: ${registros.length}');
-
-        // Salvar usuário corretamente via AuthController
-        await authController.registerUser(user);
-        //await registerController.saveListRegisterController(registros);
-
-        emit(BackupRestoreStateSuccessState());
-
-        return 'Usuário importado!';
-      } else {
-        log('Falha ao importar os dados.');
-        emit(BackupRestoreStateErrorState('Falha ao importar os dados.'));
-        return 'Falha ao importar os dados.';
-      }
-    } catch (_) {
-      const message = 'Erro ao importar backup.';
-      emit(BackupRestoreStateErrorState(message));
-      return message;
-    }
-  }
-
-  Future<Map<String, dynamic>?> _importarViaArquivo() async {
-    try {
-      // Selecionar o arquivo criptografado
-      // FilePickerResult? result = await FilePicker.platform.pickFiles(
-      //   type: FileType.custom,
-      //   allowedExtensions: ['enc'], // Arquivo encriptado
-      // );
-
-      final PlatformFile? result = await FilePicker.pickFile(
-        dialogTitle: 'Selecione um arquivo',
-        type: FileType.any, // ✅ Permite qualquer arquivo
-      );
-
-      if (result?.path == null) {
-        log("Nenhum arquivo selecionado.");
-        return null;
-      }
-
-      final File file = File(result!.path!);
-      final String encryptedContent = await file.readAsString();
-
-      // 🔓 Descriptografar os dados
-      final String decryptedData = _decryptData(encryptedContent);
-
-      // Decodificar o JSON
-      final Map<String, dynamic> dataMap = jsonDecode(decryptedData);
-
-      // Validar a estrutura do JSON
-      if (!dataMap.containsKey(_userKey) ||
-          !dataMap.containsKey(_keyRegistros)) {
-        log("Formato de arquivo inválido.");
-        return null;
-      }
-
-      // Decodificar o usuário
-      final AuthUserModel user =
-          AuthUserModel.fromJson(jsonDecode(dataMap[_userKey]));
-
-      // Decodificar os registros
-      final List<dynamic> registrosJson = jsonDecode(dataMap[_keyRegistros]);
-      final List<RegisterModel> registros =
-          registrosJson.map((r) => RegisterModel.fromJson(r)).toList();
-
-      log("Importação concluída com sucesso!");
-      log("Registros: ${registros.length}");
-
-      return {
-        'user': user,
-        'registros': registros,
-      };
-    } catch (_) {
-      log('Erro ao importar arquivo de backup.');
-      return null;
-    }
+  /// The portable format is unfinished. Never create an account from a backup
+  /// unless its records can also be restored and verified.
+  Future<String> restoreBackup(
+    AuthController authController,
+    RegisterController registerController,
+  ) async {
+    const message = 'Restauração de backup Keezy ainda não disponível.';
+    emit(BackupRestoreStateErrorState(message));
+    return message;
   }
 
 
