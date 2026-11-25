@@ -1,5 +1,3 @@
-
-
 abstract class BackupRestoreState {}
 
 class BackupRestoreStateInitialState extends BackupRestoreState {}
@@ -7,10 +5,11 @@ class BackupRestoreStateInitialState extends BackupRestoreState {}
 class BackupRestoreStateLoadingState extends BackupRestoreState {}
 
 class BackupRestoreStateSuccessState extends BackupRestoreState {
-  
+  BackupRestoreStateSuccessState(this.message);
 
- // BackupRestoreStateSuccessState();
+  final String message;
 }
+
 class BackupRestoreStateUnauthenticatedState extends BackupRestoreState {}
 
 class BackupRestoreStateErrorState extends BackupRestoreState {
@@ -18,5 +17,3 @@ class BackupRestoreStateErrorState extends BackupRestoreState {
 
   BackupRestoreStateErrorState(this.message);
 }
-
-

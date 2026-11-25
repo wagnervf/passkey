@@ -85,5 +85,7 @@ void main() {
     await tester.enterText(find.byType(TextField), password);
 
     expect(controller.text, password);
+    await tester.tap(find.text('Gerar Senha'));
+    expect(controller.text.length, 16);
   });
 }

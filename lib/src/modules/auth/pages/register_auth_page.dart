@@ -11,6 +11,7 @@ import 'package:keezy/src/core/utils/utils.dart';
 import 'package:keezy/src/modules/auth/controllers/auth_controller.dart';
 import 'package:keezy/src/modules/auth/controllers/auth_state.dart';
 import 'package:keezy/src/modules/auth/model/auth_user_model.dart';
+import 'package:keezy/src/modules/auth/security/master_password_policy.dart';
 
 class RegisterAuthPage extends StatefulWidget {
   const RegisterAuthPage({super.key});
@@ -60,11 +61,13 @@ class _RegisterAuthPageState extends State<RegisterAuthPage> {
             email: _emailController.text,
           );
         } else {
-          await controller.registerUser(AuthUserModel(
-            name: _nameController.text,
-            email: _emailController.text,
-            password: _passwordController.text,
-          ));
+          await controller.registerUser(
+            AuthUserModel(
+              name: _nameController.text,
+              email: _emailController.text,
+              password: _passwordController.text,
+            ),
+          );
         }
       } catch (_) {
         DialogUtils.showSuccessDialog(
@@ -88,13 +91,8 @@ class _RegisterAuthPageState extends State<RegisterAuthPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        excludeHeaderSemantics: true,
-        toolbarHeight: 5,
-      ),
-      body: SafeArea(
-        child: blocConsumer(context),
-      ),
+      appBar: AppBar(excludeHeaderSemantics: true, toolbarHeight: 5),
+      body: SafeArea(child: blocConsumer(context)),
     );
   }
 
@@ -104,9 +102,8 @@ class _RegisterAuthPageState extends State<RegisterAuthPage> {
         if (state is AuthSuccessState) {
           await _authSuccess(context);
         } else if (state is AuthErrorState) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.message)),
-          );
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text(state.message)));
         }
       },
       builder: (context, state) {
@@ -119,10 +116,7 @@ class _RegisterAuthPageState extends State<RegisterAuthPage> {
   }
 
   Future<void> _authSuccess(BuildContext context) async {
-    DialogUtils.showSuccessDialog(
-      context,
-      'Tudo certo!',
-    );
+    DialogUtils.showSuccessDialog(context, 'Tudo certo!');
     await Future.delayed(const Duration(milliseconds: 500));
 
     edit
@@ -170,7 +164,9 @@ class _RegisterAuthPageState extends State<RegisterAuthPage> {
                       TextFormField(
                         controller: _emailController,
                         decoration: Utils.decorationField(
-                            'E-mail', Icons.email_outlined,),
+                          'E-mail',
+                          Icons.email_outlined,
+                        ),
                       ),
                       SizedBox(height: size.height * 0.03),
                       if (!edit) ...[
@@ -182,7 +178,7 @@ class _RegisterAuthPageState extends State<RegisterAuthPage> {
                         Padding(
                           padding: const EdgeInsets.all(4),
                           child: Text(
-                            'Senha mestra, a única senha que você precisará lembrar.',
+                            MasterPasswordPolicy.guidance,
                             textAlign: TextAlign.start,
                             style: Theme.of(context).textTheme.labelSmall,
                           ),
@@ -198,7 +194,9 @@ class _RegisterAuthPageState extends State<RegisterAuthPage> {
                           child: Text(
                             edit ? 'Salvar' : "Criar Conta",
                             style: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 18),
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                            ),
                           ),
                         ),
                       ),
@@ -211,17 +209,15 @@ class _RegisterAuthPageState extends State<RegisterAuthPage> {
                               child: OutlinedButton(
                                 child: Text(
                                   "Já possuo uma conta",
-                                  style:
-                                      Theme.of(context).textTheme.displaySmall,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .displaySmall,
                                 ),
                                 onPressed: () => _acessar(context),
                               ),
                             ),
                       TextButton.icon(
-                        icon: const Icon(
-                          Icons.help,
-                          size: 16,
-                        ),
+                        icon: const Icon(Icons.help, size: 16),
                         label: Text('Porque devo criar uma conta?'),
                         onPressed: () =>
                             HelpView.mostrarDialogCriarConta(context),
@@ -262,11 +258,14 @@ class _RegisterAuthPageState extends State<RegisterAuthPage> {
         color: Theme.of(context).colorScheme.primary,
         child: ListTile(
           minTileHeight: 60,
-          title: Text(edit ? 'Salvar' : 'Criar',
-              style:
-                  TextStyle(color: Theme.of(context).colorScheme.onSecondary)),
-          leading: Icon(Icons.save,
-              color: Theme.of(context).colorScheme.onSecondary),
+          title: Text(
+            edit ? 'Salvar' : 'Criar',
+            style: TextStyle(color: Theme.of(context).colorScheme.onSecondary),
+          ),
+          leading: Icon(
+            Icons.save,
+            color: Theme.of(context).colorScheme.onSecondary,
+          ),
           trailing: Icon(
             Icons.keyboard_arrow_right_outlined,
             color: Theme.of(context).colorScheme.onSecondary,

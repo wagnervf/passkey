@@ -11,10 +11,10 @@ import 'package:keezy/src/modules/auth/controllers/auth_controller.dart';
 import 'package:keezy/src/modules/auth/controllers/auth_state.dart';
 import 'package:keezy/src/modules/auth/model/auth_user_model.dart';
 import 'package:keezy/src/modules/configuracoes/views/widgets/icon_change_theme.dart';
+import 'package:keezy/src/modules/configuracoes/backup_restore/views/backup_restore_page.dart';
 import 'package:keezy/src/modules/export_registers_csv/pages/export_exemple_register_widget.dart';
 import 'package:keezy/src/modules/export_registers_csv/pages/export_register_csv_page.dart';
 import 'package:keezy/src/modules/import_registers_csv/pages/import_register_csv_page.dart';
-import 'package:keezy/src/modules/register/controller/register_controller.dart';
 
 class ConfiguracoesPage extends StatefulWidget {
   const ConfiguracoesPage({super.key});
@@ -24,13 +24,6 @@ class ConfiguracoesPage extends StatefulWidget {
 }
 
 class _ConfiguracoesPageState extends State<ConfiguracoesPage> {
-  AuthUserModel? userLoged;
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -45,15 +38,9 @@ class _ConfiguracoesPageState extends State<ConfiguracoesPage> {
     return BlocBuilder<AuthController, AuthState>(
       builder: (context, state) {
         if (state is AuthLoadingState) {
-          return const CircularProgressIndicator();
+          return const Center(child: CircularProgressIndicator());
         } else if (state is AuthSuccessState) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            setState(() {
-              userLoged = state.user;
-            });
-          });
-
-          return _body(context, currentYear, userLoged);
+          return _body(context, currentYear);
         } else if (state is AuthErrorState) {
           return Text('Erro: ${state.message}');
         }
@@ -62,96 +49,74 @@ class _ConfiguracoesPageState extends State<ConfiguracoesPage> {
     );
   }
 
-  LayoutBuilder _body(BuildContext context, int currentYear, userLoged) {
-    return LayoutBuilder(
-      builder: (context, constraint) {
-        return SingleChildScrollView(
-          child: ConstrainedBox(
-            constraints: BoxConstraints(minHeight: constraint.maxHeight),
-            child: IntrinsicHeight(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.all(18.0),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Utils.titleCard(context, 'Opções'),
-                          const SizedBox(height: 10),
-                          Card(
-                            elevation: 0,
-                            margin: EdgeInsets.zero,
-                            child: Column(
-                              children: [
-                                BiometricSwitchWidget(),
-                                _divider(),
-                                const IconChangeTheme(),
-                              ],
-                            ),
-                          ),
-
-                          const SizedBox(height: 30),
-                          Utils.titleCard(context, 'Gerenciar Registros'),
-                          const SizedBox(height: 10),
-
-                          Card(
-                            elevation: 0,
-                            margin: EdgeInsets.zero,
-                            child: Column(
-                              children: [
-                                ExportRegisterCsvPage(),
-                                _divider(),
-                                ImportRegisterCsvPage(),
-                                _divider(),
-                                ExportExempleRegisterWidget(),
-                              ],
-                            ),
-                          ),
-
-                          const Spacer(),
-
-                          Card(
-                            elevation: 0,
-                            margin: EdgeInsets.zero,
-                            child: ListTile(
-                              onTap: () => _confirmarExclusao(context),
-                              leading: Icon(
-                                Icons.dangerous_outlined,
-                                color: Colors.red[800],
-                              ),
-                              title: Text(
-                                'Excluir todos os dados',
-                                style: Theme.of(context).textTheme.titleMedium!
-                                    .copyWith(color: Colors.red[800]),
-                              ),
-                              subtitle: Text(
-                                'Apagar do celular todos os dados do aplicativo.',
-                                style: Theme.of(context).textTheme.bodySmall,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                          Center(
-                            child: Text(
-                              '© $currentYear keezy seu gerenciador de senhas particular e privativo. Todos os direitos reservados.',
-                              style: Theme.of(context).textTheme.bodySmall
-                                  ?.copyWith(color: Colors.grey),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
+  Widget _body(BuildContext context, int currentYear) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(18),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Utils.titleCard(context, 'Opções'),
+          const SizedBox(height: 10),
+          Card(
+            elevation: 0,
+            margin: EdgeInsets.zero,
+            child: Column(
+              children: [
+                const BiometricSwitchWidget(),
+                _divider(),
+                const IconChangeTheme(),
+              ],
+            ),
+          ),
+          const SizedBox(height: 30),
+          Utils.titleCard(context, 'Gerenciar Registros'),
+          const SizedBox(height: 10),
+          Card(
+            key: const ValueKey('manage-records-card'),
+            elevation: 0,
+            margin: EdgeInsets.zero,
+            child: Column(
+              children: [
+                const ExportRegisterCsvPage(),
+                _divider(),
+                const ImportRegisterCsvPage(),
+                _divider(),
+                const ExportExempleRegisterWidget(),
+              ],
+            ),
+          ),
+          const SizedBox(height: 30),
+          Utils.titleCard(context, 'Backup Keezy'),
+          const SizedBox(height: 10),
+          const BackupRestorePage(showRestore: false, showImport: true),
+          const SizedBox(height: 72),
+          Card(
+            key: const ValueKey('delete-all-data-card'),
+            elevation: 0,
+            margin: EdgeInsets.zero,
+            child: ListTile(
+              onTap: () => _confirmarExclusao(context),
+              leading: Icon(Icons.dangerous_outlined, color: Colors.red[800]),
+              title: Text(
+                'Excluir todos os dados',
+                style: Theme.of(context).textTheme.titleMedium
+                    ?.copyWith(color: Colors.red[800]),
+              ),
+              subtitle: Text(
+                'Apagar do celular todos os dados do aplicativo.',
+                style: Theme.of(context).textTheme.bodySmall,
               ),
             ),
           ),
-        );
-      },
+          const SizedBox(height: 16),
+          Text(
+            '© $currentYear keezy seu gerenciador de senhas particular e privativo. Todos os direitos reservados.',
+            style: Theme.of(context).textTheme.bodySmall
+                ?.copyWith(color: Colors.grey),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
     );
   }
 
@@ -164,65 +129,71 @@ class _ConfiguracoesPageState extends State<ConfiguracoesPage> {
 
   // Modal de confirmação antes de excluir a conta
   void _confirmarExclusao(BuildContext context) {
+    var backupConfirmed = false;
     showDialog(
       context: context,
-      builder: (context) {
-        return AlertDialog(
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (dialogContext, setDialogState) => AlertDialog(
           title: const Text('Excluir Conta'),
-          content: SizedBox(
-            height: 180,
-            child: Column(
-              children: [
-                const Text(
-                  'Tem certeza que deseja excluir sua conta? Esta ação não pode ser desfeita.',
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'Tem certeza que deseja excluir sua conta? Esta ação não pode ser desfeita.',
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'Exporte seus registros em CSV antes de continuar.',
+                style: Theme.of(dialogContext).textTheme.bodyMedium!
+                    .copyWith(color: Colors.red),
+              ),
+              CheckboxListTile(
+                contentPadding: EdgeInsets.zero,
+                value: backupConfirmed,
+                onChanged: (value) =>
+                    setDialogState(() => backupConfirmed = value ?? false),
+                title: const Text(
+                  'Confirmei que possuo um backup dos registros.',
                 ),
-                Text(
-                  'Importante! Realize a exportação dos registros antes de resetar o aplicativo.',
-                  style: Theme.of(
-                    context,
-                  ).textTheme.bodyMedium!.copyWith(color: Colors.red),
-                ),
-              ],
-            ),
+                controlAffinity: ListTileControlAffinity.leading,
+              ),
+            ],
           ),
           actions: [
             TextButton(
-              onPressed: () => Navigator.pop(context),
+              onPressed: () => Navigator.pop(dialogContext),
               child: const Text('Cancelar'),
             ),
             TextButton(
-              onPressed: () async {
-                final recordsRemoved = await context
-                    .read<RegisterController>()
-                    .deleteAllRegistersController();
-                if (!context.mounted) return;
-                if (!recordsRemoved) {
-                  ShowMessager.show(context, 'Não foi possível apagar os registros.');
-                  return;
-                }
+              onPressed: backupConfirmed
+                  ? () async {
+                      Navigator.pop(dialogContext);
+                      final result = await context
+                          .read<AuthController>()
+                          .logoutAndRemoveUser();
+                      if (!context.mounted) return;
 
-                final result = await context
-                    .read<AuthController>()
-                    .logoutAndRemoveUser();
-                if (!context.mounted) return;
-
-                if (result) {
-                  ShowMessager.show(context, 'Usuário removido com sucesso.');
-                } else {
-                  ShowMessager.show(
-                    context,
-                    'Erro ao tentar remover o usuário. Tente Novamente.',
-                  );
-                }
-
-                GoRouter.of(context).pushReplacement(RoutesPaths.splash);
-              },
+                      if (result) {
+                        ShowMessager.show(
+                          context,
+                          'Usuário removido com sucesso.',
+                        );
+                        GoRouter.of(context)
+                            .pushReplacement(RoutesPaths.splash);
+                      } else {
+                        ShowMessager.show(
+                          context,
+                          'Erro ao tentar remover o usuário. Tente novamente.',
+                        );
+                      }
+                    }
+                  : null,
               style: TextButton.styleFrom(foregroundColor: Colors.red),
               child: const Text('Excluir'),
             ),
           ],
-        );
-      },
+        ),
+      ),
     );
   }
 

@@ -26,7 +26,7 @@ class _WelcomeScreenOneState extends State<WelcomeScreenOne> {
 
   @override
   void dispose() {
-    _timer?.cancel(); 
+    _timer?.cancel();
     _pageController.dispose();
     super.dispose();
   }
@@ -82,32 +82,28 @@ class _WelcomeScreenOneState extends State<WelcomeScreenOne> {
                         context,
                         icon: Icons.lock_outline,
                         title: 'Proteja Seus Dados',
-                        description:
-                            'Armazenamento criptografado e acesso fácil quando precisar',
+                        description: 'Armazenamento criptografado e acesso fácil quando precisar',
                       );
                     case 1:
                       return _buildCarouselPage(
                         context,
                         icon: Icons.phone_android,
                         title: 'Seus dados no seu aparelho',
-                        description:
-                            'O cofre fica neste dispositivo. Exporte um CSV para transferir registros manualmente.',
+                        description: 'O cofre fica neste dispositivo. Exporte um CSV para transferir registros manualmente.',
                       );
                     case 2:
                       return _buildCarouselPage(
                         context,
                         icon: Icons.security,
                         title: 'Proteção local',
-                        description:
-                            'Seus registros são criptografados no aparelho e protegidos pela senha mestra.',
+                        description: 'Seus registros são criptografados no aparelho e protegidos pela senha mestra.',
                       );
                     case 3:
                       return _buildCarouselPage(
                         context,
                         icon: Icons.upload_file_outlined,
                         title: 'Importe arquivos CSV',
-                        description:
-                            'Adicione registros ao cofre usando um arquivo CSV compatível.',
+                        description: 'Adicione registros ao cofre usando um arquivo CSV compatível.',
                       );
                     default:
                       return Container(); // Should not happen
@@ -136,9 +132,15 @@ class _WelcomeScreenOneState extends State<WelcomeScreenOne> {
                 }),
               ),
             ),
+            TextButton(
+              onPressed: () => context.push(RoutesPaths.restoreBackup),
+              child: const Text('Restaurar um backup Keezy'),
+            ),
             Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 24.0, vertical: 32.0),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 24.0,
+                vertical: 32.0,
+              ),
               child: ElevatedButton(
                 onPressed: () {
                   context.push(RoutesPaths.createMasterPassword);
@@ -148,13 +150,12 @@ class _WelcomeScreenOneState extends State<WelcomeScreenOne> {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30),
                   ),
-                  minimumSize:
-                      Size(double.infinity, 50), // Make button full width
+                  minimumSize: Size(
+                    double.infinity,
+                    50,
+                  ), // Make button full width
                 ),
-                child: Text(
-                  'Começar',
-                  style: TextStyle(fontSize: 18),
-                ),
+                child: Text('Começar', style: TextStyle(fontSize: 18)),
               ),
             ),
           ],
@@ -163,26 +164,22 @@ class _WelcomeScreenOneState extends State<WelcomeScreenOne> {
     );
   }
 
-  Widget _buildCarouselPage(BuildContext context,
-      {required IconData icon,
-      required String title,
-      required String description}) {
+  Widget _buildCarouselPage(
+    BuildContext context, {
+    required IconData icon,
+    required String title,
+    required String description,
+  }) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Icon(
-          icon,
-          size: 100,
-             color: Theme.of(context).primaryColor,
-        ),
+        Icon(icon, size: 100, color: Theme.of(context).primaryColor),
         SizedBox(height: 32),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
           child: Text(
             title,
-            style: Theme.of(context)
-                .textTheme
-                .headlineMedium
+            style: Theme.of(context).textTheme.headlineMedium
                 ?.copyWith(fontWeight: FontWeight.bold),
             textAlign: TextAlign.center,
           ),

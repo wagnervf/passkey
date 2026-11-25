@@ -1,9 +1,11 @@
 import 'dart:convert';
 import 'dart:developer';
+
 import 'package:keezy/src/core/components/encrypt/encrypt_decrypt_services.dart';
 import 'package:keezy/src/core/data/services/secure_storage_service.dart';
 import 'package:keezy/src/modules/auth/model/auth_user_model.dart';
 import 'package:keezy/src/modules/auth/security/master_password_verifier.dart';
+import 'package:keezy/src/modules/auth/security/master_password_policy.dart';
 
 class AuthRepository {
   static const _userKey = 'auth_user';
@@ -20,7 +22,7 @@ class AuthRepository {
 
   Future<bool> saveUser(AuthUserModel user) async {
     try {
-      if (user.password.isEmpty ||
+      if (MasterPasswordPolicy.validate(user.password) != null ||
           await secureStorageService.hasApiKey(_userKey)) {
         return false;
       }
@@ -30,7 +32,15 @@ class AuthRepository {
         'email': user.email,
         'passwordVerifier': await verifier.create(user.password),
       };
-      await secureStorageService.setDataKey(_userKey, json.encode(userToSave));
+      final encoded = jsonEncode(userToSave);
+      await secureStorageService.setDataKey(_userKey, encoded);
+
+      // Secure storage writes can fail silently on some platform backends.
+      // Confirm the complete credential is readable before reporting success.
+      if (await secureStorageService.getDataKey(_userKey) != encoded) {
+        await secureStorageService.deleteApiKey(_userKey);
+        return false;
+      }
       return true;
     } catch (_) {
       log('Erro ao cadastrar usuário.');
@@ -38,7 +48,10 @@ class AuthRepository {
     }
   }
 
-  Future<bool> updateProfile({required String name, required String email}) async {
+  Future<bool> updateProfile({
+    required String name,
+    required String email,
+  }) async {
     try {
       final stored = await _readUser();
       if (stored == null) return false;
@@ -79,8 +92,13 @@ class AuthRepository {
         name: stored['name']?.toString() ?? '',
         email: stored['email']?.toString() ?? '',
       );
-    } catch (_) {
-      log('Erro ao recuperar o usuário.');
+    } catch (error, stackTrace) {
+      log(
+        'Erro ao recuperar o usuário para o backup.',
+        name: 'keezy.backup',
+        error: error.runtimeType,
+        stackTrace: stackTrace,
+      );
       return null;
     }
   }

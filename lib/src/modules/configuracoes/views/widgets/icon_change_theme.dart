@@ -17,7 +17,7 @@ class IconChangeTheme extends StatelessWidget {
       ),
       subtitle: Text(
         'Ative o modo escuro',
-        style: Theme.of(context).textTheme.bodyMedium,
+        style: Theme.of(context).textTheme.bodySmall,
       ),
       secondary: Icon(
         themeConfig.isDark
@@ -27,10 +27,8 @@ class IconChangeTheme extends StatelessWidget {
       value: themeConfig.isDark,
       onChanged: (_) => themeConfig.toggleTheme(),
       activeThumbColor: themeConfig.isDark
-            ? Theme.of(context).colorScheme.secondary
-
-            : Theme.of(context).colorScheme.primary,
-      
+          ? Theme.of(context).colorScheme.secondary
+          : Theme.of(context).colorScheme.primary,
     );
   }
 }

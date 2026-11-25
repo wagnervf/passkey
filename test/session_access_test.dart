@@ -8,67 +8,72 @@ void main() {
     SessionManager.setForeground(true);
   });
 
-  test('direct vault routes require an open vault and an authenticated session', () {
-    const protectedPaths = [
-      RoutesPaths.home,
-      RoutesPaths.config,
-      RoutesPaths.exportRegistersCsv,
-      RoutesPaths.profile,
-      RoutesPaths.register,
-      RoutesPaths.listRegisters,
-      RoutesPaths.importOneRegister,
-      RoutesPaths.authRegister,
-      RoutesPaths.masterPasswordWarning,
-      RoutesPaths.biometricSetup,
-      RoutesPaths.finalization,
-      RoutesPaths.authValidade,
-    ];
+  test(
+    'direct vault routes require an open vault and an authenticated session',
+    () {
+      const protectedPaths = [
+        RoutesPaths.home,
+        RoutesPaths.config,
+        RoutesPaths.exportRegistersCsv,
+        RoutesPaths.profile,
+        RoutesPaths.register,
+        RoutesPaths.listRegisters,
+        RoutesPaths.importOneRegister,
+        RoutesPaths.authRegister,
+        RoutesPaths.masterPasswordWarning,
+        RoutesPaths.biometricSetup,
+        RoutesPaths.finalization,
+        RoutesPaths.authValidade,
+      ];
 
-    for (final path in protectedPaths) {
-      expect(
-        vaultRedirect(
-          path,
-          vaultUnlocked: true,
-          sessionActive: false,
-          authenticated: true,
-        ),
-        RoutesPaths.digitarSenha,
-        reason: path,
-      );
-      expect(
-        vaultRedirect(
-          path,
-          vaultUnlocked: true,
-          sessionActive: true,
-          authenticated: false,
-        ),
-        RoutesPaths.digitarSenha,
-        reason: path,
-      );
-      expect(
-        vaultRedirect(
-          path,
-          vaultUnlocked: false,
-          sessionActive: true,
-          authenticated: true,
-        ),
-        RoutesPaths.digitarSenha,
-        reason: path,
-      );
-      expect(
-        vaultRedirect(
-          path,
-          vaultUnlocked: true,
-          sessionActive: true,
-          authenticated: true,
-        ),
-        isNull,
-        reason: path,
-      );
-    }
-  });
+      for (final path in protectedPaths) {
+        expect(
+          vaultRedirect(
+            path,
+            vaultUnlocked: true,
+            sessionActive: false,
+            authenticated: true,
+          ),
+          RoutesPaths.digitarSenha,
+          reason: path,
+        );
+        expect(
+          vaultRedirect(
+            path,
+            vaultUnlocked: true,
+            sessionActive: true,
+            authenticated: false,
+          ),
+          RoutesPaths.digitarSenha,
+          reason: path,
+        );
+        expect(
+          vaultRedirect(
+            path,
+            vaultUnlocked: false,
+            sessionActive: true,
+            authenticated: true,
+          ),
+          RoutesPaths.digitarSenha,
+          reason: path,
+        );
+        expect(
+          vaultRedirect(
+            path,
+            vaultUnlocked: true,
+            sessionActive: true,
+            authenticated: true,
+          ),
+          isNull,
+          reason: path,
+        );
+      }
+    },
+  );
 
-  testWidgets('activity renews the idle timer and expiry locks once', (tester) async {
+  testWidgets('activity renews the idle timer and expiry locks once', (
+    tester,
+  ) async {
     var locks = 0;
     SessionManager.configure(onExpired: () async => locks++);
     SessionManager.start();
@@ -104,5 +109,40 @@ void main() {
     expect(SessionManager.isForeground, false);
     await SessionManager.background();
     expect(locks, 1);
+  });
+
+  test(
+    'native file picker keeps the vault open until returning to the app',
+    () async {
+      var locks = 0;
+      SessionManager.configure(onExpired: () async => locks++);
+      SessionManager.start();
+      SessionManager.beginSystemPicker();
+
+      await SessionManager.background();
+      expect(SessionManager.isActive, true);
+      expect(locks, 0);
+
+      SessionManager.endSystemPicker();
+      SessionManager.setForeground(true);
+      expect(SessionManager.isActive, true);
+
+      await SessionManager.background();
+      expect(locks, 1);
+    },
+  );
+
+  testWidgets('native file picker still obeys the idle timeout', (
+    tester,
+  ) async {
+    var locks = 0;
+    SessionManager.configure(onExpired: () async => locks++);
+    SessionManager.start();
+    SessionManager.beginSystemPicker();
+    await SessionManager.background();
+
+    await tester.pump(SessionManager.timeout);
+    expect(locks, 1);
+    expect(SessionManager.isActive, false);
   });
 }

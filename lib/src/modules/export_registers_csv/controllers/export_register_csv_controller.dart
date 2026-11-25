@@ -1,4 +1,5 @@
 import 'dart:developer';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:keezy/src/modules/export_registers_csv/controllers/export_registers_csv_state.dart';
 import 'package:keezy/src/modules/export_registers_csv/services/export_registers_csv_services.dart';
@@ -13,6 +14,11 @@ class ExportRegisterCsvController extends Cubit<ExportRegistersCsvState> {
     required this.exportRegistersCsvServices,
     required this.registerController,
   }) : super(ExportCsvInitial());
+
+  Future<bool> hasRegisters() async {
+    final registros = await registerController.getRegisterForExportCsv();
+    return registros?.isNotEmpty ?? false;
+  }
 
   Future<bool> exportFileCsv() async {
     emit(ExportCsvLoading());
@@ -45,7 +51,6 @@ class ExportRegisterCsvController extends Cubit<ExportRegistersCsvState> {
     }
   }
 
-
   Future<void> exportSingleRegister(RegisterModel register) async {
     try {
       emit(ExportCsvLoading());
@@ -56,16 +61,13 @@ class ExportRegisterCsvController extends Cubit<ExportRegistersCsvState> {
     }
   }
 
-Future<void> exportEmptyTemplate() async {
-  emit(ExportCsvLoading());
-  try {
-    await exportRegistersCsvServices.exportEmptyCsvTemplate();
-    emit(ExportCsvLoaded('Modelo CSV compartilhado com sucesso.'));
-  } catch (_) {
-    emit(ExportCsvError('Erro ao gerar modelo CSV.'));
+  Future<void> exportEmptyTemplate() async {
+    emit(ExportCsvLoading());
+    try {
+      await exportRegistersCsvServices.exportEmptyCsvTemplate();
+      emit(ExportCsvLoaded('Modelo CSV compartilhado com sucesso.'));
+    } catch (_) {
+      emit(ExportCsvError('Erro ao gerar modelo CSV.'));
+    }
   }
-}
-
-
-
 }

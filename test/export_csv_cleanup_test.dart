@@ -25,6 +25,9 @@ void main() {
       share: (params) async {
         sharedPath = params.files!.single.path;
         expect(await File(sharedPath!).readAsString(), contains(secret));
+        expect(params.text, contains('CSV'));
+        expect(params.text, contains('texto legível'));
+        expect(params.text, isNot(contains('backup')));
         return const ShareResult('destino', ShareResultStatus.success);
       },
     );
@@ -58,6 +61,20 @@ void main() {
     }
   });
 
+  test('não compartilha arquivo quando não há registros', () async {
+    var shareCalled = false;
+    final repository = ExportRegistersCsvRepositoryImpl(
+      temporaryDirectory: () async => temp,
+      share: (_) async {
+        shareCalled = true;
+        return const ShareResult('destino', ShareResultStatus.success);
+      },
+    );
+
+    await expectLater(repository.exportToCsv([]), throwsException);
+    expect(shareCalled, isFalse);
+  });
+
   test('apaga arquivos antigos ao iniciar novamente', () async {
     final folder = Directory('${temp.path}/keezy_exports');
     await folder.create();
@@ -69,22 +86,25 @@ void main() {
     expect(await folder.exists(), isFalse);
   });
 
-  test('apaga arquivos temporários do modelo e do registro individual', () async {
-    final paths = <String>[];
-    final repository = ExportRegistersCsvRepositoryImpl(
-      temporaryDirectory: () async => temp,
-      share: (params) async {
-        paths.add(params.files!.single.path);
-        expect(await File(paths.last).exists(), isTrue);
-        return const ShareResult('destino', ShareResultStatus.success);
-      },
-    );
+  test(
+    'apaga arquivos temporários do modelo e do registro individual',
+    () async {
+      final paths = <String>[];
+      final repository = ExportRegistersCsvRepositoryImpl(
+        temporaryDirectory: () async => temp,
+        share: (params) async {
+          paths.add(params.files!.single.path);
+          expect(await File(paths.last).exists(), isTrue);
+          return const ShareResult('destino', ShareResultStatus.success);
+        },
+      );
 
-    await repository.exportEmptyCsvTemplate();
-    await repository.exportSingleRegisterCsv(registers.single);
-    expect(paths, hasLength(2));
-    for (final path in paths) {
-      expect(await File(path).exists(), isFalse);
-    }
-  });
+      await repository.exportEmptyCsvTemplate();
+      await repository.exportSingleRegisterCsv(registers.single);
+      expect(paths, hasLength(2));
+      for (final path in paths) {
+        expect(await File(path).exists(), isFalse);
+      }
+    },
+  );
 }

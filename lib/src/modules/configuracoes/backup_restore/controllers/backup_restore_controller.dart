@@ -1,302 +1,318 @@
-// ignore_for_file: unnecessary_nullable_for_final_variable_declarations
-
-import 'dart:convert';
-import 'dart:developer';
+import 'dart:developer' as developer;
 import 'dart:io';
-import 'dart:typed_data';
 
-import 'package:csv/csv.dart';
-import 'package:encrypt/encrypt.dart' as encrypt;
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:keezy/src/core/data/services/secure_storage_service.dart';
-import 'package:keezy/src/core/either/either.dart';
-import 'package:keezy/src/core/exceptions/repository_exception.dart';
 import 'package:keezy/src/modules/auth/controllers/auth_controller.dart';
+import 'package:keezy/src/modules/auth/security/master_password_policy.dart';
+import 'package:keezy/src/core/session/session_manager.dart';
 import 'package:keezy/src/modules/auth/model/auth_user_model.dart';
 import 'package:keezy/src/modules/auth/repositories/auth_repository.dart';
 import 'package:keezy/src/modules/configuracoes/backup_restore/controllers/backup_restore_state.dart';
+import 'package:keezy/src/modules/configuracoes/backup_restore/backup_merge_plan.dart';
+import 'package:keezy/src/modules/configuracoes/backup_restore/portable_backup_codec.dart';
 import 'package:keezy/src/modules/register/controller/register_controller.dart';
+import 'package:keezy/src/modules/register/data/register_hive.dart';
 import 'package:keezy/src/modules/register/model/register_model.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
 class BackupRestoreController extends Cubit<BackupRestoreState> {
-  BackupRestoreController({required this.registerControllerX})
-      : super(BackupRestoreStateInitialState());
+  BackupRestoreController({
+    required this.registerController,
+    required this.authRepository,
+    PortableBackupCodec? codec,
+  }) : _codec = codec ?? PortableBackupCodec(),
+       super(BackupRestoreStateInitialState());
 
-  static const _keyRegistros = 'registers';
-  static const _userKey = 'auth_user';
+  final RegisterController registerController;
+  final AuthRepository authRepository;
+  final PortableBackupCodec _codec;
+  String? _pendingImportEncoded;
 
-  final secureStorageService = SecureStorageService();
-  final RegisterController registerControllerX;
-
-   /// 🔐 Função para criptografar os dados
-  String _encryptData(String plainText) {
-    final key = encrypt.Key.fromUtf8(
-        '0123456789abcdef0123456789abcdef'); // Chave de 32 bytes
-    final iv = encrypt.IV.fromLength(16); // IV de 16 bytes
-    final encrypter = encrypt.Encrypter(encrypt.AES(key));
-
-    final encrypted = encrypter.encrypt(plainText, iv: iv);
-    return base64Encode(iv.bytes + encrypted.bytes); // Concatenamos IV + dados
-  }
-
-/// 🔓 Função para descriptografar os dados
-  String _decryptData(String encryptedText) {
-    final key = encrypt.Key.fromUtf8(
-        '0123456789abcdef0123456789abcdef'); // Chave de 32 bytes
-    final encryptedBytes = base64Decode(encryptedText);
-
-    final iv = encrypt.IV(Uint8List.fromList(
-        encryptedBytes.sublist(0, 16))); // Primeiro 16 bytes são o IV
-    final encryptedData =
-        encrypt.Encrypted(Uint8List.fromList(encryptedBytes.sublist(16)));
-
-    final encrypter = encrypt.Encrypter(encrypt.AES(key));
-    return encrypter.decrypt(encryptedData, iv: iv);
-  }
-
-  
-
-
-  /// Obtém a lista de registros armazenados
-  Future<List<RegisterModel>> _getListRegister() async {
+  Future<String?> exportBackup(String password) async {
+    emit(BackupRestoreStateLoadingState());
+    File? file;
+    var stage = 'carregar perfil';
+    developer.log('Criação iniciada.', name: 'keezy.backup');
     try {
-      final List<String>? registrosString =
-          await secureStorageService.getStringList(_keyRegistros);
-
-      if (registrosString == null || registrosString.isEmpty) {
-        return [];
+      final user = await authRepository.getUser();
+      stage = 'carregar registros';
+      final registers = await registerController.getRegisterForExportCsv();
+      if (user == null || registers == null || registers.isEmpty) {
+        developer.log(
+          'Dados indisponíveis: perfil=${user == null ? 'ausente' : 'presente'}, '
+          'registros=${registers == null ? 'falha na leitura' : registers.length}.',
+          name: 'keezy.backup',
+        );
+        const message = 'Não há registros para incluir no backup.';
+        emit(BackupRestoreStateErrorState(message));
+        return message;
       }
-
-      return registrosString
-          .map(
-            (registro) => RegisterModel.fromMap(jsonDecode(registro)),
-          )
-          .toList();
-    } catch (_) {
-      log('Erro ao buscar registros para backup.');
-      return [];
+      stage = 'criptografar backup';
+      final encoded = await _codec.encode(
+        user: user,
+        registers: registers,
+        password: password,
+      );
+      stage = 'criar arquivo temporário';
+      final directory = await getTemporaryDirectory();
+      file = File(
+        '${directory.path}/keezy_backup_${DateTime.now().microsecondsSinceEpoch}.keezy',
+      );
+      await file.writeAsString(encoded, flush: true);
+      stage = 'compartilhar arquivo';
+      developer.log(
+        'Arquivo criado; abrindo compartilhamento.',
+        name: 'keezy.backup',
+      );
+      final result = await SharePlus.instance.share(
+        ShareParams(
+          subject: 'Backup Keezy protegido',
+          text: 'Backup Keezy protegido por senha.',
+          files: [XFile(file.path)],
+        ),
+      );
+      developer.log(
+        'Compartilhamento retornou: ${result.status}.',
+        name: 'keezy.backup',
+      );
+      if (result.status != ShareResultStatus.success) {
+        const message = 'Compartilhamento cancelado ou não confirmado.';
+        emit(BackupRestoreStateErrorState(message));
+        return message;
+      }
+      developer.log('Backup compartilhado com sucesso.', name: 'keezy.backup');
+      emit(BackupRestoreStateSuccessState('Backup compartilhado com sucesso.'));
+      return null;
+    } on FormatException catch (error, stackTrace) {
+      developer.log(
+        'Formato inválido na etapa: $stage.',
+        name: 'keezy.backup',
+        error: error.runtimeType,
+        stackTrace: stackTrace,
+      );
+      emit(BackupRestoreStateErrorState(error.message));
+      return error.message;
+    } catch (error, stackTrace) {
+      developer.log(
+        'Falha na etapa: $stage.',
+        name: 'keezy.backup',
+        error: error.runtimeType,
+        stackTrace: stackTrace,
+      );
+      const message = 'Não foi possível criar o backup.';
+      emit(BackupRestoreStateErrorState(message));
+      return message;
+    } finally {
+      try {
+        if (file != null && await file.exists()) await file.delete();
+      } catch (error, stackTrace) {
+        developer.log(
+          'Falha ao remover arquivo temporário.',
+          name: 'keezy.backup',
+          error: error.runtimeType,
+          stackTrace: stackTrace,
+        );
+      }
     }
   }
 
-  // Buscar o usuário para exportá-lo
-  Future<AuthUserModel?> getUser() async {
-    return AuthRepository().getUser();
-  }
-
-  Future<String> exportBackup() async {
+  Future<String?> restoreBackup({
+    required AuthController authController,
+    required String backupPassword,
+    required String newMasterPassword,
+  }) async {
     emit(BackupRestoreStateLoadingState());
-
     try {
-      AuthUserModel? user = await getUser();
-
-      if (user == null || user.name.isEmpty) {
-        log('Usuário não encontrado para exportação.');
-        return 'Usuário não encontrado para exportação.';
+      if (await authRepository.hasUser() ||
+          await RegisterHive.hasPersistentVault()) {
+        const message =
+            'Para restaurar, exclua primeiro o cofre atual deste dispositivo.';
+        emit(BackupRestoreStateErrorState(message));
+        return message;
       }
-
-      final List<RegisterModel> registros = await _getListRegister();
-
-      if (registros.isEmpty) {
-        log('Nenhum registro encontrado para exportação.');
-        return 'Nenhum registro encontrado para exportação.';
+      if (MasterPasswordPolicy.validate(newMasterPassword)
+          case final message?) {
+        emit(BackupRestoreStateErrorState(message));
+        return message;
       }
-
-      final String jsonRegister =
-          jsonEncode(registros.map((r) => r.toJson()).toList());
-
-      final String userJson = jsonEncode(user.toJson());
-
-      final String dataExport =
-          jsonEncode({_userKey: userJson, _keyRegistros: jsonRegister});
-
-      // 🔐 Criptografando os dados
-      final String encryptedData = _encryptData(dataExport);
-
-      // Obtendo diretório
-      final Directory directory = await getApplicationDocumentsDirectory();
-      final String filePath = '${directory.path}/keezy_backup.enc';
-      final File file = File(filePath);
-
-      await file.writeAsString(encryptedData);
-
-      // Compartilhando o arquivo
-      await Share.shareXFiles(
-        [XFile(file.path)],
-        text: 'Segue o backup criptografado dos dados do meu aplicativo!',
+      final selection = await FilePicker.pickFile(
+        type: FileType.custom,
+        allowedExtensions: ['keezy'],
       );
-
-      file.existsSync();
-      emit(BackupRestoreStateSuccessState());
-
-      log('Backup exportado com sucesso.');
-      return 'Backup exportado com sucesso!';
+      final path = selection?.path;
+      if (path == null) {
+        emit(BackupRestoreStateInitialState());
+        return null;
+      }
+      final backup = await _codec.decode(
+        encoded: await File(path).readAsString(),
+        password: backupPassword,
+      );
+      if (backup.registers.isEmpty) {
+        const message = 'O backup não contém registros para restaurar.';
+        emit(BackupRestoreStateErrorState(message));
+        return message;
+      }
+      final accountCreated = await authController.registerUser(
+        AuthUserModel(
+          name: backup.user.name,
+          email: backup.user.email,
+          password: newMasterPassword,
+        ),
+      );
+      if (!accountCreated) {
+        const message = 'Não foi possível preparar o novo cofre.';
+        emit(BackupRestoreStateErrorState(message));
+        return message;
+      }
+      final recordsSaved = await registerController.saveListRegistersController(
+        backup.registers,
+      );
+      final restored = await registerController.getRegisterForExportCsv();
+      final restoredIds =
+          restored?.map((register) => register.id).toSet() ?? {};
+      final expectedIds = backup.registers
+          .map((register) => register.id)
+          .toSet();
+      if (!recordsSaved ||
+          restoredIds.length != expectedIds.length ||
+          !restoredIds.containsAll(expectedIds)) {
+        final removed = await authController.logoutAndRemoveUser();
+        final message = removed
+            ? 'A restauração falhou e o novo cofre foi removido.'
+            : 'A restauração falhou. Exclua o novo cofre antes de tentar novamente.';
+        emit(BackupRestoreStateErrorState(message));
+        return message;
+      }
+      emit(
+        BackupRestoreStateSuccessState(
+          '${backup.registers.length} registros restaurados com sucesso.',
+        ),
+      );
+      return null;
+    } on FormatException catch (error) {
+      emit(BackupRestoreStateErrorState(error.message));
+      return error.message;
     } catch (_) {
-      const message = 'Erro ao exportar backup.';
+      const message = 'Não foi possível restaurar este backup.';
       emit(BackupRestoreStateErrorState(message));
-      log(message);
       return message;
     }
   }
- 
-  /// The portable format is unfinished. Never create an account from a backup
-  /// unless its records can also be restored and verified.
-  Future<String> restoreBackup(
-    AuthController authController,
-    RegisterController registerController,
-  ) async {
-    const message = 'Restauração de backup Keezy ainda não disponível.';
-    emit(BackupRestoreStateErrorState(message));
-    return message;
-  }
 
-
-
-  
-  Future<bool> exportarUmRegistro(RegisterModel registro) async {
+  /// Imports a protected backup into an unlocked vault without replacing data.
+  Future<String?> importBackupIntoCurrentVault(String backupPassword) async {
+    emit(BackupRestoreStateLoadingState());
+    var stage = 'selecionar arquivo';
     try {
-      final String jsonContent = jsonEncode(registro.toJson());
-
-      // 🔐 Criptografando os dados
-      final String encryptedData = _encryptData(jsonContent);
-
-      // Obtendo diretório
-      final Directory directory = await getApplicationDocumentsDirectory();
-      final String filePath = '${directory.path}/registro_backup.json';
-      final File file = File(filePath);
-
-      await file.writeAsString(encryptedData);
-
-      // Compartilhando o arquivo
-      await Share.shareXFiles(
-        [XFile(file.path)],
-        text: 'Segue o backup criptografado do registro selecionado!',
+      if (!RegisterHive.isUnlocked) {
+        const message = 'Desbloqueie o cofre antes de restaurar o backup.';
+        emit(BackupRestoreStateErrorState(message));
+        return message;
+      }
+      var encoded = _pendingImportEncoded;
+      if (encoded == null) {
+        String? path;
+        SessionManager.beginSystemPicker();
+        try {
+          final selection = await FilePicker.pickFile(
+            type: FileType.custom,
+            allowedExtensions: ['keezy'],
+          );
+          path = selection?.path;
+        } finally {
+          SessionManager.endSystemPicker();
+        }
+        if (path == null) {
+          emit(BackupRestoreStateInitialState());
+          return null;
+        }
+        stage = 'ler arquivo selecionado';
+        encoded = await File(path).readAsString();
+      }
+      if (!RegisterHive.isUnlocked) {
+        _pendingImportEncoded = encoded;
+        const message =
+            'Arquivo selecionado. Desbloqueie o cofre e volte '
+            'a Configurações para concluir a restauração.';
+        emit(BackupRestoreStateErrorState(message));
+        return message;
+      }
+      stage = 'descriptografar backup';
+      final backup = await _codec.decode(
+        encoded: encoded,
+        password: backupPassword,
       );
-
-      file.existsSync();
-      emit(BackupRestoreStateSuccessState());
-
-      log('Registro exportado com sucesso.');
-      return true;
-    } catch (_) {
-      log('Erro ao exportar registro.');
-      emit(BackupRestoreStateErrorState('Erro ao exportar registro.'));
-      return false;
-    }
-  }
-
-  /// Importa um único registro a partir de um arquivo JSON
-  Future<Either<RepositoryException, bool>> importarUmRegistro() async {
-    try {
-      final PlatformFile? result = await FilePicker.pickFile(
-        dialogTitle: 'Selecione um arquivo',
-        type: FileType.any, // ✅ Permite qualquer arquivo
+      if (!RegisterHive.isUnlocked) {
+        _pendingImportEncoded = encoded;
+        const message =
+            'Cofre bloqueado. Desbloqueie e tente restaurar novamente.';
+        emit(BackupRestoreStateErrorState(message));
+        return message;
+      }
+      stage = 'comparar registros';
+      final current = await registerController.getRegisterForExportCsv();
+      if (current == null) {
+        throw StateError('Não foi possível ler o cofre atual');
+      }
+      final plan = BackupMergePlan(
+        current: current,
+        imported: backup.registers,
       );
-
-      if (result?.path == null) {
-        log("Nenhum arquivo selecionado.");
-        return Left(RepositoryException(message: 'Nenhum arquivo selecionado.'));
+      if (plan.toImport.isEmpty) {
+        _pendingImportEncoded = null;
+        const message = 'Nenhum registro novo no backup.';
+        emit(BackupRestoreStateSuccessState(message));
+        return message;
       }
-
-      final File file = File(result!.path!);
-      final String encryptedContent = await file.readAsString();
-
-      // 🔓 Descriptografar os dados
-      final String decryptedData = _decryptData(encryptedContent);
-
-      // Decodificar o JSON
-      final Map<String, dynamic> dataMap = jsonDecode(decryptedData);
-
-      // Validar a estrutura do JSON
-      if (!dataMap.containsKey('id') || !dataMap.containsKey('name')) {
-        log("Formato de arquivo inválido.");
-        return Left(RepositoryException(message: 'Formato de arquivo inválido.'));
+      stage = 'salvar registros';
+      final saved = await registerController.addNewRegistersController(
+        plan.toImport,
+      );
+      stage = 'confirmar registros salvos';
+      final verified = await registerController.getRegisterForExportCsv();
+      final byId = {
+        for (final record in verified ?? <RegisterModel>[]) record.id: record,
+      };
+      if (!saved ||
+          verified == null ||
+          !plan.toImport.every((record) {
+            final actual = byId[record.id];
+            return actual != null &&
+                BackupMergePlan.sameContent(actual, record);
+          })) {
+        throw StateError('Não foi possível confirmar todos os registros');
       }
-
-      // Decodificar o registro
-      final RegisterModel registro = RegisterModel.fromJson(dataMap);
-
-      // Salvar o registro importado
-      final sucesso = await _saveOneRegisterImported(registro);
-
-      if (sucesso) {
-        log('Registro importado com sucesso!');
-        return Right(true);
-      } else {
-        return Left(RepositoryException(
-            message: 'Falha ao salvar o registro importado.'));
-      }
-    } catch (_) {
-      log('Erro ao importar registro.');
-      return Left(RepositoryException(message: 'Erro ao importar o registro.'));
+      final message =
+          '${plan.toImport.length} registro(s) restaurado(s); '
+          '${plan.duplicates} repetido(s) ignorado(s).';
+      _pendingImportEncoded = null;
+      emit(BackupRestoreStateSuccessState(message));
+      return message;
+    } on FormatException catch (error, stackTrace) {
+      _pendingImportEncoded = null;
+      developer.log(
+        'Falha na restauração: $stage.',
+        name: 'keezy.backup',
+        error: error.runtimeType,
+        stackTrace: stackTrace,
+      );
+      emit(BackupRestoreStateErrorState(error.message));
+      return error.message;
+    } catch (error, stackTrace) {
+      developer.log(
+        'Falha na restauração: $stage.',
+        name: 'keezy.backup',
+        error: error.runtimeType,
+        stackTrace: stackTrace,
+      );
+      const message =
+          'Restauração interrompida. Registros existentes foram mantidos. '
+          'Selecione o mesmo backup para concluir.';
+      emit(BackupRestoreStateErrorState(message));
+      return message;
     }
   }
-
-  Future<bool> _saveOneRegisterImported(RegisterModel registro) async {
-    try {
-      final List<RegisterModel> registros = await _getListRegister();
-      registros.add(registro);
-
-      final List<String> registrosString =
-          registros.map((reg) => jsonEncode(reg.toMap())).toList();
-
-      await secureStorageService.saveStringList(_keyRegistros, registrosString);
-
-      return true;
-    } catch (_) {
-      log('Erro ao salvar registro importado.');
-      return false;
-    }
-  }
-
- 
-Future<List<Map<String, String>>> importCsv() async {
-  try {
-    // Permitir que o usuário selecione o arquivo CSV
-    final PlatformFile? result = await FilePicker.pickFile(
-      dialogTitle: 'Selecione um arquivo CSV',
-      type: FileType.custom,
-      allowedExtensions: ['csv'], // Apenas arquivos CSV
-    );
-
-    if (result?.path == null) {
-      throw Exception('Nenhum arquivo selecionado.');
-    }
-
-    final File file = File(result!.path!);
-
-    if (!await file.exists()) {
-      throw Exception('Arquivo CSV não encontrado.');
-    }
-
-    final csvContent = await file.readAsString();
-    final List<List<dynamic>> rows = const CsvDecoder(fieldDelimiter: ',')
-        .convert(csvContent);
-
-    if (rows.isEmpty) {
-      throw Exception('O arquivo CSV está vazio.');
-    }
-
-    // A primeira linha do CSV deve conter os cabeçalhos
-    final headers = rows.first.map((header) => header.toString()).toList();
-    final dataRows = rows.skip(1); // Ignora a linha de cabeçalhos
-
-    // Converte as linhas em uma lista de mapas
-    final List<Map<String, String>> data = dataRows.map((row) {
-      final Map<String, String> rowData = {};
-      for (int i = 0; i < headers.length; i++) {
-        rowData[headers[i]] = row[i]?.toString() ?? '';
-      }
-      return rowData;
-    }).toList();
-
-    return data;
-  } catch (_) {
-    throw const FormatException('Não foi possível importar o CSV.');
-  }
-}
-
-
 }

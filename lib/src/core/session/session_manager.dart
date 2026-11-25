@@ -9,15 +9,34 @@ class SessionManager {
   static Future<void> Function()? _onExpired;
   static bool _active = false;
   static bool _foreground = true;
+  static bool _systemPickerOpen = false;
   static Future<void>? _expiryInProgress;
 
   static bool get isActive => _active;
   static bool get isForeground => _foreground;
 
-  static void setForeground(bool foreground) => _foreground = foreground;
+  static void setForeground(bool foreground) {
+    _foreground = foreground;
+    if (foreground && _systemPickerOpen) {
+      _systemPickerOpen = false;
+      if (isExpired()) unawaited(expire());
+    }
+  }
 
-  static Future<void> background() {
+  /// A native file picker may pause the Flutter activity briefly. Keep the
+  /// privacy cover, while allowing the existing idle timeout to protect the vault.
+  static void beginSystemPicker() {
+    updateActivity();
+    _systemPickerOpen = true;
+  }
+
+  static void endSystemPicker() {
+    if (_foreground) _systemPickerOpen = false;
+  }
+
+  static Future<void> background({bool force = false}) {
     _foreground = false;
+    if (!force && _systemPickerOpen && !isExpired()) return Future.value();
     return expire();
   }
 
@@ -66,6 +85,7 @@ class SessionManager {
 
   static void dispose() {
     stop();
+    _systemPickerOpen = false;
     _onExpired = null;
   }
 

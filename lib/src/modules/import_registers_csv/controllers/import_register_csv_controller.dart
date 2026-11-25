@@ -1,85 +1,128 @@
 import 'dart:developer';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:keezy/src/modules/import_registers_csv/controllers/csv_import_preview.dart';
 import 'package:keezy/src/modules/import_registers_csv/controllers/import_registers_csv_state.dart';
+import 'package:keezy/src/modules/import_registers_csv/repositories/import_registers_csv_repository.dart';
 import 'package:keezy/src/modules/import_registers_csv/services/import_registers_csv_services.dart';
 import 'package:keezy/src/modules/register/controller/register_controller.dart';
-import 'package:keezy/src/modules/register/model/register_model.dart';
-import 'package:uuid/uuid.dart';
 
 class ImportRegisterCsvController extends Cubit<ImportRegistersCsvState> {
-  final ImportRegistersCsvServices importRegistersCsvServices;
-  final RegisterController registerController;
-
   ImportRegisterCsvController({
     required this.importRegistersCsvServices,
     required this.registerController,
   }) : super(ImportCsvInitial());
 
-  Future<List<RegisterModel>?> importFromCsv() async {
+  final ImportRegistersCsvServices importRegistersCsvServices;
+  final RegisterController registerController;
+  bool _busy = false;
+
+  Future<CsvImportPreview?> prepareImport() async {
+    if (_busy) return null;
+    _busy = true;
     emit(ImportCsvLoading());
-
     try {
-      final registers = await importRegistersCsvServices.importFromCsv();
-
-      if (registers.isEmpty) {
-        const msg = 'Nenhum registro válido encontrado no arquivo!';
-        emit(ImportCsvNull(msg));
+      final imported = await importRegistersCsvServices.importFromCsv();
+      if (imported.isEmpty) {
+        emit(ImportCsvNull('Nenhum registro encontrado no arquivo.'));
         return null;
       }
-
-      log('Registros importados: ${registers.length}');
-      emit(ImportCsvLoaded('Registros importados: ${registers.length}'));
-
-      return registers;
-    } catch (_) {
-      log('Erro ao importar CSV.');
-      emit(ImportCsvError('Erro ao importar CSV. Verifique o arquivo.'));
+      final current = await registerController.getRegisterForExportCsv();
+      if (current == null) {
+        emit(ImportCsvError('Não foi possível ler o cofre. Tente novamente.'));
+        return null;
+      }
+      final preview = CsvImportPreview.create(
+        imported: imported,
+        current: current,
+      );
+      emit(ImportCsvInitial());
+      return preview;
+    } on CsvImportCancelled {
+      emit(ImportCsvInitial());
       return null;
+    } catch (_) {
+      log('Erro ao preparar importação CSV.');
+      emit(ImportCsvError('Erro ao ler CSV. Verifique o arquivo.'));
+      return null;
+    } finally {
+      _busy = false;
     }
   }
-  
-  Future<String?> restoreBackupFromFileCsv() async {
+
+  Future<bool> commitImport(CsvImportPreview preview) async {
+    if (_busy) return false;
+    _busy = true;
     emit(ImportCsvLoading());
     try {
-      // 1. Importa do CSV
-      final importedRegisters = await importFromCsv();
-
-      if (importedRegisters == null || importedRegisters.isEmpty) {
-        const msg = 'Nenhum registro encontrado!';
-        emit(ImportCsvNull(msg));
-        return msg;
+      final current = await registerController.getRegisterForExportCsv();
+      if (current == null) {
+        emit(ImportCsvError('Não foi possível ler o cofre. Tente novamente.'));
+        return false;
+      }
+      if (!preview.matchesVault(current)) {
+        emit(
+          ImportCsvError(
+            'O cofre mudou desde a prévia. Selecione o CSV novamente.',
+          ),
+        );
+        return false;
+      }
+      if (preview.newCount == 0) {
+        emit(ImportCsvInitial());
+        return false;
       }
 
-      // 2. Busca registros já existentes
-      final currentRegisters =
-          await registerController.getRegisterForExportCsv() ?? [];
-
-      // 3. Garante ID ÚNICO para cada importado
-      final newRegisters = importedRegisters
-          .map((r) => r.copyWith(id: const Uuid().v4()))
-          .toList();
-
-      // 4. Junta tudo numa só lista
-      final allRegisters = [...currentRegisters, ...newRegisters];
-
-      // 5. Salva tudo de uma vez (mais seguro e rápido)
-      final success = await registerController.saveListRegistersController(
-        allRegisters,
+      final saved = await registerController.addNewRegistersController(
+        preview.toImport,
       );
-
-      if (!success) {
-        emit(ImportCsvError('Erro ao salvar registros!'));
-        return 'Erro ao salvar registros!';
+      if (!saved) {
+        emit(
+          ImportCsvError(
+            'Importação interrompida. Registros anteriores foram mantidos. '
+            'Selecione o mesmo CSV para concluir.',
+          ),
+        );
+        return false;
       }
 
-      emit(ImportCsvLoaded('Importação concluída com sucesso!'));
-      return 'Importação concluída com sucesso!';
+      final verified = await registerController.getRegisterForExportCsv();
+      final byId = {for (final record in verified ?? []) record.id: record};
+      final complete =
+          verified != null &&
+          preview.toImport.every((expected) {
+            final actual = byId[expected.id];
+            return actual != null &&
+                CsvImportPreview.hasSameContent(actual, expected);
+          });
+      if (!complete) {
+        emit(
+          ImportCsvError(
+            'Não foi possível confirmar todos os registros. '
+            'Selecione o mesmo CSV para concluir.',
+          ),
+        );
+        return false;
+      }
+
+      emit(
+        ImportCsvLoaded(
+          '${preview.newCount} registro(s) importado(s); '
+          '${preview.duplicates} duplicado(s) ignorado(s).',
+        ),
+      );
+      return true;
     } catch (_) {
-      log('Erro ao restaurar registros do CSV.');
-      const errorMsg = 'Erro ao restaurar registros do CSV.';
-      emit(ImportCsvError(errorMsg));
-      return errorMsg;
+      log('Erro ao salvar importação CSV.');
+      emit(
+        ImportCsvError(
+          'Importação interrompida. Registros anteriores foram mantidos. '
+          'Selecione o mesmo CSV para concluir.',
+        ),
+      );
+      return false;
+    } finally {
+      _busy = false;
     }
   }
 }

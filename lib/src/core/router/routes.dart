@@ -6,6 +6,7 @@ import 'package:keezy/src/modules/auth/pages/auth_page.dart';
 import 'package:keezy/src/modules/auth/pages/auth_validade_page.dart';
 import 'package:keezy/src/modules/auth/pages/register_auth_page.dart';
 import 'package:keezy/src/modules/configuracoes/backup_restore/import_one_register_page.dart';
+import 'package:keezy/src/modules/configuracoes/backup_restore/views/backup_restore_page.dart';
 import 'package:keezy/src/modules/configuracoes/views/pages/configuracoes_page.dart';
 import 'package:keezy/src/modules/export_registers_csv/pages/export_register_csv_page.dart';
 import 'package:keezy/src/modules/home/home_navigation_page.dart';
@@ -82,6 +83,15 @@ final routes = GoRouter(
       path: '/create-master-password',
       builder: (BuildContext context, GoRouterState state) {
         return MasterPasswordCreationScreen();
+      },
+    ),
+    GoRoute(
+      path: RoutesPaths.restoreBackup,
+      builder: (BuildContext context, GoRouterState state) {
+        return const Scaffold(
+          appBar: null,
+          body: SafeArea(child: BackupRestorePage(showExport: false)),
+        );
       },
     ),
 
@@ -303,6 +313,7 @@ String? vaultRedirect(
     RoutesPaths.splash,
     RoutesPaths.modeSelection,
     RoutesPaths.createMasterPassword,
+    RoutesPaths.restoreBackup,
     RoutesPaths.auth,
     RoutesPaths.digitarSenha,
   };

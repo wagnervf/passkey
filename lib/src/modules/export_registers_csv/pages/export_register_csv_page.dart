@@ -17,6 +17,27 @@ class ExportRegisterCsvPage extends StatefulWidget {
 }
 
 class _ExportRegisterCsvPageState extends State<ExportRegisterCsvPage> {
+  bool _checkingAvailability = true;
+  bool _hasRegisters = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadAvailability();
+  }
+
+  Future<void> _loadAvailability() async {
+    final hasRegisters = await context
+        .read<ExportRegisterCsvController>()
+        .hasRegisters();
+    if (mounted) {
+      setState(() {
+        _hasRegisters = hasRegisters;
+        _checkingAvailability = false;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final controller = Provider.of<ExportRegisterCsvController>(
@@ -36,10 +57,7 @@ class _ExportRegisterCsvPageState extends State<ExportRegisterCsvPage> {
         if (state is ExportCsvLoaded) {
           ShowMessager.show(context, '✅ Registros compartilhados com sucesso!');
         } else if (state is ExportCsvNull) {
-          ShowMessager.show(
-            context,
-            '⚠️ ${state.message}',
-          );
+          ShowMessager.show(context, '⚠️ ${state.message}');
         } else if (state is ExportCsvError) {
           ShowMessager.show(context, '❌ ${state.message}');
         }
@@ -47,9 +65,13 @@ class _ExportRegisterCsvPageState extends State<ExportRegisterCsvPage> {
       builder: (context, state) {
         return ItemCardWithIcon(
           text: 'Exportar Registros',
-          subtTitle:
-              'Exportará seus registros para um arquivo ".csv".',
+          subtTitle: _checkingAvailability
+              ? 'Verificando registros disponíveis...'
+              : _hasRegisters
+              ? 'Exportará seus registros para um arquivo ".csv".'
+              : 'Adicione um registro para habilitar a exportação.',
           icon: Icons.share,
+          enabled: !_checkingAvailability && _hasRegisters,
           onTap: () => _confirmarExportacao(context, controller),
         );
       },
@@ -80,23 +102,25 @@ class _ExportRegisterCsvPageState extends State<ExportRegisterCsvPage> {
     );
   }
 
-    Future<void> _confirmarExportacao(BuildContext context, ExportRegisterCsvController controller) async {
+  Future<void> _confirmarExportacao(
+    BuildContext context,
+    ExportRegisterCsvController controller,
+  ) async {
     final confirmou = await AuthDialogService.confirmarAcao(
       context: context,
       titulo: 'Compartilhar registros em CSV',
-      mensagem: 'O arquivo CSV contém todas as senhas em texto legível. '
+      mensagem:
+          'O arquivo CSV contém todas as senhas em texto legível. '
           'Quem tiver acesso a ele poderá lê-las. Guarde o arquivo com cuidado.',
       textoConfirmar: 'Compartilhar',
     );
 
     if (!mounted) return;
     if (confirmou) {
-     await _exportarRegistros(controller);
+      await _exportarRegistros(controller);
+      await _loadAvailability();
     }
   }
-
-
- 
 
   Future<void> _exportarRegistros(
     ExportRegisterCsvController controller,
@@ -106,10 +130,7 @@ class _ExportRegisterCsvPageState extends State<ExportRegisterCsvPage> {
     } catch (_) {
       log('Erro ao exportar registros.');
       if (!mounted) return;
-      ShowMessager.show(
-        context,
-        '❌ Ocorreu um erro durante a exportação.',
-      );
+      ShowMessager.show(context, '❌ Ocorreu um erro durante a exportação.');
     }
   }
 }

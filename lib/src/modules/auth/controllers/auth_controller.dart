@@ -9,17 +9,26 @@ import 'package:keezy/src/modules/auth/controllers/auth_state.dart';
 import 'package:keezy/src/modules/auth/model/auth_user_model.dart';
 import 'package:keezy/src/modules/auth/providers/auth_user_provider.dart';
 import 'package:keezy/src/modules/auth/repositories/auth_repository.dart';
+import 'package:keezy/src/modules/auth/security/master_password_attempts.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:local_auth_android/local_auth_android.dart';
 import 'package:local_auth_darwin/local_auth_darwin.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthController extends Cubit<AuthState> {
-  AuthController({required this.tokenStorage, required this.authRepository})
-    : super(AuthInitialState());
+  AuthController({
+    required this.tokenStorage,
+    required this.authRepository,
+    MasterPasswordAttempts? passwordAttempts,
+  }) : passwordAttempts =
+           passwordAttempts ??
+           MasterPasswordAttempts(storage: authRepository.secureStorageService),
+       super(AuthInitialState());
 
   final TokenStorageInterface tokenStorage;
   final AuthRepository authRepository;
+  final MasterPasswordAttempts passwordAttempts;
+  bool _passwordLoginInProgress = false;
 
   AuthUserModel? _user;
   AuthUserModel? get userLogado => _user;
@@ -50,10 +59,26 @@ class AuthController extends Cubit<AuthState> {
   }
 
   Future<bool> login(String password) async {
+    if (_passwordLoginInProgress) return false;
+    _passwordLoginInProgress = true;
     emit(AuthLoadingState());
-    final isValid = await authRepository.validatePassword(password);
+    try {
+      final wait = await passwordAttempts.remaining();
+      if (wait > Duration.zero) {
+        emit(AuthErrorState(_waitMessage(wait)));
+        return false;
+      }
+      final isValid = await authRepository.validatePassword(password);
+      if (!isValid) {
+        final delay = await passwordAttempts.recordFailure();
+        emit(
+          AuthErrorState(
+            delay > Duration.zero ? _waitMessage(delay) : 'Senha incorreta',
+          ),
+        );
+        return false;
+      }
 
-    if (isValid) {
       try {
         final hadLegacyKey =
             await RegisterHive.keyManager.store.readLegacyKey() != null;
@@ -77,6 +102,11 @@ class AuthController extends Cubit<AuthState> {
           return false;
         }
         _user = user;
+        try {
+          await passwordAttempts.clear();
+        } catch (_) {
+          // A valid password must still be able to unlock the vault.
+        }
         SessionManager.start();
         emit(AuthSuccessState(user));
         // Notify the provider about the new user
@@ -89,35 +119,56 @@ class AuthController extends Cubit<AuthState> {
         );
         return false;
       }
-    } else {
-      emit(AuthErrorState('Senha incorreta'));
+    } catch (_) {
+      emit(
+        AuthErrorState('Não foi possível verificar a senha. Tente novamente.'),
+      );
       return false;
+    } finally {
+      _passwordLoginInProgress = false;
     }
+  }
+
+  String _waitMessage(Duration wait) {
+    final seconds = (wait.inMilliseconds / 1000).ceil();
+    final minutes = (seconds / 60).ceil();
+    return seconds < 60
+        ? 'Muitas tentativas. Tente novamente em $seconds segundos.'
+        : 'Muitas tentativas. Tente novamente em $minutes minutos.';
   }
 
   Future<bool> registerUser(AuthUserModel user) async {
     emit(AuthLoadingState());
+    var createdNewVault = false;
     try {
       if (!await authRepository.hasUser()) {
         await RegisterHive.completePendingDeletion();
       }
+      if (await RegisterHive.hasPersistentVault()) {
+        emit(AuthErrorState('Já existe um cofre neste dispositivo.'));
+        return false;
+      }
       final result = await authRepository.saveUser(user);
       if (result) {
+        createdNewVault = true;
         await RegisterHive.unlockWithPassword(
           user.password,
           createIfMissing: true,
         );
         final savedUser = await authRepository.getUser();
         if (savedUser == null) {
-          await RegisterHive.lock();
-          emit(AuthErrorState('Erro ao cadastrar usuário'));
-          return false;
+          throw StateError('Credencial do usuário não foi confirmada');
         }
         if (!SessionManager.isForeground) {
           await lockVault();
           return false;
         }
         _user = savedUser;
+        try {
+          await passwordAttempts.clear();
+        } catch (_) {
+          // Account creation remains usable if attempt cleanup fails.
+        }
         SessionManager.start();
         emit(AuthSuccessState(savedUser));
         AuthUserProvider.instance.setUser(savedUser);
@@ -132,6 +183,12 @@ class AuthController extends Cubit<AuthState> {
         return false;
       }
     } catch (_) {
+      if (createdNewVault) {
+        try {
+          final removed = await authRepository.logoutAndRemoveUser();
+          if (removed) await RegisterHive.discardNewVault();
+        } catch (_) {}
+      }
       emit(
         AuthErrorState(
           'Não foi possível preparar o cofre. Tente entrar com sua senha.',
@@ -171,16 +228,27 @@ class AuthController extends Cubit<AuthState> {
   Future<bool> logoutAndRemoveUser() async {
     emit(AuthLoadingState());
     try {
-      await RegisterHive.markEmptyVaultForDeletion();
+      await RegisterHive.markVaultForDeletion();
       final result = await authRepository.logoutAndRemoveUser();
       if (!result) {
+        await RegisterHive.cancelPendingDeletion();
         emit(AuthErrorState('Erro ao remover o usuário'));
         return false;
       }
       await RegisterHive.completePendingDeletion();
-      await tokenStorage.saveHasUser(false);
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setBool('biometric_enabled', false);
+      try {
+        await passwordAttempts.clear();
+      } catch (_) {
+        // The old delay expires by itself if cleanup is unavailable.
+      }
+      try {
+        await tokenStorage.saveHasUser(false);
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setBool('biometric_enabled', false);
+      } catch (_) {
+        // These are convenience flags. The account and vault were already
+        // deleted durably and must not be reported as a failed deletion.
+      }
       _user = null;
       SessionManager.stop();
       AuthUserProvider.instance.clearUser();
@@ -285,7 +353,11 @@ class AuthController extends Cubit<AuthState> {
 
   Future<bool> checkExistUserLocal() async {
     final exists = await authRepository.hasUser();
-    if (!exists) await RegisterHive.completePendingDeletion();
+    if (exists) {
+      await RegisterHive.cancelPendingDeletion();
+    } else {
+      await RegisterHive.completePendingDeletion();
+    }
     return exists;
   }
 }

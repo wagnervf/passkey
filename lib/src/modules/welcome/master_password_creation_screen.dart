@@ -1,246 +1,363 @@
-// master_password_creation_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:keezy/src/core/components/help/help_view.dart';
-import 'package:keezy/src/core/components/show_sucess.dart';
 import 'package:keezy/src/core/router/routes.dart';
+import 'package:keezy/src/core/utils/password_field_with_generator.dart';
 import 'package:keezy/src/modules/auth/controllers/auth_controller.dart';
+import 'package:keezy/src/modules/auth/controllers/auth_state.dart';
 import 'package:keezy/src/modules/auth/model/auth_user_model.dart';
+import 'package:keezy/src/modules/auth/security/master_password_policy.dart';
 
 class MasterPasswordCreationScreen extends StatefulWidget {
   const MasterPasswordCreationScreen({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
-  _MasterPasswordCreationScreenState createState() =>
+  State<MasterPasswordCreationScreen> createState() =>
       _MasterPasswordCreationScreenState();
 }
 
 class _MasterPasswordCreationScreenState
     extends State<MasterPasswordCreationScreen> {
-  final TextEditingController _createPasswordController =
-      TextEditingController();
-  final TextEditingController _confirmPasswordController =
-      TextEditingController();
-
-  final TextEditingController _nameController = TextEditingController();
-
   final _formKey = GlobalKey<FormState>();
+  final _nameController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _confirmationController = TextEditingController();
 
-  bool _obscureCreatePassword = true;
-  bool _obscureConfirmPassword = true;
-  String? _passwordError;
-  String? _nameError;
+  bool _showPassword = false;
+  bool _showConfirmation = false;
+  bool _generatedPassword = false;
+  bool _submitted = false;
+  bool _creatingAccount = false;
+  String? _submitError;
 
   @override
   void dispose() {
-    _createPasswordController.dispose();
-    _confirmPasswordController.dispose();
     _nameController.dispose();
+    _passwordController.dispose();
+    _confirmationController.dispose();
     super.dispose();
   }
 
-  // Function to validate passwords
-  bool _validatePasswords() {
+  void _suggestPassword(int length) {
+    final password = MasterPasswordPolicy.generate(length: length);
     setState(() {
-      _passwordError = null;
-      _nameError = null;
+      _passwordController.text = password;
+      _confirmationController.text = password;
+      _showPassword = true;
+      _generatedPassword = true;
+      _submitError = null;
     });
-
-    if (_createPasswordController.text.isEmpty ||
-        _confirmPasswordController.text.isEmpty) {
-      setState(() {
-        _passwordError = 'Ambos os campos de senha são obrigatórios.';
-      });
-      return false;
-    }
-
-    if (_createPasswordController.text != _confirmPasswordController.text) {
-      setState(() {
-        _passwordError = 'As senhas não coincidem. Por favor, verifique.';
-      });
-      return false;
-    }
-
-    if (_createPasswordController.text.length < 6) {
-      setState(() {
-        _passwordError = 'A senha deve ter pelo menos 6 caracteres.';
-      });
-      return false;
-    }
-
-    if (_nameController.text.isEmpty) {
-      setState(() {
-        _nameError = 'Informe seu nome para continuar';
-      });
-      return false;
-    }
-
-    return true;
+    if (_submitted) _formKey.currentState?.validate();
   }
 
-  Future<void> _sendDataToController(String masterPassword) async {
-    final controller = context.read<AuthController>();
-
-    if (_formKey.currentState!.validate()) {
-      final user = AuthUserModel(
-        password: masterPassword,
-        name: _nameController.text,
-        email: '',
-      );
-
-      if (!mounted) return;
-
-      try {
-        final saved = await controller.registerUser(user);
-        if (saved && mounted) {
-          context.push(RoutesPaths.biometricSetup);
-
-           context.push(
-      RoutesPaths.masterPasswordWarning,
-      extra: masterPassword, // enviar senha para tela
+  Future<void> _showPasswordHelp() async {
+    FocusScope.of(context).unfocus();
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Gerar senha mestra'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(MasterPasswordPolicy.guidance),
+              const SizedBox(height: 20),
+              const Text('Escolha o tamanho da senha aleatória:'),
+              const SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: () {
+                    Navigator.pop(dialogContext);
+                    _suggestPassword(8);
+                  },
+                  icon: const Icon(Icons.auto_awesome_outlined),
+                  label: const Text('Gerar 8 caracteres'),
+                ),
+              ),
+              const SizedBox(height: 8),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: () {
+                    Navigator.pop(dialogContext);
+                    _suggestPassword(16);
+                  },
+                  icon: const Icon(Icons.auto_awesome_outlined),
+                  label: const Text('Gerar 16 caracteres'),
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'A sugestão preenche os dois campos. Guarde a senha antes de continuar.',
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(dialogContext);
+              HelpView.mostrarDialogCriarConta(context);
+            },
+            child: const Text('Por que preciso dela?'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('Fechar'),
+          ),
+        ],
+      ),
     );
-        }
-      } catch (_) {
-        if (mounted) {
-          DialogUtils.showSuccessDialog(
-            context,
-            'Erro ao realizar cadastro. Tente novamente.',
-          );
-        }
+  }
+
+  Future<void> _submit() async {
+    setState(() {
+      _submitted = true;
+      _submitError = null;
+    });
+    if (!_formKey.currentState!.validate()) return;
+
+    FocusScope.of(context).unfocus();
+    setState(() => _creatingAccount = true);
+    final controller = context.read<AuthController>();
+    final password = _passwordController.text;
+    try {
+      final saved = await controller.registerUser(
+        AuthUserModel(
+          password: password,
+          name: _nameController.text.trim(),
+          email: '',
+        ),
+      );
+      if (!mounted) return;
+      if (saved) {
+        context.push(RoutesPaths.masterPasswordWarning, extra: password);
+      } else {
+        final state = controller.state;
+        setState(() {
+          _submitError = state is AuthErrorState
+              ? state.message
+              : 'Não foi possível criar o cofre. Tente novamente.';
+        });
       }
+    } catch (_) {
+      if (mounted) {
+        setState(() {
+          _submitError = 'Não foi possível criar o cofre. Tente novamente.';
+        });
+      }
+    } finally {
+      if (mounted) setState(() => _creatingAccount = false);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
     return Scaffold(
-      appBar: AppBar(title: Text('Crie sua Senha Mestra'), centerTitle: true),
+      appBar: AppBar(title: const Text('Criar conta'), centerTitle: true),
       body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24.0),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Icon(
-                    Icons.vpn_key,
-                    size: 80,
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                  SizedBox(height: 24),
-                  Text.rich(
-                    TextSpan(
-                      children: [
-                        TextSpan(
-                          text: 'Senha Mestra é a ',
-                          style: Theme.of(context).textTheme.titleMedium
-                              ?.copyWith(fontStyle: FontStyle.italic),
+        child: LayoutBuilder(
+          builder: (context, constraints) => SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                minHeight: constraints.maxHeight - 40,
+              ),
+              child: IntrinsicHeight(
+                child: Form(
+                  key: _formKey,
+                  autovalidateMode: _submitted
+                      ? AutovalidateMode.onUserInteraction
+                      : AutovalidateMode.disabled,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Container(
+                          width: 52,
+                          height: 52,
+                          decoration: BoxDecoration(
+                            color: colors.primaryContainer,
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Icon(
+                            Icons.key_rounded,
+                            color: colors.onPrimaryContainer,
+                            size: 28,
+                          ),
                         ),
-                        TextSpan(
-                          text: 'chave para todos os seus dados',
-                          style: Theme.of(context).textTheme.titleMedium
-                              ?.copyWith(
-                                fontWeight: FontWeight.bold,
-                                fontStyle: FontStyle.italic,
-                              ),
+                      ),
+                      const SizedBox(height: 14),
+                      Text(
+                        'Crie sua senha mestra',
+                        style: textTheme.headlineSmall?.copyWith(
+                          fontWeight: FontWeight.bold,
                         ),
-                        TextSpan(
-                          text:
-                              '. A única senha que você precisará lembrar.\nGuarde-a bem!',
-                          style: Theme.of(context).textTheme.titleMedium
-                              ?.copyWith(fontStyle: FontStyle.italic),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        'Ela protege seu cofre. Guarde-a em um lugar seguro.',
+                        style: textTheme.bodyMedium?.copyWith(
+                          color: colors.onSurfaceVariant,
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      _fieldLabel('Nome'),
+                      const SizedBox(height: 6),
+                      TextFormField(
+                        key: const ValueKey('master-name'),
+                        controller: _nameController,
+                        textCapitalization: TextCapitalization.words,
+                        textInputAction: TextInputAction.next,
+                        autofillHints: const [AutofillHints.name],
+                        decoration: _fieldDecoration(
+                          hint: 'Como podemos chamar você?',
+                          icon: Icons.person_outline,
+                        ),
+                        validator: (value) =>
+                            value == null || value.trim().isEmpty
+                            ? 'Informe seu nome para continuar.'
+                            : null,
+                      ),
+                      const SizedBox(height: 16),
+                      _fieldLabel('Senha mestra'),
+                      const SizedBox(height: 6),
+                      TextFormField(
+                        key: const ValueKey('master-password'),
+                        controller: _passwordController,
+                        obscureText: !_showPassword,
+                        keyboardType: TextInputType.visiblePassword,
+                        textInputAction: TextInputAction.next,
+                        autofillHints: const [AutofillHints.newPassword],
+                        decoration: _fieldDecoration(
+                          hint: 'Crie uma senha',
+                          icon: Icons.lock_outline,
+                          suffix: IconButton(
+                            tooltip: _showPassword
+                                ? 'Ocultar senha'
+                                : 'Mostrar senha',
+                            onPressed: () => setState(() {
+                              _showPassword = !_showPassword;
+                            }),
+                            icon: Icon(
+                              _showPassword
+                                  ? Icons.visibility_off_outlined
+                                  : Icons.visibility_outlined,
+                            ),
+                          ),
+                        ),
+                        onChanged: (_) {
+                          if (_generatedPassword) {
+                            setState(() => _generatedPassword = false);
+                          }
+                          if (_submitted &&
+                              _confirmationController.text.isNotEmpty) {
+                            _formKey.currentState?.validate();
+                          }
+                        },
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Informe uma senha mestra.';
+                          }
+                          return MasterPasswordPolicy.validate(value);
+                        },
+                      ),
+                      const SizedBox(height: 8),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: PasswordGeneratorButton(
+                          onPressed: _showPasswordHelp,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      _fieldLabel('Confirmar senha mestra'),
+                      const SizedBox(height: 6),
+                      TextFormField(
+                        key: const ValueKey('master-confirmation'),
+                        controller: _confirmationController,
+                        obscureText: !_showConfirmation,
+                        keyboardType: TextInputType.visiblePassword,
+                        textInputAction: TextInputAction.done,
+                        autofillHints: const [AutofillHints.newPassword],
+                        onFieldSubmitted: (_) {
+                          if (!_creatingAccount) _submit();
+                        },
+                        decoration: _fieldDecoration(
+                          hint: 'Digite a senha novamente',
+                          icon: Icons.lock_reset_outlined,
+                          suffix: IconButton(
+                            tooltip: _showConfirmation
+                                ? 'Ocultar confirmação'
+                                : 'Mostrar confirmação',
+                            onPressed: () => setState(() {
+                              _showConfirmation = !_showConfirmation;
+                            }),
+                            icon: Icon(
+                              _showConfirmation
+                                  ? Icons.visibility_off_outlined
+                                  : Icons.visibility_outlined,
+                            ),
+                          ),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Confirme a senha mestra.';
+                          }
+                          if (value != _passwordController.text) {
+                            return 'As senhas não coincidem.';
+                          }
+                          return null;
+                        },
+                      ),
+                      if (_generatedPassword) ...[
+                        const SizedBox(height: 8),
+                        Text(
+                          'Senha sugerida preenchida. Guarde-a antes de continuar.',
+                          style: textTheme.bodySmall?.copyWith(
+                            color: colors.onSurfaceVariant,
+                          ),
                         ),
                       ],
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  SizedBox(height: 32),
-                  TextField(
-                    controller: _nameController,
-                    decoration: InputDecoration(
-                      labelText: 'Nome',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      prefixIcon: Icon(Icons.person),
-                    ),
-                    onChanged: (_) => setState(() => _nameError = null),
-                  ),
-                  SizedBox(height: 22),
-                  TextField(
-                    controller: _createPasswordController,
-                    obscureText: _obscureCreatePassword,
-                    decoration: InputDecoration(
-                      labelText: 'Criar Senha',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      prefixIcon: Icon(Icons.lock_outline),
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          _obscureCreatePassword
-                              ? Icons.visibility_off
-                              : Icons.visibility,
+                      if (_submitError != null) ...[
+                        const SizedBox(height: 12),
+                        Text(
+                          _submitError!,
+                          style: textTheme.bodySmall?.copyWith(
+                            color: colors.error,
+                          ),
                         ),
-                        onPressed: () {
-                          setState(() {
-                            _obscureCreatePassword = !_obscureCreatePassword;
-                          });
-                        },
-                      ),
-                    ),
-                    onChanged: (_) => setState(() => _passwordError = null),
-                  ),
-                  SizedBox(height: 20),
-                  TextField(
-                    controller: _confirmPasswordController,
-                    obscureText: _obscureConfirmPassword,
-                    decoration: InputDecoration(
-                      labelText: 'Confirmar Senha',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      prefixIcon: Icon(Icons.lock),
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          _obscureConfirmPassword
-                              ? Icons.visibility_off
-                              : Icons.visibility,
+                      ],
+                      const Spacer(),
+                      const SizedBox(height: 24),
+                      SizedBox(
+                        height: 54,
+                        child: FilledButton.icon(
+                          onPressed: _creatingAccount ? null : _submit,
+                          icon: _creatingAccount
+                              ? const SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : const Icon(Icons.arrow_forward),
+                          label: Text(
+                            _creatingAccount ? 'Criando cofre...' : 'Continuar',
+                          ),
                         ),
-                        onPressed: () {
-                          setState(() {
-                            _obscureConfirmPassword = !_obscureConfirmPassword;
-                          });
-                        },
                       ),
-                    ),
-                    onChanged: (_) => setState(() => _passwordError = null),
+                    ],
                   ),
-                  if (_passwordError != null)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 10.0),
-                      child: Text(
-                        _passwordError!,
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.error,
-                          fontSize: 14,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  SizedBox(height: 40),
-                  _buttonContinuar(),
-                  SizedBox(height: 40),
-                  TextButton.icon(
-                    icon: const Icon(Icons.help, size: 16),
-                    label: Text('Por que criar uma senha mestra?'),
-                    onPressed: () => HelpView.mostrarDialogCriarConta(context),
-                  ),
-                ],
+                ),
               ),
             ),
           ),
@@ -249,23 +366,20 @@ class _MasterPasswordCreationScreenState
     );
   }
 
-  SizedBox _buttonContinuar() {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton(
-        onPressed: () async {
-          if (_validatePasswords()) {
-            await _sendDataToController(_createPasswordController.text);
-          }
-        },
-        style: ElevatedButton.styleFrom(
-          padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(30),
-          ),
-        ),
-        child: Text('Continuar', style: TextStyle(fontSize: 18)),
-      ),
-    );
-  }
+  Widget _fieldLabel(String text) => Text(
+    text,
+    style: Theme.of(context).textTheme.labelLarge
+        ?.copyWith(fontWeight: FontWeight.w600),
+  );
+
+  InputDecoration _fieldDecoration({
+    required String hint,
+    required IconData icon,
+    Widget? suffix,
+  }) => InputDecoration(
+    hintText: hint,
+    prefixIcon: Icon(icon),
+    suffixIcon: suffix,
+    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+  );
 }

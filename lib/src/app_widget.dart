@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:keezy/src/core/router/routes.dart';
 import 'package:keezy/src/core/session/session_manager.dart';
 import 'package:keezy/src/core/theme/controller/theme_controller.dart';
@@ -8,7 +9,9 @@ import 'package:keezy/src/modules/auth/controllers/auth_controller.dart';
 import 'package:provider/provider.dart';
 
 class AppWidget extends StatefulWidget {
-  const AppWidget({super.key});
+  const AppWidget({super.key, this.router});
+
+  final GoRouter? router;
 
   @override
   AppWidgetState createState() => AppWidgetState();
@@ -29,7 +32,7 @@ class AppWidgetState extends State<AppWidget> with WidgetsBindingObserver {
     if (_lockInProgress != null) return _lockInProgress!;
     if (mounted) setState(() => _covered = true);
     final future = context.read<AuthController>().lockVault().whenComplete(() {
-      if (mounted) routes.go(RoutesPaths.digitarSenha);
+      if (mounted) (widget.router ?? routes).go(RoutesPaths.digitarSenha);
     });
     _lockInProgress = future.whenComplete(() => _lockInProgress = null);
     return _lockInProgress!;
@@ -40,9 +43,8 @@ class AppWidgetState extends State<AppWidget> with WidgetsBindingObserver {
     if (state == AppLifecycleState.hidden ||
         state == AppLifecycleState.paused ||
         state == AppLifecycleState.detached) {
-      SessionManager.background();
-    } else if (state == AppLifecycleState.inactive) {
-      if (mounted) setState(() => _covered = true);
+      if (mounted && !_covered) setState(() => _covered = true);
+      SessionManager.background(force: state == AppLifecycleState.detached);
     } else if (state == AppLifecycleState.resumed) {
       SessionManager.setForeground(true);
       final pending = _lockInProgress;
@@ -69,19 +71,27 @@ class AppWidgetState extends State<AppWidget> with WidgetsBindingObserver {
     return Listener(
       behavior: HitTestBehavior.translucent,
       onPointerDown: (_) => SessionManager.updateActivity(),
-      child: Stack(
-        children: [
-          MaterialApp.router(
-            title: 'keezy',
-            theme: lightTheme,
-            darkTheme: darkTheme,
-            themeMode: themeConfig.isDark ? ThemeMode.dark : ThemeMode.system,
-            debugShowCheckedModeBanner: false,
-            routerConfig: routes,
-          ),
-          if (_covered)
-            const Positioned.fill(child: ColoredBox(color: Colors.black)),
-        ],
+      child: Directionality(
+        textDirection: TextDirection.ltr,
+        child: Stack(
+          children: [
+            MaterialApp.router(
+              title: 'keezy',
+              theme: lightTheme,
+              darkTheme: darkTheme,
+              themeMode: themeConfig.isDark ? ThemeMode.dark : ThemeMode.system,
+              debugShowCheckedModeBanner: false,
+              routerConfig: widget.router ?? routes,
+            ),
+            if (_covered)
+              const Positioned.fill(
+                child: ColoredBox(
+                  key: ValueKey('privacy-cover'),
+                  color: Colors.black,
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }

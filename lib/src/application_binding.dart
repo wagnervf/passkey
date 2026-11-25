@@ -28,10 +28,7 @@ import 'package:keezy/src/modules/register/repositories/register_repository_impl
 import 'package:provider/provider.dart';
 
 class ApplicationBinding extends StatelessWidget {
-  const ApplicationBinding({
-    super.key,
-    required this.child,
-  });
+  const ApplicationBinding({super.key, required this.child});
 
   final Widget child;
 
@@ -55,53 +52,61 @@ class ApplicationBinding extends StatelessWidget {
         ),
 
         //Provider<GoogleAuthServices>(lazy: true, create: (context) => AuthServices()),
-
-        ChangeNotifierProvider(
-          create: (_) => AuthUserProvider.instance,
-        ),
+        ChangeNotifierProvider(create: (_) => AuthUserProvider.instance),
         Provider<AuthRepository>(
-            lazy: true, create: (context) => AuthRepository()),
-        Provider<AuthController>(
-            lazy: true,
-            create: (context) => AuthController(
-                  authRepository: context.read(),
-                  tokenStorage: context.read(),
-                )),
-        Provider<Cubit<AuthState>>(
-            lazy: true,
-            create: (context) => AuthController(
-                  tokenStorage: context.read(),
-                  authRepository: context.read(),
-                )),
-
-        ChangeNotifierProvider<ConfiguracoesController>(
           lazy: true,
-          create: (context) => ConfiguracoesController(
-            sharedPreferences: sharedPreferences,
+          create: (context) => AuthRepository(),
+        ),
+        Provider<AuthController>(
+          lazy: true,
+          create: (context) => AuthController(
+            authRepository: context.read(),
+            tokenStorage: context.read(),
+          ),
+        ),
+        Provider<Cubit<AuthState>>(
+          lazy: true,
+          create: (context) => AuthController(
+            tokenStorage: context.read(),
+            authRepository: context.read(),
           ),
         ),
 
+        ChangeNotifierProvider<ConfiguracoesController>(
+          lazy: true,
+          create: (context) =>
+              ConfiguracoesController(sharedPreferences: sharedPreferences),
+        ),
+
         Provider<RegisterRepository>(
-            lazy: true, create: (context) => RegisterRepositoryImpl()),
+          lazy: true,
+          create: (context) => RegisterRepositoryImpl(),
+        ),
 
         Provider<RegisterController>(
-            lazy: true,
-            create: (context) =>
-                RegisterController(registerRepository: context.read())),
+          lazy: true,
+          create: (context) =>
+              RegisterController(registerRepository: context.read()),
+        ),
 
         Provider<BackupRestoreController>(
-            lazy: true,
-            create: (context) =>
-                BackupRestoreController(registerControllerX: context.read())),
+          lazy: true,
+          create: (context) => BackupRestoreController(
+            registerController: context.read(),
+            authRepository: context.read(),
+          ),
+        ),
 
         Provider<ImportRegistersCsvRepository>(
-            lazy: true,
-            create: (context) => ImportRegistersCsvRepositoryImpl()),
+          lazy: true,
+          create: (context) => ImportRegistersCsvRepositoryImpl(),
+        ),
 
         Provider<ImportRegistersCsvServices>(
-            lazy: true,
-            create: (context) =>
-                ImportRegistersCsvServicesImpl(repository: context.read())),
+          lazy: true,
+          create: (context) =>
+              ImportRegistersCsvServicesImpl(repository: context.read()),
+        ),
 
         Provider<ImportRegisterCsvController>(
           lazy: true,
@@ -112,18 +117,21 @@ class ApplicationBinding extends StatelessWidget {
         ),
 
         Provider<ExportRegistersCsvRepository>(
-            lazy: true,
-            create: (context) => ExportRegistersCsvRepositoryImpl()),
+          lazy: true,
+          create: (context) => ExportRegistersCsvRepositoryImpl(),
+        ),
 
         Provider<ExportRegistersCsvServices>(
-            lazy: true,
-            create: (context) =>
-                ExportRegistersCsvServicesImpl(repository: context.read())),
+          lazy: true,
+          create: (context) =>
+              ExportRegistersCsvServicesImpl(repository: context.read()),
+        ),
 
         Provider<ExportRegisterCsvController>(
           lazy: true,
           create: (context) => ExportRegisterCsvController(
-            exportRegistersCsvServices: context.read<ExportRegistersCsvServices>(),
+            exportRegistersCsvServices: context
+                .read<ExportRegistersCsvServices>(),
             registerController: context.read<RegisterController>(),
           ),
         ),

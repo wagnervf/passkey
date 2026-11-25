@@ -16,8 +16,8 @@ class ExportRegistersCsvRepositoryImpl implements ExportRegistersCsvRepository {
   ExportRegistersCsvRepositoryImpl({
     Future<Directory> Function()? temporaryDirectory,
     Future<ShareResult> Function(ShareParams)? share,
-  })  : _temporaryDirectory = temporaryDirectory ?? getTemporaryDirectory,
-        _share = share ?? SharePlus.instance.share;
+  }) : _temporaryDirectory = temporaryDirectory ?? getTemporaryDirectory,
+       _share = share ?? SharePlus.instance.share;
 
   final Future<Directory> Function() _temporaryDirectory;
   final Future<ShareResult> Function(ShareParams) _share;
@@ -25,7 +25,9 @@ class ExportRegistersCsvRepositoryImpl implements ExportRegistersCsvRepository {
 
   /// Clears copies left by a process interruption. Android's share_plus also
   /// makes its own cache copy; it is safe to remove on the next app launch.
-  static Future<void> cleanupStaleExports({Directory? temporaryDirectory}) async {
+  static Future<void> cleanupStaleExports({
+    Directory? temporaryDirectory,
+  }) async {
     try {
       final temp = temporaryDirectory ?? await getTemporaryDirectory();
       final exports = Directory('${temp.path}/$_exportFolder');
@@ -104,7 +106,7 @@ class ExportRegistersCsvRepositoryImpl implements ExportRegistersCsvRepository {
 
       // Compartilha diretamente com o SharePlus
       final shareParams = ShareParams(
-        text: 'Aqui está o backup dos seus registros.',
+        text: 'Registros exportados em CSV. O arquivo contém senhas em texto legível.',
         subject: fileName,
 
         files: [XFile(file.path)],
@@ -151,7 +153,6 @@ class ExportRegistersCsvRepositoryImpl implements ExportRegistersCsvRepository {
         throw StateError('Compartilhamento não confirmado.');
       }
       log('Modelo CSV compartilhado com sucesso.');
-
     } catch (_) {
       log('Erro ao exportar modelo CSV.');
       rethrow;

@@ -1,7 +1,19 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:keezy/src/core/utils/secure_password_generator.dart';
+
+class PasswordGeneratorButton extends StatelessWidget {
+  const PasswordGeneratorButton({super.key, required this.onPressed});
+
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) => TextButton.icon(
+    onPressed: onPressed,
+    icon: const Icon(Icons.autorenew_rounded),
+    label: const Text('Gerar Senha'),
+  );
+}
 
 class PasswordFieldWithGenerator extends StatefulWidget {
   final TextEditingController controller;
@@ -43,20 +55,9 @@ class _PasswordFieldWithGeneratorState
   }
 
   void _generatePassword() {
-    final newPassword = _generateSecurePassword(length: widget.generatedLength);
+    final newPassword = generateSecurePassword(length: widget.generatedLength);
     widget.controller.text = newPassword;
     widget.onChanged?.call(newPassword);
-  }
-
-  String _generateSecurePassword({int length = 12}) {
-    const lower = 'abcdefghijklmnopqrstuvwxyz';
-    const upper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    const nums = '0123456789';
-    const symbols = '!@#\$%&()=+[]{}|?';
-    final all = lower + upper + nums + symbols;
-
-    final rand = Random.secure();
-    return List.generate(length, (_) => all[rand.nextInt(all.length)]).join();
   }
 
   @override
@@ -96,13 +97,7 @@ class _PasswordFieldWithGeneratorState
         ),
         Row(
           mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            TextButton.icon(
-              label: const Text('Gerar Senha'),
-              icon: const Icon(Icons.autorenew_rounded),
-              onPressed: _generatePassword,
-            ),
-          ],
+          children: [PasswordGeneratorButton(onPressed: _generatePassword)],
         ),
       ],
     );

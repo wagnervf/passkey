@@ -39,9 +39,7 @@ class _ImportOneRegisterPageState extends State<ImportOneRegisterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Importar registro'),
-      ),
+      appBar: AppBar(title: Text('Importar registro')),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -66,15 +64,11 @@ class _ImportOneRegisterPageState extends State<ImportOneRegisterPage> {
                       child: Text('Selecionar arquivo JSON'),
                     ),
                   ),
-                  SizedBox(
-                    height: 20,
-                  ),
+                  SizedBox(height: 20),
                   textFlield(context),
                   Spacer(),
                   buttonImport(context),
-                  SizedBox(
-                    height: 10,
-                  ),
+                  SizedBox(height: 10),
                   SizedBox(
                     width: double.infinity,
                     child: OutlinedButton(
@@ -105,9 +99,7 @@ class _ImportOneRegisterPageState extends State<ImportOneRegisterPage> {
               builder: (BuildContext context) {
                 return AlertDialog(
                   title: Text('Preview do Registro'),
-                  content: SingleChildScrollView(
-                    child: Text(jsonContent),
-                  ),
+                  content: SingleChildScrollView(child: Text(jsonContent)),
                   actions: [
                     TextButton(
                       onPressed: () => Navigator.of(context).pop(),
@@ -116,7 +108,9 @@ class _ImportOneRegisterPageState extends State<ImportOneRegisterPage> {
                     ElevatedButton(
                       onPressed: () async {
                         Navigator.of(context).pop();
-                        var registroImportado = await importarRegistro(jsonContent);
+                        var registroImportado = await importarRegistro(
+                          jsonContent,
+                        );
 
                         // if (registroImportado != null) {
                         //   showMessage('Registro importado com sucesso!');
@@ -134,10 +128,7 @@ class _ImportOneRegisterPageState extends State<ImportOneRegisterPage> {
             showMessage('O campo JSON está vazio!');
           }
         },
-        child: Text(
-          'Importar Registro',
-          style: TextStyle(fontSize: 18),
-        ),
+        child: Text('Importar Registro', style: TextStyle(fontSize: 18)),
       ),
     );
   }
@@ -158,11 +149,9 @@ class _ImportOneRegisterPageState extends State<ImportOneRegisterPage> {
             elevation: 5,
             borderOnForeground: true,
             shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-                side: BorderSide(
-                  color: Colors.teal,
-                  width: 1,
-                )),
+              borderRadius: BorderRadius.circular(10),
+              side: BorderSide(color: Colors.teal, width: 1),
+            ),
             child: TextFormField(
               onChanged: (value) {
                 setState(() {
@@ -172,13 +161,13 @@ class _ImportOneRegisterPageState extends State<ImportOneRegisterPage> {
               controller: jsonController,
               focusNode: FocusNode(),
               maxLines: (MediaQuery.of(context).size.height / 90).toInt(),
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.black,
-              ),
+              style: TextStyle(fontSize: 16, color: Colors.black),
               scrollPadding: const EdgeInsets.all(10),
               decoration: InputDecoration(
-                contentPadding: const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                contentPadding: const EdgeInsets.symmetric(
+                  vertical: 15,
+                  horizontal: 10,
+                ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),

@@ -233,9 +233,8 @@ class _RegisterFormPageState extends State<RegisterFormPage> {
                 )
               : Text(
                   "Salvar",
-                  style: Theme.of(
-                    context,
-                  ).textTheme.titleLarge!.copyWith(color: Colors.white),
+                  style: Theme.of(context).textTheme.titleLarge!
+                      .copyWith(color: Colors.white),
                 ),
         ),
       ),
@@ -249,8 +248,7 @@ class _RegisterFormPageState extends State<RegisterFormPage> {
     final confirmou = await AuthDialogService.confirmarAcao(
       context: context,
       titulo: 'Compartilhar Registro',
-      mensagem:
-          '''⚠ ATENÇÃO!\n\nAo exportar, suas senhas ficarão visíveis em um arquivo externo.\nRecomendamos guardar esse arquivo com extremo cuidado.
+      mensagem: '''⚠ ATENÇÃO!\n\nAo exportar, suas senhas ficarão visíveis em um arquivo externo.\nRecomendamos guardar esse arquivo com extremo cuidado.
         ''',
       textoConfirmar: 'Compartilhar',
     );
@@ -288,9 +286,9 @@ class _RegisterFormPageState extends State<RegisterFormPage> {
     setState(() => buscandoApps = false);
   }
 
-  ColoredBox appSelecionado() {
+  Material appSelecionado() {
     final app = selectedApp!;
-    return ColoredBox(
+    return Material(
       color: Theme.of(context).colorScheme.surface,
       child: ListTile(
         dense: true,

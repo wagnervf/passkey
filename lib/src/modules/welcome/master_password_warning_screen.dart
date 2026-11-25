@@ -27,77 +27,82 @@ class MasterPasswordWarningScreen extends StatelessWidget {
         excludeHeaderSemantics: true,
         centerTitle: true,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            const Icon(Icons.warning, size: 80, color: Colors.amber),
-            const SizedBox(height: 20),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const Icon(Icons.warning, size: 80, color: Colors.amber),
+              const SizedBox(height: 20),
 
-            Text(
-              "Se você esquecer sua senha mestra,\n"
-              "NÃO HÁ COMO RECUPERAR.\n\n"
-              "Anote em um lugar seguro ou salve o QR Code abaixo!",
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
+              Text(
+                "Se você esquecer sua senha mestra,\n"
+                "NÃO HÁ COMO RECUPERAR.\n\n"
+                "Anote em um lugar seguro ou salve o QR Code abaixo!",
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
 
-            const SizedBox(height: 24),
+              const SizedBox(height: 24),
 
-            RepaintBoundary(
-              key: qrKey,
-              child: Container(
-                color: Colors.white,
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    QrImageView(
-                      data: masterPassword ?? 'Sem senha',
-                      version: QrVersions.auto,
+              RepaintBoundary(
+                key: qrKey,
+                child: Container(
+                  color: Colors.white,
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      QrImageView(
+                        data: masterPassword ?? 'Sem senha',
+                        version: QrVersions.auto,
 
-                      size: 200,
-                    ),
-                    const SizedBox(height: 8),
-                    const Text(
-                      'NÃO COMPARTILHE ESTE QR CODE!',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.red,
+                        size: 200,
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: 8),
+                      const Text(
+                        'NÃO COMPARTILHE ESTE QR CODE!',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.red,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
 
-            const SizedBox(height: 12),
-            SelectableText(
-              masterPassword,
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
+              const SizedBox(height: 12),
+              SelectableText(
+                masterPassword,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
 
-            const Spacer(),
+              const SizedBox(height: 32),
 
-            OutlinedButton.icon(
-              icon: const Icon(Icons.download),
-              label: const Text("Exportar QR Code"),
-              onPressed: () => exportQrCode(),
-            ),
+              OutlinedButton.icon(
+                icon: const Icon(Icons.download),
+                label: const Text("Exportar QR Code"),
+                onPressed: () => exportQrCode(),
+              ),
 
-            const SizedBox(height: 24),
+              const SizedBox(height: 24),
 
-            ElevatedButton.icon(
-              icon: const Icon(Icons.arrow_forward),
-              label: const Text("Entendi e quero continuar"),
-              onPressed: () {
-                context.push(RoutesPaths.biometricSetup);
-              },
-            ),
-            const SizedBox(height: 34),
-          ],
+              ElevatedButton.icon(
+                icon: const Icon(Icons.arrow_forward),
+                label: const Text("Entendi e quero continuar"),
+                onPressed: () {
+                  context.push(RoutesPaths.biometricSetup);
+                },
+              ),
+              const SizedBox(height: 34),
+            ],
+          ),
         ),
       ),
     );

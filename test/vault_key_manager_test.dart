@@ -159,9 +159,12 @@ void main() {
     expect(await Hive.boxExists(RegisterHive.oldBoxName), isFalse);
   });
 
-  test('empty vault deletion resumes after app restart', () async {
+  test('vault deletion resumes after app restart even with records', () async {
     await RegisterHive.unlockWithPassword('senha', createIfMissing: true);
-    await RegisterHive.markEmptyVaultForDeletion();
+    await RegisterHive().addRegister(
+      RegisterModel(id: 'one', password: 'dado'),
+    );
+    await RegisterHive.markVaultForDeletion();
     await RegisterHive.lock();
 
     await RegisterHive.completePendingDeletion();
@@ -171,5 +174,20 @@ void main() {
 
     await RegisterHive.unlockWithPassword('nova senha', createIfMissing: true);
     expect(RegisterHive.isUnlocked, isTrue);
+  });
+
+  test('cancelling a pending vault deletion preserves the vault', () async {
+    await RegisterHive.unlockWithPassword('senha', createIfMissing: true);
+    await RegisterHive().addRegister(
+      RegisterModel(id: 'one', password: 'dado'),
+    );
+    await RegisterHive.markVaultForDeletion();
+    await RegisterHive.cancelPendingDeletion();
+    await RegisterHive.lock();
+
+    await RegisterHive.completePendingDeletion();
+    expect(await Hive.boxExists(RegisterHive.boxName), isTrue);
+    await RegisterHive.unlockWithPassword('senha');
+    expect(RegisterHive().getRegister('one')?.password, 'dado');
   });
 }

@@ -15,6 +15,8 @@ class RegisterHive {
   static VaultKeyManager keyManager = VaultKeyManager();
 
   static bool get isUnlocked => _registerBox?.isOpen ?? false;
+
+  static Future<bool> hasPersistentVault() => Hive.boxExists(boxName);
   static Box<RegisterModel> get _box {
     final box = _registerBox;
     if (box == null || !box.isOpen) throw StateError('Cofre bloqueado');
@@ -131,18 +133,34 @@ class RegisterHive {
     if (box != null && box.isOpen) await box.close();
   }
 
-  /// The marker lets deletion resume after a crash once the account is gone.
-  static Future<void> markEmptyVaultForDeletion() async {
-    if (!isUnlocked || _box.isNotEmpty) {
-      throw StateError('O cofre deve estar aberto e vazio');
-    }
-    await keyManager.store.writeDeletionMarker();
-  }
+  /// Marks the complete vault reset before the account credential is removed.
+  /// A restart can then either preserve the account or finish deleting the vault.
+  static Future<void> markVaultForDeletion() =>
+      keyManager.store.writeDeletionMarker();
+
+  static Future<void> cancelPendingDeletion() =>
+      keyManager.store.deleteDeletionMarker();
+
+  /// Kept for compatibility with an older empty-vault deletion flow.
+  static Future<void> markEmptyVaultForDeletion() => markVaultForDeletion();
 
   static Future<void> completePendingDeletion() async {
     if (await keyManager.store.readDeletionMarker() != 'empty') return;
     await lock();
     await Hive.deleteBoxFromDisk(boxName);
+    await keyManager.store.deletePasswordEnvelope();
+    await keyManager.store.deleteLegacyKey();
+    await keyManager.store.deleteBiometricKey();
+    await keyManager.store.deleteDeletionMarker();
+  }
+
+  /// Rolls back a failed account provisioning attempt that started without a
+  /// persisted vault. Existing vaults are never passed to this method.
+  static Future<void> discardNewVault() async {
+    await lock();
+    if (await Hive.boxExists(boxName)) {
+      await Hive.deleteBoxFromDisk(boxName);
+    }
     await keyManager.store.deletePasswordEnvelope();
     await keyManager.store.deleteLegacyKey();
     await keyManager.store.deleteBiometricKey();
@@ -173,10 +191,35 @@ class RegisterHive {
   RegisterModel? getRegister(String id) => _box.get(id);
   List<RegisterModel> getAllRegisters() => _box.values.toList();
 
+  /// Adds a CSV batch without clearing or replacing any existing record.
+  /// A partial disk write can be completed by importing the same CSV again.
+  Future<void> addNewRegisters(List<RegisterModel> records) async {
+    final box = _box;
+    final additions = <String, RegisterModel>{};
+    for (final record in records) {
+      if (record.id.isEmpty ||
+          box.containsKey(record.id) ||
+          additions.containsKey(record.id)) {
+        throw StateError('ID de registro repetido');
+      }
+      additions[record.id] = record;
+    }
+    if (additions.isEmpty) return;
+    await box.putAll(additions);
+    await box.flush();
+  }
+
   Future<void> replaceAll(List<RegisterModel> list) async {
-    await _box.clear();
-    for (var reg in list) {
-      await _box.put(reg.id, reg);
+    final previous = Map<String, RegisterModel>.from(_box.toMap());
+    try {
+      await _box.clear();
+      for (final reg in list) {
+        await _box.put(reg.id, reg);
+      }
+    } catch (_) {
+      await _box.clear();
+      await _box.putAll(previous);
+      rethrow;
     }
   }
 

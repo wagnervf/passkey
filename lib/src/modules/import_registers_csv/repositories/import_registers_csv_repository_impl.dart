@@ -17,7 +17,7 @@ class ImportRegistersCsvRepositoryImpl implements ImportRegistersCsvRepository {
     );
 
     if (result?.path == null) {
-      throw Exception('Nenhum arquivo selecionado.');
+      throw const CsvImportCancelled();
     }
 
     final file = File(result!.path!);
@@ -33,8 +33,10 @@ class ImportRegistersCsvRepositoryImpl implements ImportRegistersCsvRepository {
 
   /// Parses CSV without changing whitespace inside record values.
   static List<RegisterModel> parseCsv(String csvString) {
-    final csvTable = const CsvDecoder(fieldDelimiter: ',', dynamicTyping: false)
-        .convert(csvString);
+    final csvTable = const CsvDecoder(
+      fieldDelimiter: ',',
+      dynamicTyping: false,
+    ).convert(csvString);
 
     if (csvTable.isEmpty) {
       throw Exception('Arquivo CSV vazio.');
@@ -44,6 +46,10 @@ class ImportRegistersCsvRepositoryImpl implements ImportRegistersCsvRepository {
     final header = csvTable.first
         .map((e) => e.toString().trim().toLowerCase())
         .toList();
+
+    if (header.toSet().length != header.length) {
+      throw const FormatException('Cabeçalhos duplicados no CSV.');
+    }
 
     const requiredHeaders = ['name', 'url', 'username', 'password', 'note'];
 
@@ -61,12 +67,18 @@ class ImportRegistersCsvRepositoryImpl implements ImportRegistersCsvRepository {
     // 4. Linhas de dados (SEM linhas vazias)
     final dataRows = csvTable.skip(1).where((row) {
       // Remove linhas 100% vazias
-      final hasOnlyEmpty = row.every((cell) => cell == null || cell.toString().isEmpty);
+      final hasOnlyEmpty = row.every(
+        (cell) => cell == null || cell.toString().isEmpty,
+      );
       return !hasOnlyEmpty;
     }).toList();
 
     if (dataRows.isEmpty) {
       throw Exception('Nenhum dado válido encontrado no arquivo.');
+    }
+
+    if (dataRows.any((row) => row.length != header.length)) {
+      throw const FormatException('Linha com número incorreto de colunas.');
     }
 
     // Cada registro importado recebe um ID novo, mesmo se o CSV tiver a coluna id.

@@ -52,7 +52,7 @@ class InstalledAppModel extends HiveObject {
       'id': id,
       'name': name,
       'iconPath': iconPath,
-      'iconBytes': iconBytes?.asMap(),
+      'iconBytes': iconBytes?.toList(),
       'packageName': packageName,
     };
   }
@@ -62,7 +62,9 @@ class InstalledAppModel extends HiveObject {
       id: map['id'] as int,
       name: map['name'] as String,
       iconPath: map['iconPath'] != null ? map['iconPath'] as String : null,
-      iconBytes: map['iconBytes'] != null ? Uint8List.fromList(map['iconBytes']) : null,
+      iconBytes: map['iconBytes'] != null
+          ? Uint8List.fromList((map['iconBytes'] as List).cast<int>())
+          : null,
       packageName: map['packageName'] != null ? map['packageName'] as String : null,
     );
   }

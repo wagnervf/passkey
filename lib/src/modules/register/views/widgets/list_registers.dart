@@ -77,8 +77,6 @@ class _ListRegistersState extends State<ListRegisters> {
             registrosFiltrados = todosRegistros
                 .where((registro) => registro.isFavorite == true)
                 .toList();
-
-
           } else if (_searchController.text.isEmpty) {
             registrosFiltrados = todosRegistros;
           } else {
@@ -95,7 +93,9 @@ class _ListRegistersState extends State<ListRegisters> {
               const SizedBox(height: 6),
               _barraDeAcoes(),
               const SizedBox(height: 12),
-           registrosFiltrados.isEmpty ? Center(child: Text('Nenhum registro encontrado')) :  Expanded(child: listRegistros(registrosFiltrados)),
+              registrosFiltrados.isEmpty
+                  ? Center(child: Text('Nenhum registro encontrado'))
+                  : Expanded(child: listRegistros(registrosFiltrados)),
               const SizedBox(height: 10),
             ],
           );
@@ -120,39 +120,38 @@ class _ListRegistersState extends State<ListRegisters> {
 
         return Container(
           margin: const EdgeInsets.only(bottom: 2, top: 2),
-          decoration: BoxDecoration(
+          child: Material(
             color: Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.vertical(
               top: isFirst ? const Radius.circular(16) : Radius.zero,
               bottom: isLast ? const Radius.circular(16) : Radius.zero,
             ),
-            // border: Border.all(color: Colors.grey[300]!),
-          ),
-          child: ListTile(
-            contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 0),
-
-            onTap: () => _goToView(register),
-            leading: register.selectedApp?.iconBytes != null
-                ? ClipRRect(
-                    borderRadius: BorderRadius.circular(25),
-                    child: Image.memory(
-                      register.selectedApp!.iconBytes!,
-                      width: 50,
-                      height: 50,
-                      fit: BoxFit.cover,
-                    ),
-                  )
-                : iconDay(register, context, corDeFundo),
-            title: Text(nome, style: Theme.of(context).textTheme.titleMedium),
-            subtitle: register.username?.isNotEmpty == true
-                ? Text(
-                    register.username!,
-                    style: Theme.of(context).textTheme.bodySmall,
-                  )
-                : null,
-            trailing: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: const Icon(Icons.remove_red_eye),
+            clipBehavior: Clip.antiAlias,
+            child: ListTile(
+              contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+              onTap: () => _goToView(register),
+              leading: register.selectedApp?.iconBytes != null
+                  ? ClipRRect(
+                      borderRadius: BorderRadius.circular(25),
+                      child: Image.memory(
+                        register.selectedApp!.iconBytes!,
+                        width: 50,
+                        height: 50,
+                        fit: BoxFit.cover,
+                      ),
+                    )
+                  : iconDay(register, context, corDeFundo),
+              title: Text(nome, style: Theme.of(context).textTheme.titleMedium),
+              subtitle: register.username?.isNotEmpty == true
+                  ? Text(
+                      register.username!,
+                      style: Theme.of(context).textTheme.bodySmall,
+                    )
+                  : null,
+              trailing: const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 8.0),
+                child: Icon(Icons.remove_red_eye),
+              ),
             ),
           ),
         );
@@ -371,7 +370,6 @@ class _ListRegistersState extends State<ListRegisters> {
             app.contains(queryLower) ||
             login.contains(queryLower);
       }).toList();
-
     });
   }
 
