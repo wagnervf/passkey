@@ -21,7 +21,6 @@ import 'package:keezy/src/modules/splash/splash_page.dart';
 import 'package:keezy/src/modules/welcome/biometric_setup_screen_four.dart';
 import 'package:keezy/src/modules/welcome/finalization_screen_five.dart';
 import 'package:keezy/src/modules/welcome/master_password_creation_screen.dart';
-import 'package:keezy/src/modules/welcome/master_password_warning_screen.dart';
 import 'package:keezy/src/modules/welcome/mode_selection_screen_two.dart';
 import 'package:keezy/src/modules/welcome/welcome_screen_one.dart';
 
@@ -46,11 +45,6 @@ final routes = GoRouter(
     );
     if (SessionManager.isExpired()) {
       SessionManager.expire();
-    }
-    if (destination == null &&
-        state.matchedLocation == RoutesPaths.masterPasswordWarning &&
-        state.extra is! String) {
-      return RoutesPaths.home;
     }
     return destination;
   },
@@ -129,16 +123,6 @@ final routes = GoRouter(
       parentNavigatorKey: navigatorKey,
       builder: (context, state) {
         return const AuthFormSenhaPage();
-      },
-    ),
-
-    GoRoute(
-      path: RoutesPaths.masterPasswordWarning,
-      name: 'Atenção',
-      parentNavigatorKey: navigatorKey,
-      builder: (context, state) {
-        final masterPassword = state.extra as String;
-        return MasterPasswordWarningScreen(masterPassword: masterPassword);
       },
     ),
 

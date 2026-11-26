@@ -70,6 +70,7 @@ class _PasswordFieldWithGeneratorState
           obscureText: _obscureText,
           onChanged: widget.onChanged,
           decoration: InputDecoration(
+            labelText: widget.labelText,
             hintText: widget.hintText ?? 'Digite sua senha',
             counterText: '',
             suffixIcon: SizedBox(

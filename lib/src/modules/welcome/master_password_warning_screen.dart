@@ -1,142 +1,129 @@
-// ignore_for_file: use_build_context_synchronously
-import 'dart:developer';
-import 'dart:io';
-import 'dart:ui';
+import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:go_router/go_router.dart';
-import 'package:keezy/src/core/router/routes.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:qr_flutter/qr_flutter.dart';
-import 'package:share_plus/share_plus.dart';
 
-class MasterPasswordWarningScreen extends StatelessWidget {
+/// Shows the newly created password only while the user explicitly reveals it.
+class MasterPasswordWarningScreen extends StatefulWidget {
+  const MasterPasswordWarningScreen({super.key, required this.masterPassword});
+
   final String masterPassword;
-  MasterPasswordWarningScreen({super.key, required this.masterPassword});
 
-  // GlobalKey para acessar o widget do QR
-  final GlobalKey qrKey = GlobalKey();
+  @override
+  State<MasterPasswordWarningScreen> createState() =>
+      _MasterPasswordWarningScreenState();
+}
+
+class _MasterPasswordWarningScreenState
+    extends State<MasterPasswordWarningScreen> with WidgetsBindingObserver {
+  static const _revealDuration = Duration(seconds: 15);
+  Timer? _hideTimer;
+  bool _visible = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state != AppLifecycleState.resumed) _hide();
+  }
+
+  void _reveal() {
+    _hideTimer?.cancel();
+    setState(() => _visible = true);
+    _hideTimer = Timer(_revealDuration, _hide);
+  }
+
+  void _hide() {
+    _hideTimer?.cancel();
+    if (mounted && _visible) setState(() => _visible = false);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _hideTimer?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Atenção"),
-        leading: SizedBox.shrink(),
-        excludeHeaderSemantics: true,
-        centerTitle: true,
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const Icon(Icons.warning, size: 80, color: Colors.amber),
-              const SizedBox(height: 20),
-
-              Text(
-                "Se você esquecer sua senha mestra,\n"
-                "NÃO HÁ COMO RECUPERAR.\n\n"
-                "Anote em um lugar seguro ou salve o QR Code abaixo!",
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-
-              const SizedBox(height: 24),
-
-              RepaintBoundary(
-                key: qrKey,
-                child: Container(
-                  color: Colors.white,
+    final colors = Theme.of(context).colorScheme;
+    return PopScope(
+      canPop: false,
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Guarde sua senha mestra'),
+          automaticallyImplyLeading: false,
+        ),
+        body: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Icon(Icons.key_rounded, size: 72, color: colors.primary),
+                const SizedBox(height: 24),
+                Text(
+                  'Você precisará desta senha para abrir seu cofre. '
+                  'Guarde-a em um local seguro.',
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                const SizedBox(height: 24),
+                Container(
+                  key: const ValueKey('master-password-panel'),
                   padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: colors.surfaceContainerHighest,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
                   child: Column(
-                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      QrImageView(
-                        data: masterPassword ?? 'Sem senha',
-                        version: QrVersions.auto,
-
-                        size: 200,
+                      Text(
+                        _visible ? widget.masterPassword : 'Senha oculta',
+                        key: const ValueKey('master-password-display'),
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.titleMedium,
                       ),
-                      const SizedBox(height: 8),
-                      const Text(
-                        'NÃO COMPARTILHE ESTE QR CODE!',
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.red,
+                      const SizedBox(height: 12),
+                      TextButton.icon(
+                        onPressed: _visible ? _hide : _reveal,
+                        icon: Icon(
+                          _visible ? Icons.visibility_off : Icons.visibility,
+                        ),
+                        label: Text(
+                          _visible
+                              ? 'Ocultar agora'
+                              : 'Mostrar por 15 segundos',
                         ),
                       ),
                     ],
                   ),
                 ),
-              ),
-
-              const SizedBox(height: 12),
-              SelectableText(
-                masterPassword,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
+                const SizedBox(height: 24),
+                Text(
+                  'Depois de adicionar registros, crie um backup Keezy '
+                  'criptografado em Configurações. Ele permite restaurar '
+                  'seus dados com uma nova senha mestra.',
+                  style: Theme.of(context).textTheme.bodyMedium,
                 ),
-              ),
-
-              const SizedBox(height: 32),
-
-              OutlinedButton.icon(
-                icon: const Icon(Icons.download),
-                label: const Text("Exportar QR Code"),
-                onPressed: () => exportQrCode(),
-              ),
-
-              const SizedBox(height: 24),
-
-              ElevatedButton.icon(
-                icon: const Icon(Icons.arrow_forward),
-                label: const Text("Entendi e quero continuar"),
-                onPressed: () {
-                  context.push(RoutesPaths.biometricSetup);
-                },
-              ),
-              const SizedBox(height: 34),
-            ],
+                const SizedBox(height: 32),
+                FilledButton.icon(
+                  onPressed: () {
+                    _hide();
+                    Navigator.of(context).pop(true);
+                  },
+                  icon: const Icon(Icons.arrow_forward),
+                  label: const Text('Entendi e quero continuar'),
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
-  }
-
-  Future<void> exportQrCode() async {
-    try {
-      await Future.delayed(const Duration(milliseconds: 300));
-
-      RenderRepaintBoundary boundary =
-          qrKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
-
-      final image = await boundary.toImage(pixelRatio: 3.0);
-      final byteData = await image.toByteData(format: ImageByteFormat.png);
-
-      if (byteData == null) return;
-
-      final pngBytes = byteData.buffer.asUint8List();
-
-      final directory = await getTemporaryDirectory();
-      final file = File('${directory.path}/senha_qrcode.png');
-      await file.writeAsBytes(pngBytes);
-
-      final shareParams = ShareParams(
-        text: 'QR Code contendo sua senha mestra.',
-        subject: 'Senha mestra Keezy',
-
-        files: [XFile(file.path)],
-      );
-
-      await SharePlus.instance.share(shareParams);
-    } catch (_) {
-      log('Erro ao exportar QR.');
-      // ShowMessager.show(, 'Erro ao exportar QR Code');
-    }
   }
 }

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 const lightColorScheme = ColorScheme(
 
-  primary: Color(0xFF009688), // Dark Green
+  primary: Color(0xFF00796B), // Contraste com onPrimary.
   surface: Color(0xFFFFFFFF),
   onPrimary: Color(0xFFF0F1F5),//Color.fromRGBO(238, 238, 238, 0.945), // Soft White
   error: Color(0xFFD32F2F), // Rustic Red
@@ -18,7 +18,7 @@ const lightColorScheme = ColorScheme(
   tertiaryContainer: Color(0xFFE6DEFF),
   onTertiaryContainer: Color(0xFF1C1736),
   errorContainer: Color(0xFFFFDAD6),
-  onError: Color.fromRGBO(229, 115, 115, 1),
+  onError: Color(0xFFFFFFFF),
   onErrorContainer: Color(0xFF410002),
   onSurface: Color(0xFF191C1E),
   surfaceContainerHighest: Color(0xFFDCE3E9),
@@ -41,7 +41,7 @@ const darkColorScheme = ColorScheme(
   onPrimary: Color(0xFF1F2C34),
   onSecondary: Colors.white,
   onSurface: Colors.white,
-  onError: Colors.red,
+  onError: Color(0xFF690005),
   //primary: Color(0xFF78D1FF),
   // onPrimary: Color(0xFF003549),
   primaryContainer: Color(0xFF004C68),

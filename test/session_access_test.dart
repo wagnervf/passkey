@@ -20,7 +20,6 @@ void main() {
         RoutesPaths.listRegisters,
         RoutesPaths.importOneRegister,
         RoutesPaths.authRegister,
-        RoutesPaths.masterPasswordWarning,
         RoutesPaths.biometricSetup,
         RoutesPaths.finalization,
         RoutesPaths.authValidade,

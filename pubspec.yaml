@@ -36,7 +36,6 @@ dependencies:
   introduction_screen: ^5.0.1
   hive: ^2.2.3
   hive_flutter: ^1.1.0
-  qr_flutter: ^4.1.0
   local_auth_android: ^2.3.0
   local_auth_darwin: ^2.0.5
   cryptography: ^2.9.0

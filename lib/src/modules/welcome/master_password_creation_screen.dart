@@ -8,6 +8,7 @@ import 'package:keezy/src/modules/auth/controllers/auth_controller.dart';
 import 'package:keezy/src/modules/auth/controllers/auth_state.dart';
 import 'package:keezy/src/modules/auth/model/auth_user_model.dart';
 import 'package:keezy/src/modules/auth/security/master_password_policy.dart';
+import 'package:keezy/src/modules/welcome/master_password_warning_screen.dart';
 
 class MasterPasswordCreationScreen extends StatefulWidget {
   const MasterPasswordCreationScreen({super.key});
@@ -135,7 +136,16 @@ class _MasterPasswordCreationScreenState
       );
       if (!mounted) return;
       if (saved) {
-        context.push(RoutesPaths.masterPasswordWarning, extra: password);
+        _passwordController.clear();
+        _confirmationController.clear();
+        final acknowledged = await showDialog<bool>(
+          context: context,
+          barrierDismissible: false,
+          builder: (_) => MasterPasswordWarningScreen(masterPassword: password),
+        );
+        if (mounted && acknowledged == true) {
+          context.go(RoutesPaths.biometricSetup);
+        }
       } else {
         final state = controller.state;
         setState(() {

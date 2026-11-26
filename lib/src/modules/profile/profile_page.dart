@@ -15,105 +15,71 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  AuthUserModel? userLoged;
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.onPrimary,
-      appBar: AppBar(
-        toolbarHeight: 10,
-        excludeHeaderSemantics: true,
-        leading: SizedBox.shrink(),
-      ),
+      appBar: AppBar(title: const Text('Perfil')),
       body: SafeArea(child: body(context)),
     );
   }
 
   BlocBuilder body(BuildContext context) {
-    final int currentYear = DateTime.now().year;
     return BlocBuilder<AuthController, AuthState>(
       builder: (context, state) {
         if (state is AuthLoadingState) {
-          return const CircularProgressIndicator();
+          return const Center(child: CircularProgressIndicator());
         } else if (state is AuthSuccessState) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            setState(() {
-              userLoged = state.user;
-            });
-          });
-          return _body(context, currentYear, userLoged);
+          final user = state.user;
+          return user == null
+              ? const Center(child: Text('Perfil indisponível.'))
+              : _body(context, user);
         } else if (state is AuthErrorState) {
-          return Text('Erro: ${state.message}');
+          return Center(child: Text('Erro: ${state.message}'));
         }
         return const SizedBox.shrink();
       },
     );
   }
 
-  LayoutBuilder _body(BuildContext context, int currentYear, userLoged) {
-    return LayoutBuilder(
-      builder: (context, constraint) {
-        return SingleChildScrollView(
-          child: ConstrainedBox(
-            constraints: BoxConstraints(minHeight: constraint.maxHeight),
-            child: IntrinsicHeight(
+  Widget _body(BuildContext context, AuthUserModel userLoged) {
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          profile(context, userLoged),
+          Padding(
+            padding: const EdgeInsets.all(18),
+            child: Card(
+              elevation: 0,
+              margin: EdgeInsets.zero,
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  profile(context, userLoged),
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.all(18.0),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Card(
-                            elevation: 0,
-                            margin: EdgeInsets.zero,
-
-                            child: Column(
-                              children: [
-                                SizedBox(height: 20),
-                                ItemCardWithIcon(
-                                  text: 'Editar Perfil',
-                                  subtTitle: 'Altere os dados do seu perfil',
-                                  icon: Icons.edit,
-                                  onTap: () => _goToEdit(userLoged!),
-                                ),
-                                _divider(),
-                                ItemCardWithIcon(
-                                  text: 'Configurações',
-                                  subtTitle: 'Altere as configurações do app',
-                                  icon: Icons.settings,
-                                  onTap: () => _goToConfig(userLoged!),
-                                ),
-                                _divider(),
-                                ItemCardWithIcon(
-                                  text: 'Sair',
-                                  subtTitle: 'Sair do aplicativo',
-                                  icon: Icons.logout_outlined,
-                                  onTap: () => _auth(),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                  ItemCardWithIcon(
+                    text: 'Editar Perfil',
+                    subtTitle: 'Altere os dados do seu perfil',
+                    icon: Icons.edit,
+                    onTap: () => _goToEdit(userLoged),
+                  ),
+                  _divider(),
+                  ItemCardWithIcon(
+                    text: 'Configurações',
+                    subtTitle: 'Altere as configurações do app',
+                    icon: Icons.settings,
+                    onTap: _goToConfig,
+                  ),
+                  _divider(),
+                  ItemCardWithIcon(
+                    text: 'Sair',
+                    subtTitle: 'Sair do aplicativo',
+                    icon: Icons.logout_outlined,
+                    onTap: _auth,
                   ),
                 ],
               ),
             ),
           ),
-        );
-      },
+        ],
+      ),
     );
   }
 
@@ -161,7 +127,7 @@ class _ProfilePageState extends State<ProfilePage> {
     await GoRouter.of(context).push(RoutesPaths.authRegister, extra: userLoged);
   }
 
-  Future<void> _goToConfig(AuthUserModel userLoged) async {
-    await GoRouter.of(context).push(RoutesPaths.config, extra: userLoged);
+  Future<void> _goToConfig() async {
+    await GoRouter.of(context).push(RoutesPaths.config);
   }
 }

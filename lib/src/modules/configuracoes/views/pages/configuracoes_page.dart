@@ -134,30 +134,38 @@ class _ConfiguracoesPageState extends State<ConfiguracoesPage> {
       context: context,
       builder: (dialogContext) => StatefulBuilder(
         builder: (dialogContext, setDialogState) => AlertDialog(
-          title: const Text('Excluir Conta'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text(
-                'Tem certeza que deseja excluir sua conta? Esta ação não pode ser desfeita.',
-              ),
-              const SizedBox(height: 12),
-              Text(
-                'Exporte seus registros em CSV antes de continuar.',
-                style: Theme.of(dialogContext).textTheme.bodyMedium!
-                    .copyWith(color: Colors.red),
-              ),
-              CheckboxListTile(
-                contentPadding: EdgeInsets.zero,
-                value: backupConfirmed,
-                onChanged: (value) =>
-                    setDialogState(() => backupConfirmed = value ?? false),
-                title: const Text(
-                  'Confirmei que possuo um backup dos registros.',
+          title: const Text('Excluir todos os dados'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'O cofre e a conta neste aparelho serão apagados. '
+                  'Esta ação não pode ser desfeita.',
                 ),
-                controlAffinity: ListTileControlAffinity.leading,
-              ),
-            ],
+                const SizedBox(height: 12),
+                Text(
+                  'Para restaurar seus registros depois, guarde um backup '
+                  'Keezy protegido (.keezy) e a senha desse backup.',
+                  style: Theme.of(dialogContext).textTheme.bodyMedium?.copyWith(
+                    color: Theme.of(dialogContext).colorScheme.error,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                const Text('O CSV contém senhas legíveis e não é protegido.'),
+                CheckboxListTile(
+                  contentPadding: EdgeInsets.zero,
+                  value: backupConfirmed,
+                  onChanged: (value) =>
+                      setDialogState(() => backupConfirmed = value ?? false),
+                  title: const Text(
+                    'Guardei um backup Keezy protegido ou aceito perder estes dados.',
+                  ),
+                  controlAffinity: ListTileControlAffinity.leading,
+                ),
+              ],
+            ),
           ),
           actions: [
             TextButton(

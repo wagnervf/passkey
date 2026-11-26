@@ -113,53 +113,24 @@ ThemeData get lightTheme => ThemeData(
           ),
           filled: true,
           hintStyle: TextStyle(
-            color: lightColorScheme.primary,
+            color: lightColorScheme.onSurfaceVariant,
             fontWeight: FontWeight.w400,
             fontSize: 14,
           )),
       segmentedButtonTheme: _segmentedButtonTheme(),
       textTheme: TextTheme(
-        displayLarge: TextStyle(
-          fontSize: 28,
-          fontWeight: FontWeight.bold,
-          color: lightColorScheme.primary,
-        ),
-        displayMedium: TextStyle(
-          color: lightColorScheme.primary,
-          fontSize: 22,
-          fontWeight: FontWeight.bold,
-        ),
-        displaySmall: TextStyle(
-          color: lightColorScheme.primary,
-          fontSize: 18,
-          fontWeight: FontWeight.bold,
-        ),
-        labelMedium: TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.bold,
-          color: lightColorScheme.primary,
-        ),
-        labelSmall: TextStyle(
-          color: lightColorScheme.primary,
-          fontSize: 12,
-        ),
-        titleLarge: const TextStyle(
-          fontWeight: FontWeight.bold,
-        ),
-        titleMedium: const TextStyle(
-          fontWeight: FontWeight.w600,
-        ),
-        titleSmall: const TextStyle(fontWeight: FontWeight.bold),
-        headlineSmall: TextStyle(color: lightColorScheme.surface, fontSize: 12),
-        bodySmall: TextStyle(fontSize: 12,),
-        bodyMedium: const TextStyle(
-          fontSize: 16,
-          //  color: Colors.white,
-        ),
-        bodyLarge: const TextStyle(
-          fontSize: 20,
-          //color: Colors.white,
-        ),
+        displayLarge: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: lightColorScheme.primary),
+        displayMedium: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: lightColorScheme.primary),
+        displaySmall: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: lightColorScheme.primary),
+        labelMedium: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: lightColorScheme.secondary),
+        labelSmall: TextStyle(fontSize: 12, color: lightColorScheme.secondary),
+        headlineSmall: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: lightColorScheme.onSurface),
+        titleLarge: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: lightColorScheme.onSurface),
+        titleMedium: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: lightColorScheme.onSurface),
+        titleSmall: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: lightColorScheme.onSurface),
+        bodySmall: TextStyle(fontSize: 14, color: lightColorScheme.onSurfaceVariant),
+        bodyMedium: TextStyle(fontSize: 16, color: lightColorScheme.onSurface),
+        bodyLarge: TextStyle(fontSize: 18, color: lightColorScheme.onSurface),
       ),
     );
 
@@ -229,20 +200,20 @@ ThemeData get darkTheme => ThemeData(
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.all(Radius.circular(7.0)),
             borderSide: BorderSide(
-              color: darkColorScheme.primary,
+              color: darkColorScheme.secondary,
               width: 1,
             ),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.all(Radius.circular(7.0)),
             borderSide: BorderSide(
-              color: darkColorScheme.primary,
+              color: darkColorScheme.outline,
               width: 1,
             ),
           ),
           filled: true,
           hintStyle: TextStyle(
-            color: lightColorScheme.primary,
+            color: darkColorScheme.onSurfaceVariant,
             fontWeight: FontWeight.w400,
             fontSize: 14,
           )),
@@ -296,38 +267,18 @@ ThemeData get darkTheme => ThemeData(
         ),
       ),
       textTheme: TextTheme(
-        displayLarge: const TextStyle(
-          fontSize: 28,
-          fontWeight: FontWeight.bold,
-        ),
-        displayMedium: const TextStyle(
-          fontSize: 22,
-          fontWeight: FontWeight.bold,
-        ),
-        displaySmall: const TextStyle(
-          fontSize: 18,
-          fontWeight: FontWeight.bold,
-        ),
-        labelMedium: const TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.bold,
-          // color: lightColorScheme.primary,
-        ),
-        labelSmall: TextStyle(
-          color: darkColorScheme.secondary,
-          fontSize: 12,
-          //   color: lightColorScheme.primary,
-        ),
-        titleLarge: const TextStyle(
-          fontWeight: FontWeight.bold,
-        ),
-        titleMedium: TextStyle(
-          fontWeight: FontWeight.bold,
-          // fontSize: 18,
-          color: lightColorScheme.onPrimary,
-        ),
-        titleSmall: TextStyle(
-            color: darkColorScheme.secondary, fontWeight: FontWeight.bold),
+        displayLarge: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+        displayMedium: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+        displaySmall: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        labelMedium: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+        labelSmall: TextStyle(fontSize: 12, color: darkColorScheme.secondary),
+        headlineSmall: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: darkColorScheme.onSurface),
+        titleLarge: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: darkColorScheme.onSurface),
+        titleMedium: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: darkColorScheme.onSurface),
+        titleSmall: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: darkColorScheme.onSurface),
+        bodySmall: TextStyle(fontSize: 14, color: darkColorScheme.onSurfaceVariant),
+        bodyMedium: TextStyle(fontSize: 16, color: darkColorScheme.onSurface),
+        bodyLarge: TextStyle(fontSize: 18, color: darkColorScheme.onSurface),
       ),
     );
 
@@ -337,9 +288,9 @@ SegmentedButtonThemeData _segmentedButtonTheme() {
     textStyle: WidgetStateProperty.resolveWith<TextStyle>(
       (states) {
         if (states.contains(WidgetState.selected)) {
-          return const TextStyle(fontSize: 9.0);
+          return const TextStyle(fontSize: 14, fontWeight: FontWeight.w600);
         }
-        return const TextStyle(fontSize: 12.0);
+        return const TextStyle(fontSize: 14);
       },
     ),
   ));

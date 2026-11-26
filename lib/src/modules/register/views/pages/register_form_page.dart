@@ -133,15 +133,8 @@ class _RegisterFormPageState extends State<RegisterFormPage> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           const SizedBox(height: 8),
-          selectedApp == null ? selecionarApp() : appSelecionado(),
-          const SizedBox(height: 24),
           const Text("Nome, app ou site"),
           _buildTextFormField(_titleController, "Nome do app ou site"),
-          const SizedBox(height: 8),
-
-          const Text("URL"),
-          _buildTextFormField(_siteController, "Ulr do site"),
-
           const SizedBox(height: 24),
           const Text("Usuário e senha"),
           const SizedBox(height: 8),
@@ -149,9 +142,12 @@ class _RegisterFormPageState extends State<RegisterFormPage> {
           const SizedBox(height: 12),
           PasswordFieldWithGenerator(
             controller: _passwordController,
-            labelText: "Senha do Cofre",
+            labelText: "Senha do registro",
             generatedLength: 16,
           ),
+          const SizedBox(height: 24),
+          const Text("URL (opcional)"),
+          _buildTextFormField(_siteController, "URL do site"),
           const SizedBox(height: 18),
           const Text("Observação"),
           const SizedBox(height: 8),
@@ -160,6 +156,8 @@ class _RegisterFormPageState extends State<RegisterFormPage> {
             "Observação",
             maxLines: 2,
           ),
+          const SizedBox(height: 24),
+          selectedApp == null ? selecionarApp() : appSelecionado(),
           const SizedBox(height: 20),
           _buttonSalvar(context),
         ],
@@ -262,7 +260,7 @@ class _RegisterFormPageState extends State<RegisterFormPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text("Selecionar um App do celular"),
+        const Text("App do celular (opcional)"),
         const SizedBox(height: 8),
         SizedBox(
           width: double.maxFinite,
@@ -272,7 +270,7 @@ class _RegisterFormPageState extends State<RegisterFormPage> {
             ),
             icon: const Icon(Icons.apps),
             onPressed: buscandoApps ? null : _onBuscarAppPressed,
-            label: const Text("Buscar app"),
+            label: const Text("Selecionar app"),
           ),
         ),
       ],
@@ -385,7 +383,9 @@ class _RegisterFormPageState extends State<RegisterFormPage> {
           iconPath: "",
           id: 4,
         );
-        _titleController.text = selected.name;
+        if (_titleController.text.trim().isEmpty) {
+          _titleController.text = selected.name;
+        }
       });
     }
   }

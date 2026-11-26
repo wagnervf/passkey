@@ -72,7 +72,14 @@ void main() {
           Provider<ExportRegisterCsvController>.value(value: export),
           ChangeNotifierProvider<ThemeController>.value(value: theme),
         ],
-        child: const MaterialApp(home: ConfiguracoesPage()),
+        child: MaterialApp(
+          builder: (context, child) => MediaQuery(
+            data: MediaQuery.of(context)
+                .copyWith(textScaler: const TextScaler.linear(1.5)),
+            child: child!,
+          ),
+          home: const ConfiguracoesPage(),
+        ),
       ),
     );
     await tester.pump();
@@ -94,6 +101,21 @@ void main() {
     expect(
       tester.getTopLeft(delete).dy - tester.getBottomLeft(backup).dy,
       greaterThanOrEqualTo(72),
+    );
+    expect(tester.takeException(), isNull);
+
+    await tester.ensureVisible(delete);
+    await tester.tap(delete);
+    await tester.pumpAndSettle();
+    expect(find.text('Excluir todos os dados'), findsNWidgets(2));
+    expect(
+      find.textContaining('backup Keezy protegido (.keezy)'),
+      findsOneWidget,
+    );
+    expect(find.textContaining('O CSV contém senhas legíveis'), findsOneWidget);
+    expect(
+      find.textContaining('Guardei um backup Keezy protegido'),
+      findsOneWidget,
     );
     expect(tester.takeException(), isNull);
 
